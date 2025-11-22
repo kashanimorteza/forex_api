@@ -109,7 +109,20 @@ python download.py instrument=EUR/USD timeframe=t1 mode=complete bulk=True
 python download.py instrument=EUR/USD timeframe=t1 mode=update bulk=False
 python download.py instrument=EUR/USD timeframe=W1,D1 mode=complete bulk=True
 python download.py instrument=EUR/USD,EUR/GBP timeframe=W1,D1 mode=complete bulk=True
+
+python download.py instrument=XAU/USD timeframe=all mode=complete save =False bulk=True
+
 ```
+<!-------------------------- Parameters -->
+Download
+```bash
+rm -fr ./History
+python download.py instrument=XAU/USD timeframe=all mode=complete save=False bulk=True
+
+```
+
+
+
 <!-------------------------- Schedule -->
 Schedule
 ```bash

@@ -58,9 +58,9 @@ forex_connect:
 
 #--------------------------------------------------------------------------------- Download
 download:
-  instrument: XAU/USD
+  instrument: all
   timeframe: W1,D1,H8,H6,H4,H3,H2,H1,m30,m15,m5,m1,t1
-  mode: complete
+  mode: down
   count: 100000
   repeat: 1
   delay: 0
