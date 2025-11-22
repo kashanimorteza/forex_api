@@ -73,12 +73,14 @@ try:
         for instrument in instruments:
             if mode == "up":
                 d = data.get_max_min(instrument=instrument, timeframe=timeframe, mode="max", filed="Date")
-                if d.status and d.data: datefrom = d.data
-                datefrom = utils.timeframe_nex_date(mode=mode, date=datefrom, timeframe=timeframe)
+                if d.status and d.data: 
+                    datefrom = d.data
+                    datefrom = utils.timeframe_nex_date(mode=mode, date=datefrom, timeframe=timeframe)
             elif mode == "down":
                 d = data.get_max_min(instrument=instrument, timeframe=timeframe, mode="min", filed="Date")
-                if d.status and d.data : dateto = d.data
-                dateto = utils.timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
+                if d.status and d.data : 
+                    dateto = d.data
+                    dateto = utils.timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
             store.run(instrument, timeframe, mode, count, repeat, delay, bulk, datefrom, dateto)
     #--------------Connection
     forex.logout()
