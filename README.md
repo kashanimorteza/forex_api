@@ -45,7 +45,14 @@ source .env/bin/activate
 pip install -r requirements.txt
 pip list
 ```
-
+```bash
+/usr/local/bin/python3.7 --version
+/usr/local/bin/python3.7 -m venv .env3.7.17
+.env3.7.17/bin/python -m pip install --upgrade pip
+source .env3.7.17/bin/activate
+pip install -r requirements.txt
+pip list
+```
 
 
 <!--------------------------------------------------------------------------------- Setup --->

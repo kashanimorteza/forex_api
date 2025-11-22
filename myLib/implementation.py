@@ -10,7 +10,6 @@ import myLib.utils as utils
 from myLib.debug import debug
 from myLib.model import model_output
 from myLib.log import Log
-from myLib.forexconnect_api import Forex
 
 #--------------------------------------------------------------------------------- Action
 class Implementation:
@@ -57,7 +56,11 @@ class Implementation:
                 output.data["create"] = self.db.execute(query)
                 self.log.log('not',f'{self.this_class}({this_method})', f'Create : {tblName} : {output.data["create"]}')
             if add:
-                instruments = defaultSymbols if useDefaultSymbols else Forex().instruments()
+                if useDefaultSymbols:
+                    instruments = defaultSymbols 
+                else:
+                    from myLib.forexconnect_api import Forex
+                    instruments = Forex().instruments()
                 query = f'INSERT INTO {tblName} (name, instrument, category) VALUES '
                 for i in instruments:
                     name = i.replace('/', '')
