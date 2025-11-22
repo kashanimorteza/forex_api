@@ -1,6 +1,10 @@
 <!--------------------------------------------------------------------------------- Description --->
 # Description
-forex_api
+Download live/history price
+Trade
+Auto-trading robots
+
+
 
 
 
