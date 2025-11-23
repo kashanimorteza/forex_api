@@ -190,7 +190,7 @@ class Forex:
                     output.status = False
             else:
                 output.status = False
-            output.message = f"{utils.sort(int(time.time() - start_time), 3)} | {instrument} | {timeframe} | {utils.sort(len(df), 6)} | {start} | {end}"
+            output.message = f"{utils.sort(int(time.time() - start_time), 3)} | {instrument} | {timeframe} | {utils.sort(len(df), 6)} | {start} | {end} |"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
             #--------------Log
