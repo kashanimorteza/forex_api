@@ -169,7 +169,7 @@ class Forex:
         try:
             if dateto > datefrom:
                 #-----Get
-                while attempt < 3:
+                while attempt < 10:
                     try: 
                         data = self.fx.get_history(instrument, timeframe, date_from=datefrom, date_to=dateto, quotes_count=count)
                         break
