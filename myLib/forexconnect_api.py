@@ -176,8 +176,8 @@ class Forex:
                     except Exception as e:
                         self.log.verbose("err", f"{self.this_class} | {this_method}", f"{instrument} | {timeframe} | {datefrom.strftime('%Y-%m-%d %H:%M:%S')} | {dateto.strftime('%Y-%m-%d %H:%M:%S')}")
                         attempt += 1
-                        print(f"Error (attempt {attempt}/3): {e}")
-                        if attempt >= 3:
+                        print(f"Error (attempt {attempt}/10): {e}")
+                        if attempt >= 10:
                             raise
                         time.sleep(1)
                 #-----Check
