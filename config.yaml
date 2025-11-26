@@ -43,16 +43,28 @@ log:
 #--------------------------------------------------------------------------------- FXCM
 forex_connect:
   default: acc-download
-  acc-download:
+  acc-history1:
     server    : 'Demo'
     username  : '52030299'
     password  : '2idfycj'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'
     key       : '490f6c2c2d2f9d20e83acee0d1fe90cc470771ea'
-  acc-trade:
+  acc-history2:
     server    : 'Demo'
     username  : '52032860'
     password  : 'aq8iwnf'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : '490f6c2c2d2f9d20e83acee0d1fe90cc470771ea'
+  acc-live:
+    server    : 'Demo'
+    username  : '52035533'
+    password  : 'iaee0at'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : '490f6c2c2d2f9d20e83acee0d1fe90cc470771ea'
+  acc-trade:
+    server    : 'Demo'
+    username  : '52035534'
+    password  : 'fjf0tzq'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'
     key       : '490f6c2c2d2f9d20e83acee0d1fe90cc470771ea'
 
