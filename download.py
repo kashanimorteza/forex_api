@@ -72,8 +72,6 @@ try:
     #--------------params
     for timeframe in timeframes:
         for instrument in instruments:
-            if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
-            time.sleep(5)
             forex.login()
             time.sleep(5)
             datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
@@ -92,6 +90,10 @@ try:
                     dateto = utils.timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
             store.run(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
             forex.logout()
+            time.sleep(5)
+            if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
+            time.sleep(5)
+
     #--------------Connection
     db.close()
     #--------------Verbose
