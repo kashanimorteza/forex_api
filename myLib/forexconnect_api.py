@@ -179,9 +179,9 @@ class Forex:
                         attempt += 5
                         print(f"Error (attempt {attempt}/10): {e}")
                         if attempt >= 1: 
-                            self.fx.logout()
+                            self.logout()
                             time.sleep(1)
-                            self.fx.login()
+                            self.login()
                         if attempt >= 10: raise
                         time.sleep(1)
                 #-----Check
