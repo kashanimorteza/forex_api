@@ -73,6 +73,7 @@ try:
     for timeframe in timeframes:
         for instrument in instruments:
             if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
+            time.sleep(5)
             forex.login()
             time.sleep(5)
             datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
