@@ -86,7 +86,7 @@ instrument:
   table: instrument
   useDefaultSymbols: True
   defaultSymbols: [
-      "EUR/USD", "EUR/GBP", "EUR/CHF", "EUR/JPY", "EUR/AUD", "EUR/CAD", "EUR/NZD",
+      "EUR/GBP", "EUR/USD", "EUR/CHF", "EUR/JPY", "EUR/AUD", "EUR/CAD", "EUR/NZD",
       "GBP/USD", "GBP/JPY", "GBP/CHF", "GBP/NZD", "GBP/AUD", "GBP/CAD",
       "AUD/USD", "AUD/CAD", "AUD/JPY", "AUD/NZD", "AUD/CHF",
       "NZD/USD", "NZD/JPY", "NZD/CHF", "NZD/CAD",
