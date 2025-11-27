@@ -92,7 +92,6 @@ try:
             store.run(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
             forex.logout()
     #--------------Connection
-    forex.logout()
     db.close()
     #--------------Verbose
     if verbose : log_ins.verbose("rep", f"{this_class}  | {this_method}", output.message)
