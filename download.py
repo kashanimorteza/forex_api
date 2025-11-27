@@ -63,7 +63,6 @@ print(utils.format_dict_block("Download", params))
 try:
     #--------------Connection
     forex = Forex(account=account)
-    forex.login()
     db.open()
     store = Store(log=log_ins, data=data, forex=forex)
     #--------------instrument
@@ -73,9 +72,7 @@ try:
     #--------------params    
     for timeframe in timeframes:
         for instrument in instruments:
-
-            #if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
-            
+            forex.login()
             datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
             dateto = args.get("dateto") if args.get("dateto") not in (None, "") else datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             datefrom = datetime.strptime(datefrom, "%Y-%m-%d %H:%M:%S")
@@ -92,6 +89,8 @@ try:
                     dateto = d.data
                     dateto = utils.timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
             store.run(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
+            forex.logout()
+            if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
     #--------------Connection
     forex.logout()
     db.close()
