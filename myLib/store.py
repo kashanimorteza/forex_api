@@ -12,7 +12,8 @@ from model import model_output
 from log import Log
 from myLib.forex import Forex
 from myLib.data import Data
-from myLib.utils import config, debug, log, sort
+from myLib.utils import config, debug, sort
+from myLib.log import Log
 
 #--------------------------------------------------------------------------------- Action
 class Store:
@@ -21,7 +22,7 @@ class Store:
         #--------------------Variable
         self.this_class = self.__class__.__name__
         #--------------------Instance
-        self.log = log
+        self.log = Log()
         self.data = data
         self.forex = forex
 

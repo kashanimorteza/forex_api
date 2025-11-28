@@ -7,8 +7,9 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 from model import model_output
-from utils import config, debug, log, sort
+from utils import config, debug, sort
 from forexconnect import ForexConnect, fxcorepy
+from myLib.log import Log
 
 #--------------------------------------------------------------------------------- Action
 class Forex_Api:
@@ -17,7 +18,7 @@ class Forex_Api:
         #--------------------Variable
         self.this_class = self.__class__.__name__
         #--------------------Instance
-        self.log = log
+        self.log = Log()
         self.fx = ForexConnect()
         #--------------------Data
         self.account = account

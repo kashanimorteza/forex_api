@@ -8,9 +8,10 @@
 import inspect, time
 import pandas as pd
 from model import model_output
-from utils import config, debug, log, sort
+from utils import config, debug, sort
 from myLib.forex_api import Forex_Api
 from forexconnect import ForexConnect, fxcorepy
+from myLib.log import Log
 
 
 #--------------------------------------------------------------------------------- Action
@@ -20,7 +21,7 @@ class Forex:
         #--------------------Variable
         self.this_class = self.__class__.__name__
         #--------------------Instance
-        self.log = log
+        self.log = Log()
         self.fx = api.fx
 
     #--------------------------------------------- account_info

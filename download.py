@@ -15,7 +15,8 @@ from myLib.store import Store
 from myLib.data import Data
 from myLib.database import Database
 from myLib.forex_api import Forex_Api
-from myLib.utils import config, debug, log, sort, parse_cli_args, format_dict_block, timeframe_nex_date, to_bool
+from myLib.utils import config, debug, sort, parse_cli_args, format_dict_block, timeframe_nex_date, to_bool
+from myLib.log import Log
 
 #--------------------------------------------------------------------------------- Debug
 this_class = "Download"
@@ -24,7 +25,7 @@ this_method = "Download"
 #--------------------------------------------------------------------------------- Variable
 output = model_output()
 db = Database.instance()
-data = Data(log=log, db=db)
+data = Data(log=Log(), db=db)
 params = []
 processes = {}
 

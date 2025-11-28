@@ -7,11 +7,11 @@
 #--------------------------------------------------------------------------------- Import
 import re
 import psycopg2
-import utils as utils
+from myLib.utils import config, debug
 
 #--------------------------------------------------------------------------------- Variable
 dbData = {}
-dbCfg = utils.config.get("database", {}).get("main", {})
+dbCfg = config.get("database", {}).get("main", {})
 dbData["host"] = dbCfg.get("host", "127.0.0.1")
 dbData["port"] = dbCfg.get("port", "5432")
 dbData["user"] = dbCfg.get("user", "forex")
@@ -24,7 +24,6 @@ class Database:
     def __init__(self, dbHost=None, dbUser=None, dbPass=None, dbName=None, log=None): 
         self.className = "Database"
         methodName = "Init"
-        self.log = log
 
         if dbHost:
             self.dbHost=dbHost
@@ -65,12 +64,12 @@ class Database:
                 self.dbConn.autocommit = True                
                 self.dbCursor = self.dbConn.cursor()
                 self.status = True
-                if self.log is not None : 
-                    self.log.log('not',f'{self.className}({methodName}) ', name)            
+                # if self.log is not None : 
+                #     self.log.log('not',f'{self.className}({methodName}) ', name)            
         except Exception as e:
             self.status = False
-            if self.log is not None :
-                self.log.log('err',f'{self.className}({methodName}) ', f"Host({self.dbHost}) | User({self.dbUser}) | Database({self.dbName}) | Error({re.sub(r'W+', ' ', str(e))})")
+            # if self.log is not None :
+            #     self.log.log('err',f'{self.className}({methodName}) ', f"Host({self.dbHost}) | User({self.dbUser}) | Database({self.dbName}) | Error({re.sub(r'W+', ' ', str(e))})")
     
     #-------------------------- close
     def close(self, name=None):
@@ -87,8 +86,8 @@ class Database:
                 if self.log is not None : self.log.log('not',f'{self.className}({methodName})', name)
         except Exception as e:
             self.status = True
-            if self.log is not None :
-                self.log.log('err',f'{self.className}({methodName})', f"Host({self.dbHost}) | User({self.dbUser}) | Database({self.dbName}) | Error({re.sub(r'W+', ' ', str(e))})")
+            # if self.log is not None :
+            #     self.log.log('err',f'{self.className}({methodName})', f"Host({self.dbHost}) | User({self.dbUser}) | Database({self.dbName}) | Error({re.sub(r'W+', ' ', str(e))})")
 
     #-------------------------- execute
     def execute(self, cmd) :
@@ -113,8 +112,8 @@ class Database:
         except Exception as e:
             res = False
             error = str(e).replace('\n', ' ')
-            if self.log is not None :
-                self.log.log('err', f'{self.className}({methodName})', f"cmd({cmd[:100]}) | Error({re.sub(r'W+', ' ', str(error))})") 
+            # if self.log is not None :
+            #     self.log.log('err', f'{self.className}({methodName})', f"cmd({cmd[:100]}) | Error({re.sub(r'W+', ' ', str(error))})") 
         return res
 
    #-------------------------- getData
@@ -139,8 +138,8 @@ class Database:
                     self.close() 
         except Exception as e :
             res = False               
-            if self.log is not None :
-                self.log.log('err',f'{self.className}({methodName})', f"Cmd({cmd[:100]}) | Error({re.sub(r'W+', ' ', str(e))})")
+            # if self.log is not None :
+            #     self.log.log('err',f'{self.className}({methodName})', f"Cmd({cmd[:100]}) | Error({re.sub(r'W+', ' ', str(e))})")
             
         return res
 
@@ -168,7 +167,7 @@ class Database:
                     self.close()                 
         except Exception as e:
             res = False
-            if self.log is not None :
-                self.log.log('err',f'{self.className}({methodName})', f"Cmd({cmd[:100]}) | Error({re.sub(r'W+', ' ', str(e))})")
+            # if self.log is not None :
+            #     self.log.log('err',f'{self.className}({methodName})', f"Cmd({cmd[:100]}) | Error({re.sub(r'W+', ' ', str(e))})")
 
         return res
