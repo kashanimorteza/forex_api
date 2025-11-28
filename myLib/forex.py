@@ -5,39 +5,26 @@
 # forex
 
 #--------------------------------------------------------------------------------- Import
-import os, inspect, time
+import inspect, time
 import pandas as pd
-import utils as utils
 from model import model_output
-from log import Log
-from debug import debug
-from utils import config
+from utils import config, debug, log, sort
+from myLib.forex_api import Forex_Api
 from forexconnect import ForexConnect, fxcorepy
+
 
 #--------------------------------------------------------------------------------- Action
 class Forex:
     #--------------------------------------------- init
-    def __init__(self, log:Log=None, account=None):
+    def __init__(self, api:Forex_Api=None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         #--------------------Instance
-        self.log = Log() if log is None else log
-        self.fx = ForexConnect()
-        #--------------------Data
-        self.account = account
-        self.info = None
-        self.server = config['forex_connect'][account]['server']
-        self.username = config['forex_connect'][account]['username']
-        self.password = config['forex_connect'][account]['password']
-        self.url = config['forex_connect'][account]['url']
-        self.key = config['forex_connect'][account]['key']
+        self.log = log
+        self.fx = api.fx
 
-    #--------------------------------------------- on_status_changed
-    def session_status_changed(self, session: fxcorepy.O2GSession, status: fxcorepy.AO2GSessionStatus.O2GSessionStatus):
-        print("Trading session status: " + str(status))
-
-    #--------------------------------------------- login
-    def login(self):
+    #--------------------------------------------- account_info
+    def account_info(self):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -51,15 +38,17 @@ class Forex:
         start_time = time.time()
 
         try:
+            #-------------- Variable
+            accounts_table = self.fx.get_table(ForexConnect.ACCOUNTS)
             #--------------Action
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", f"Trying to connect({self.account})...")
-            self.fx.login(self.username, self.password, self.url, self.server, self.session_status_changed)
-            self.account = self.account_info().data
+            for account in accounts_table:
+                output.data["id"] = account.account_id
+                output.data["name"] = account.account_name
+                output.data["balance"] = account.balance
+                output.data["equity"] = account.equity
+                break
             #--------------Output
-            output.message = {
-                "Time": utils.sort(int(time.time() - start_time), 3),
-                "account": self.account,
-            }
+            output.message["Time"] = sort(int(time.time() - start_time), 3)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
             #--------------Log
@@ -72,41 +61,7 @@ class Forex:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
-
-    #--------------------------------------------- logout
-    def logout(self):
-        #-------------- Description
-        # IN     : 
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        output = model_output()
-        start_time = time.time()
-        #--------------Action
-        try:
-            self.fx.logout()
-            #--------------Output
-            output.message = {
-                "Time": utils.sort(int(time.time() - start_time), 3),
-                "account": self.account,
-            }
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-    
+       
     #--------------------------------------------- instruments
     def instruments(self):
         #-------------- Description
@@ -133,7 +88,7 @@ class Forex:
             #--------------Output
             output.data = instruments
             output.message = {
-                "Time": utils.sort(int(time.time() - start_time), 3),
+                "Time": sort(int(time.time() - start_time), 3),
                 "count": len(instruments)
             }
             #--------------Verbose
@@ -194,7 +149,7 @@ class Forex:
                     output.status = False
             else:
                 output.status = False
-            output.message = f"{utils.sort(int(time.time() - start_time), 3)} | {instrument} | {timeframe} | {utils.sort(len(data), 6)} | {start} | {end} |"
+            output.message = f"{sort(int(time.time() - start_time), 3)} | {instrument} | {timeframe} | {sort(len(data), 6)} | {start} | {end} |"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
             #--------------Log
@@ -208,44 +163,7 @@ class Forex:
         #--------------Return
         return output
 
-    #--------------------------------------------- account_info
-    def account_info(self):
-        #-------------- Description
-        # IN     : 
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        output = model_output()
-        start_time = time.time()
-
-        try:
-            #-------------- Variable
-            accounts_table = self.fx.get_table(ForexConnect.ACCOUNTS)
-            #--------------Action
-            for account in accounts_table:
-                output.data["id"] = account.account_id
-                output.data["name"] = account.account_name
-                output.data["balance"] = account.balance
-                output.data["equity"] = account.equity
-                break
-            #--------------Output
-            output.message["Time"] = utils.sort(int(time.time() - start_time), 3)
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
+    
     
     #--------------------------------------------- trade_list
     def trade_list(self):
@@ -276,7 +194,7 @@ class Forex:
             #--------------Output
             output.data = items
             output.message = {
-                "Time": utils.sort(int(time.time() - start_time), 3),
+                "Time": sort(int(time.time() - start_time), 3),
                 "count": len(items),
             }
             #--------------Verbose
@@ -334,7 +252,7 @@ class Forex:
             #--------------Output
             output.data = response_details
             output.message = {
-                "Time": utils.sort(int(time.time() - start_time), 3),
+                "Time": sort(int(time.time() - start_time), 3),
                 "Items": f"{symbol} | {buy_sell} | {amount}",
             }
             #--------------Verbose
@@ -392,7 +310,7 @@ class Forex:
             #--------------Output
             output.data = response_details["order_id"]
             output.message = {
-                "Time": utils.sort(int(time.time() - start_time), 3),
+                "Time": sort(int(time.time() - start_time), 3),
                 "Items": f"{order_id} | {symbol} | {trade_id} | {buy_sell} | {amount}",
             }
             #--------------Verbose
@@ -436,7 +354,7 @@ class Forex:
                     self.trade_close(order_id=order_id, trade_id=trade_id, symbol=symbol, buy_sell=buy_sell, amount=amount)
             #--------------Output
             output.message = {
-                "Time": utils.sort(int(time.time() - start_time), 3),
+                "Time": sort(int(time.time() - start_time), 3),
                 "Items": len(items.data),
             }
             #--------------Verbose

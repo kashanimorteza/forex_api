@@ -10,13 +10,14 @@ import utils as utils
 from debug import debug
 from model import model_output
 from log import Log
-from forexconnect_api import Forex
+from myLib.forex import Forex
 from myLib.data import Data
+from utils import config, debug, log, sort
 
 #--------------------------------------------------------------------------------- Action
 class Store:
     #--------------------------------------------- init
-    def __init__(self, log:Log, data:Data, forex:Forex):
+    def __init__(self,data:Data, forex:Forex):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         #--------------------Instance

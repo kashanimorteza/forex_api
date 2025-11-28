@@ -59,7 +59,7 @@ class Implementation:
                 if useDefaultSymbols:
                     instruments = defaultSymbols 
                 else:
-                    from myLib.forexconnect_api import Forex
+                    from myLib.forex import Forex
                     instruments = Forex().instruments()
                 query = f'INSERT INTO {tblName} (name, instrument, category) VALUES '
                 for i in instruments:

@@ -8,6 +8,7 @@
 from __future__ import annotations
 import os, yaml
 from datetime import timedelta
+from log import Log
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- load_config
@@ -135,3 +136,4 @@ def timeframe_nex_date(mode, timeframe, date):
     
 #--------------------------------------------------------------------------------- Variable
 config = load_config()
+log = Log()
