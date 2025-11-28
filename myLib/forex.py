@@ -47,6 +47,10 @@ class Forex:
         print(format_dict_block("Store", params))
         #-------------- Action
         try:
+            #---Connection
+            self.api.login()
+            self.db.open()
+            #---Check
             if mode == "up":
                 d = self.data.get_max_min(instrument=instrument, timeframe=timeframe, mode="max", filed="Date")
                 if d.status and d.data: 
@@ -57,10 +61,7 @@ class Forex:
                 if d.status and d.data : 
                     dateto = d.data
                     dateto = timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
-
-            self.api.login()
-            self.db.open()
-
+            #---Action
             while(True):
                 for r in range(repeat):
                     start = datefrom
@@ -83,7 +84,7 @@ class Forex:
                         else: break
                 if delay == 0: break; 
                 time.sleep(delay)
-                
+            #---Connection
             self.api.logout()
             self.db.close()
             #--------------Verbose
