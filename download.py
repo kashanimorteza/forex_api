@@ -56,6 +56,7 @@ print(format_dict_block("Download", params))
 
 #------------------------------------------------------------------- [ Action ]
 try:
+    db.open()
     #--------------instrument
     instruments = config["instrument"]["defaultSymbols"] if instrument == "all" else instrument.split(",")
     #--------------timeframe
@@ -68,7 +69,7 @@ try:
             forex = Forex(api=forex_api)
             forex.api.login()
             store = Store(data=data, forex=forex)
-            db.open()
+            
             datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
             dateto = args.get("dateto") if args.get("dateto") not in (None, "") else datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             datefrom = datetime.strptime(datefrom, "%Y-%m-%d %H:%M:%S")
@@ -85,7 +86,7 @@ try:
                     dateto = timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
             store.run(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
             forex.api.logout()
-            db.close()
+    db.close()
 except Exception as e:
     #--------------Error
     output.status = False
