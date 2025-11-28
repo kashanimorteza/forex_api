@@ -22,6 +22,7 @@ class Forex:
     def __init__(self, account):
         #--------------------Variable
         self.this_class = self.__class__.__name__
+        self.account = account
         #--------------------Instance
         self.log = Log()
         self.db = Database.instance()
@@ -42,11 +43,12 @@ class Forex:
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
         output = model_output()
         #-------------- Display
-        params = {"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
+        params = {"account": self.account,"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
         print(format_dict_block("Store", params))
         #-------------- Action
         try:
             self.api.login()
+            self.db.open()
             while(True):
                 for r in range(repeat):
                     start = datefrom
@@ -70,6 +72,7 @@ class Forex:
                 if delay == 0: break; 
                 time.sleep(delay)
             self.api.logout()
+            self.db.close()
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
             #--------------Log

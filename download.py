@@ -45,7 +45,7 @@ datefrom = datetime.strptime(datefrom, "%Y-%m-%d %H:%M:%S")
 dateto = datetime.strptime(dateto, "%Y-%m-%d %H:%M:%S")
 
 #--------------------------------------------------------------------------------- Display
-params = { "account": account, "instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
+params = {"account": account, "instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
 print(format_dict_block("Download", params))
 
 #------------------------------------------------------------------- [ Action ]
