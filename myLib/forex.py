@@ -212,7 +212,7 @@ class Forex:
                         print(f"Error (attempt {attempt}/10): {e}")
                         if attempt > 1: 
                             self.fx.logout()
-                            forex_api = Forex_Api(account="acc-history1")
+                            forex_api = Forex_Api(account=self.account)
                             self.fx = forex_api.fx
                             forex_api.login()
                             time.sleep(1)
