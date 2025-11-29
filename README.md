@@ -587,6 +587,7 @@ CREATE TEMP TABLE temp_date_range (
     symbol     text,
     timeframe  text,
     table_name text,
+    row_count  bigint,
     min_date   timestamp,
     max_date   timestamp
 );
@@ -599,6 +600,7 @@ DECLARE
     tbl       text;
     v_min     timestamp;
     v_max     timestamp;
+    v_count   bigint;
 BEGIN
     -- all symbols
     FOR sym IN SELECT unnest(ARRAY[
@@ -622,18 +624,19 @@ BEGIN
             tbl := prefix || '_' || tf;
 
             BEGIN
-                -- 🔴 change "date" here if your column is named differently
-                EXECUTE format('SELECT min(date), max(date) FROM %I', tbl)
-                    INTO v_min, v_max;
+                -- change 'date' if your column name is different
+                EXECUTE format('SELECT count(id), min(date), max(date) FROM %I', tbl)
+                    INTO v_count, v_min, v_max;
 
-                INSERT INTO temp_date_range(symbol, timeframe, table_name, min_date, max_date)
-                VALUES (sym, tf, tbl, v_min, v_max);
+                INSERT INTO temp_date_range(symbol, timeframe, table_name, row_count, min_date, max_date)
+                VALUES (sym, tf, tbl, v_count, v_min, v_max);
 
             EXCEPTION
                 WHEN undefined_table THEN
-                    RAISE NOTICE 'Table % does NOT exist, skipped', tbl;
+                    RAISE NOTICE 'Table % does NOT exist, skipped.', tbl;
+
                 WHEN undefined_column THEN
-                    RAISE NOTICE 'Table % has no column "date", skipped', tbl;
+                    RAISE NOTICE 'Table % missing column "date" or "id", skipped.', tbl;
             END;
 
         END LOOP;
