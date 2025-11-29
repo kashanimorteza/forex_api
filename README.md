@@ -105,7 +105,7 @@ dateto         = 2025-01-01 00:00:00
 <!-------------------------- Parameters -->
 Download
 ```bash
-.env/bin/python ./download.py account=acc-history2 instrument=XAG/USD timeframe=t1 mode=down save=True bulk=True count=25000
+.env/bin/python ./download.py account=acc-history1 instrument=all timeframe=W1,D1 mode=down save=True bulk=True count=25000
 python download.py account=acc-trade instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1 mode=down save=True bulk=True count=100000
 python download.py instrument=EUR/USD timeframe=t1 mode=complete bulk=True
 python download.py instrument=EUR/USD timeframe=t1 mode=update bulk=False
