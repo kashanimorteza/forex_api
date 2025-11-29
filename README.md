@@ -474,50 +474,174 @@ VACUUM FULL VERBOSE;
 <br><br>
 
 # Sql
-<!-------------------------- Truncate -->
+<!-------------------------- Truncate-->
 Truncate
 ```sql
-truncate table eurusd_w1 RESTART IDENTITY;
-truncate table eurusd_d1 RESTART IDENTITY;
-truncate table eurusd_h8 RESTART IDENTITY;
-truncate table eurusd_h6 RESTART IDENTITY;
-truncate table eurusd_h4 RESTART IDENTITY;
-truncate table eurusd_h3 RESTART IDENTITY;
-truncate table eurusd_h2 RESTART IDENTITY;
-truncate table eurusd_h1 RESTART IDENTITY;
-truncate table eurusd_m30 RESTART IDENTITY;
-truncate table eurusd_m15 RESTART IDENTITY;
-truncate table eurusd_m5 RESTART IDENTITY;
-truncate table eurusd_m1 RESTART IDENTITY;
-truncate table eurusd_t1 RESTART IDENTITY;
-```
-<!-------------------------- Select -->
-Select
-```sql
-SELECT
-	(SELECT COUNT(id) FROM eurusd_w1) AS eurusd_w1,
-	(SELECT COUNT(id) FROM eurusd_d1) AS eurusd_d1,
-	(SELECT COUNT(id) FROM eurusd_h8) AS eurusd_h8,
-	(SELECT COUNT(id) FROM eurusd_h6) AS eurusd_h6,
-	(SELECT COUNT(id) FROM eurusd_h4) AS eurusd_h4,  
-	(SELECT COUNT(id) FROM eurusd_h4) AS eurusd_h3,  
-	(SELECT COUNT(id) FROM eurusd_h4) AS eurusd_h2,  
-	(SELECT COUNT(id) FROM eurusd_h1) AS eurusd_h1,
-	(SELECT COUNT(id) FROM eurusd_m30) AS eurusd_m30,
-	(SELECT COUNT(id) FROM eurusd_m15) AS eurusd_m15,
-	(SELECT COUNT(id) FROM eurusd_m5) AS eurusd_m5,
-	(SELECT COUNT(id) FROM eurusd_m1) AS eurusd_m1,
-	(SELECT COUNT(id) FROM eurusd_t1) AS eurusd_t1;
-```
-<!-------------------------- Select -->
-Select
-```sql
-SELECT
-	(SELECT count(Date) FROM xauusd_t1) AS count_name,
-	(SELECT Date FROM xauusd_t1 order by Date limit 1) AS start_name,
-	(SELECT Date FROM xauusd_t1 order by Date desc limit 1) AS end_name;
+DO $$
+DECLARE
+    sym    text;
+    tf     text;
+    prefix text;
+    tbl    text;
+BEGIN
+    -- List of symbols
+    FOR sym IN SELECT unnest(ARRAY[
+        'EUR/USD','EUR/GBP','EUR/CHF','EUR/JPY','EUR/AUD','EUR/CAD','EUR/NZD',
+        'GBP/USD','GBP/JPY','GBP/CHF','GBP/NZD','GBP/AUD','GBP/CAD',
+        'AUD/USD','AUD/CAD','AUD/JPY','AUD/NZD','AUD/CHF',
+        'NZD/USD','NZD/JPY','NZD/CHF','NZD/CAD',
+        'USD/JPY','USD/CHF','USD/CAD',
+        'CAD/JPY','CAD/CHF',
+        'CHF/JPY',
+        'USOil','UKOil','XAU/USD','XAG/USD'
+    ])
+    LOOP
+        prefix := lower(replace(sym, '/', ''));
+
+        -- Loop timeframes
+        FOR tf IN SELECT unnest(ARRAY[
+            'w1','d1','h8','h6','h4','h3','h2','h1','m30','m15','m5','m1','t1'
+        ])
+        LOOP
+            tbl := prefix || '_' || tf;
+
+            BEGIN
+                EXECUTE format('TRUNCATE TABLE %I RESTART IDENTITY', tbl);
+                RAISE NOTICE 'Truncated %', tbl;
+            EXCEPTION WHEN undefined_table THEN
+                RAISE NOTICE 'Table % does NOT exist - skipped', tbl;
+            END;
+
+        END LOOP;
+
+    END LOOP;
+END $$;
 ```
 
+<!-------------------------- Count -->
+Count
+```sql
+DROP TABLE IF EXISTS temp_symbol_counts;
+
+CREATE TEMP TABLE temp_symbol_counts (
+    symbol text,
+    w1  int, d1  int,
+    h8  int, h6  int, h4 int, h3 int, h2 int, h1 int,
+    m30 int, m15 int, m5 int, m1 int,
+    t1  int
+);
+
+DO $$
+DECLARE
+    sym    text;
+    prefix text;
+    c_w1  int; c_d1  int;
+    c_h8  int; c_h6  int; c_h4 int; c_h3 int; c_h2 int; c_h1 int;
+    c_m30 int; c_m15 int; c_m5 int; c_m1 int;
+    c_t1  int;
+BEGIN
+    FOR sym IN
+        SELECT unnest(ARRAY[
+            'EUR/USD','EUR/GBP','EUR/CHF','EUR/JPY','EUR/AUD','EUR/CAD','EUR/NZD',
+            'GBP/USD','GBP/JPY','GBP/CHF','GBP/NZD','GBP/AUD','GBP/CAD',
+            'AUD/USD','AUD/CAD','AUD/JPY','AUD/NZD','AUD/CHF',
+            'NZD/USD','NZD/JPY','NZD/CHF','NZD/CAD',
+            'USD/JPY','USD/CHF','USD/CAD',
+            'CAD/JPY','CAD/CHF',
+            'CHF/JPY',
+            'USOil','UKOil','XAU/USD','XAG/USD'
+        ])
+    LOOP
+        prefix := lower(replace(sym, '/', ''));
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_w1')  INTO c_w1;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_d1')  INTO c_d1;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_h8')  INTO c_h8;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_h6')  INTO c_h6;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_h4')  INTO c_h4;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_h3')  INTO c_h3;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_h2')  INTO c_h2;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_h1')  INTO c_h1;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_m30') INTO c_m30;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_m15') INTO c_m15;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_m5')  INTO c_m5;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_m1')  INTO c_m1;
+        EXECUTE format('SELECT count(id) FROM %I', prefix || '_t1')  INTO c_t1;
+        INSERT INTO temp_symbol_counts
+        VALUES (sym,
+                c_w1, c_d1,
+                c_h8, c_h6, c_h4, c_h3, c_h2, c_h1,
+                c_m30, c_m15, c_m5, c_m1,
+                c_t1);
+    END LOOP;
+END $$;
+
+SELECT * FROM temp_symbol_counts;
+```
+
+<!-------------------------- Period -->
+Period
+```sql
+DROP TABLE IF EXISTS temp_date_range;
+
+CREATE TEMP TABLE temp_date_range (
+    symbol     text,
+    timeframe  text,
+    table_name text,
+    min_date   timestamp,
+    max_date   timestamp
+);
+
+DO $$
+DECLARE
+    sym       text;
+    tf        text;
+    prefix    text;
+    tbl       text;
+    v_min     timestamp;
+    v_max     timestamp;
+BEGIN
+    -- all symbols
+    FOR sym IN SELECT unnest(ARRAY[
+        'EUR/USD','EUR/GBP','EUR/CHF','EUR/JPY','EUR/AUD','EUR/CAD','EUR/NZD',
+        'GBP/USD','GBP/JPY','GBP/CHF','GBP/NZD','GBP/AUD','GBP/CAD',
+        'AUD/USD','AUD/CAD','AUD/JPY','AUD/NZD','AUD/CHF',
+        'NZD/USD','NZD/JPY','NZD/CHF','NZD/CAD',
+        'USD/JPY','USD/CHF','USD/CAD',
+        'CAD/JPY','CAD/CHF',
+        'CHF/JPY',
+        'USOil','UKOil','XAU/USD','XAG/USD'
+    ])
+    LOOP
+        prefix := lower(replace(sym, '/', ''));
+
+        -- all timeframes
+        FOR tf IN SELECT unnest(ARRAY[
+            'w1','d1','h8','h6','h4','h3','h2','h1','m30','m15','m5','m1','t1'
+        ])
+        LOOP
+            tbl := prefix || '_' || tf;
+
+            BEGIN
+                -- 🔴 change "date" here if your column is named differently
+                EXECUTE format('SELECT min(date), max(date) FROM %I', tbl)
+                    INTO v_min, v_max;
+
+                INSERT INTO temp_date_range(symbol, timeframe, table_name, min_date, max_date)
+                VALUES (sym, tf, tbl, v_min, v_max);
+
+            EXCEPTION
+                WHEN undefined_table THEN
+                    RAISE NOTICE 'Table % does NOT exist, skipped', tbl;
+                WHEN undefined_column THEN
+                    RAISE NOTICE 'Table % has no column "date", skipped', tbl;
+            END;
+
+        END LOOP;
+    END LOOP;
+END $$;
+
+SELECT * FROM temp_date_range;
+```
 
 
 <!--------------------------------------------------------------------------------- Nginx --->
