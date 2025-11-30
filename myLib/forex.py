@@ -45,7 +45,6 @@ class Forex:
         #-------------- Action
         try:            
             #---Check
-            self.db.open()
             if mode == "up":
                 d = self.data.get_max_min(instrument=instrument, timeframe=timeframe, mode="max", filed="Date")
                 if d.status and d.data: 
@@ -58,9 +57,7 @@ class Forex:
                     dateto = timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
             #---Display
             params = {"account": self.account,"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
-            print(format_dict_block("Store", params))
-            #---Connection
-            self.api.login()
+            print(format_dict_block("Store", params))            
             #---Action
             while(True):
                 for r in range(repeat):
@@ -84,9 +81,6 @@ class Forex:
                         else: break
                 if delay == 0: break; 
                 time.sleep(delay)
-            #---Connection
-            self.db.close()
-            self.api.logout()
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
             #--------------Log

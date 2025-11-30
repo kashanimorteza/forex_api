@@ -65,14 +65,22 @@ try:
                 if clear : 
                     if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
                 forex = Forex(account=account)
+                forex.db.open()
+                forex.api.login()
                 forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
+                forex.db.close()
+                forex.api.logout()
     else :
         forex = Forex(account=account)
+        forex.db.open()
+        forex.api.login()
         for timeframe in timeframes:
             for instrument in instruments:
                 if clear : 
                     if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
-                forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
+                forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)        
+        forex.db.close()
+        forex.api.logout()
 
 except Exception as e:
     #--------------Error
