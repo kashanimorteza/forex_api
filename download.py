@@ -41,6 +41,8 @@ save = args.get("save") if args.get("save") not in (None, "") else config['downl
 save = to_bool(save)
 clear = args.get("clear") if args.get("clear") not in (None, "") else config['download']['clear']
 clear = to_bool(clear)
+dedicate = args.get("dedicate") if args.get("dedicate") not in (None, "") else config['download']['dedicate']
+dedicate = to_bool(dedicate)
 datefrom = args.get("datefrom") if args.get("datefrom") not in (None, "") else config['download']['datefrom']
 dateto = args.get("dateto") if args.get("dateto") not in (None, "") else datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 datefrom = datetime.strptime(datefrom, "%Y-%m-%d %H:%M:%S")
@@ -57,12 +59,21 @@ try:
     #--------------timeframe
     timeframes = config["timeframe"] if timeframe == "all" else timeframe.split(",")
     #--------------params
-    for timeframe in timeframes:
-        for instrument in instruments:
-            if clear : 
-                if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
-            forex = Forex(account=account)
-            forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
+    if dedicate :
+        for timeframe in timeframes:
+            for instrument in instruments:
+                if clear : 
+                    if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
+                forex = Forex(account=account)
+                forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
+    else :
+        forex = Forex(account=account)
+        for timeframe in timeframes:
+            for instrument in instruments:
+                if clear : 
+                    if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
+                forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
+
 except Exception as e:
     #--------------Error
     output.status = False
