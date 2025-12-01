@@ -141,7 +141,7 @@ class Implementation:
                     tblName =f"{i[0]}_{t}"
                     if t =="t1":
                         query = f"""
-                            CREATE UNLOGGEDTABLE IF NOT EXISTS {tblName} (
+                            CREATE UNLOGGED TABLE IF NOT EXISTS {tblName} (
                                 id SERIAL UNIQUE NOT NULL,
                                 date TIMESTAMP UNIQUE NOT NULL PRIMARY KEY,
                                 bid real,
