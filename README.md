@@ -131,8 +131,8 @@ python download.py account=acc-history1 instrument=all timeframe=H8,H6,H4,H3,H2,
 python download.py account=acc-history1 instrument=all timeframe=m30 mode=down save=False bulk=False dedicate=False clear=False count=100000
 python download.py account=acc-history1 instrument=all timeframe=m15 mode=down save=False bulk=False dedicate=False clear=False count=100000
 python download.py account=acc-history1 instrument=all timeframe=m5 mode=down save=False bulk=False dedicate=False clear=False count=100000
-python download.py account=acc-history1 instrument=all timeframe=m1 mode=down save=False bulk=False dedicate=False clear=False count=100000
-python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=False bulk=False dedicate=False clear=False count=100000
+python download.py account=acc-history1 instrument=all timeframe=m1 mode=down save=False bulk=False dedicate=False clear=False count=100000 datefrom='2020-01-01 00:00:00'
+python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=False bulk=False dedicate=False clear=False count=100000 datefrom='2020-01-01 00:00:00'
 
 
 python download.py account=acc-trade instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1 mode=down save=True bulk=True count=100000
