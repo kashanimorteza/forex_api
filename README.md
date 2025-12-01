@@ -720,14 +720,16 @@ Server
 ```bash
 cd /root/forex_api
 python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1,m30,m15,m5,m1 mode=down save=False bulk=False dedicate=False clear=False count=100000
-tar -I pigz -cvf history_2025-11-28.tar.gz History -C /var/www/html/history_2025-11-28.tar.gz
-rm -fr ./History
+tar -I pigz -cvf history_2025-11-28.tar.gz History
+mv history_2025-11-28.tar.gz /var/www/html/
+rm -fr History
 ```
 ```bash
 cd /root/forex_api
 python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=False bulk=False dedicate=False clear=False count=100000 datefrom='2020-01-01 00:00:00'
-tar -I pigz -cvf history_2025-11-28_xauusd_t1.tar.gz History -C /var/www/html/history_2025-11-28_xauusd_t1.tar.gz
-rm -fr ./History
+tar -I pigz -cvf history_2025-11-28_xauusd_t1.tar.gz History
+mv history_2025-11-28_xauusd_t1.tar.gz /var/www/html/history_2025-11-28_xauusd_t1.tar.gz
+rm -fr History
 ```
 
 Client
