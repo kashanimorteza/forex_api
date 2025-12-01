@@ -126,25 +126,23 @@ dateto         = 2025-01-01 00:00:00
 <!-------------------------- Parameters -->
 Download
 ```bash
-python download.py account=acc-history1 instrument=all timeframe=W1,D1 mode=down save=False bulk=False dedicate=False clear=False count=100000
-python download.py account=acc-history1 instrument=all timeframe=H8,H6,H4,H3,H2,H1 mode=down save=False bulk=True dedicate=False clear=False count=100000
-python download.py account=acc-history1 instrument=all timeframe=m30 mode=down save=False bulk=False dedicate=False clear=False count=100000
-python download.py account=acc-history1 instrument=all timeframe=m15 mode=down save=False bulk=False dedicate=False clear=False count=100000
-python download.py account=acc-history1 instrument=all timeframe=m5 mode=down save=False bulk=False dedicate=False clear=False count=100000
-python download.py account=acc-history1 instrument=all timeframe=m1 mode=down save=False bulk=False dedicate=False clear=False count=100000 datefrom='2020-01-01 00:00:00'
+python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1,m30,m15,m5,m1 mode=down save=False bulk=False dedicate=False clear=False count=100000
 python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=False bulk=False dedicate=False clear=False count=100000 datefrom='2020-01-01 00:00:00'
-
-
-python download.py account=acc-trade instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1 mode=down save=True bulk=True count=100000
+```
+Save
+```bash
+python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1,m30,m15,m5,m1 mode=down save=True bulk=True dedicate=False clear=False count=100000
+python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=True bulk=True dedicate=False clear=False count=100000 datefrom='2020-01-01 00:00:00'
+```
+Other
+```bash
+python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1 mode=down save=True bulk=True count=100000
 python download.py instrument=EUR/USD timeframe=t1 mode=complete bulk=True
 python download.py instrument=EUR/USD timeframe=t1 mode=update bulk=False
 python download.py instrument=EUR/USD timeframe=W1,D1 mode=complete bulk=True
 python download.py instrument=EUR/USD,EUR/GBP timeframe=W1,D1 mode=complete bulk=True
 python download.py instrument=XAU/USD timeframe=t1 mode=down save=True bulk=True count=500000
 ```
-
-
-
 <!-------------------------- Schedule -->
 Schedule
 ```bash
@@ -724,18 +722,33 @@ sudo systemctl status nginx
 <!--------------------------------------------------------------------------------- Download --->
 <br><br>
 
-# Download
+# Download History from server
 Server 
 ```bash
 cd /root/forex_api
-tar -I pigz -cvf history_m5_2025-11-28.tar.gz History
-mv history_m5_2025-11-28.tar.gz /var/www/html/
+python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1,m30,m15,m5,m1 mode=down save=False bulk=False dedicate=False clear=False count=100000
+tar -I pigz -cvf history_2025-11-28.tar.gz History -C /var/www/html/history_2025-11-28.tar.gz
+rm -fr ./History
 ```
+```bash
+cd /root/forex_api
+python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=False bulk=False dedicate=False clear=False count=100000 datefrom='2020-01-01 00:00:00'
+tar -I pigz -cvf history_2025-11-28_xauusd_t1.tar.gz History -C /var/www/html/history_2025-11-28_xauusd_t1.tar.gz
+rm -fr ./History
+```
+
 Client
 ```bash
 cd /root/forex_api
-aria2c -x 16 http://91.107.245.66/history_m5_2025-11-28.tar.gz
-tar --use-compress-program="pigz -d" -xvf history_m5_2025-11-28.tar.gz -C ./forex_api
+aria2c -x 16 http://91.107.245.66/history_2025-11-28.tar.gz
+tar --use-compress-program="pigz -d" -xvf history_2025-11-28.tar.gz -C ./forex_api
+python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1,m30,m15,m5,m1 mode=down save=True bulk=True dedicate=False clear=False count=100000
+```
+```bash
+cd /root/forex_api
+aria2c -x 16 http://91.107.245.66/history_2025-11-28_xauusd_t1.tar.gz
+tar --use-compress-program="pigz -d" -xvf history_2025-11-28_xauusd_t1.tar.gz -C ./forex_api
+python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=True bulk=True dedicate=False clear=False count=100000
 ```
 
 
