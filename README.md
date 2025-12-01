@@ -183,6 +183,7 @@ sudo apt update
 sudo apt upgrade
 sudo timedatectl set-timezone UTC
 apt install aria2 -y
+apt install pigz -y
 ```
 <!-------------------------- Screen -->
 Screen
@@ -458,17 +459,16 @@ SELECT pg_size_pretty( pg_total_relation_size('xauusd_t1'));
 Backup
 ```bash
 sudo -i -u postgres
-pg_dump --dbname=forex --verbose --no-owner | gzip > forex.gz
+pg_dump --dbname=forex --verbose --no-owner | pigz > forex.gz
 pg_dump --dbname=forex --table public.xauusd_t1 --verbose --no-owner | gzip > xauusd_t1.gz
-exit
 cp -fr /var/lib/postgresql/*.gz /var/www/html/
 ```
 <!-------------------------- Restore -->
 Restore
 ```bash
 sudo -i -u postgres
-gunzip -c forex.gz | psql forex
-gunzip -c xauusd_t1.gz | psql forex
+pigz -dc forex.gz | psql -U postgres -d forex
+pigz -dc xauusd_t1.gz | psql -U postgres -d forex
 ```
 <!-------------------------- Download Backup -->
 Download Backup
@@ -728,14 +728,14 @@ sudo systemctl status nginx
 Server 
 ```bash
 cd /root/forex_api
-tar -czf  history_wd_2025-11-28.tar.gz History
-mv history_wd_2025-11-28.tar.gz /var/www/html/
+tar -I pigz -cvf history_m5_2025-11-28.tar.gz History
+mv history_m5_2025-11-28.tar.gz /var/www/html/
 ```
 Client
 ```bash
 cd /root/forex_api
-aria2c -x 16 http://91.107.245.66/history_wd_2025-11-28.tar.gz
-tar -zxvf history_wd_2025-11-28.tar.gz
+aria2c -x 16 http://91.107.245.66/history_m5_2025-11-28.tar.gz
+tar --use-compress-program="pigz -d" -xvf history_m5_2025-11-28.tar.gz -C ./forex_api
 ```
 
 
