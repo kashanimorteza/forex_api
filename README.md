@@ -30,12 +30,31 @@ Auto-trading robots
 ```bash
 sudo -u postgres psql
 ```
+user
 ```sql
 ALTER USER postgres WITH PASSWORD '123456';
 CREATE ROLE forex WITH LOGIN CREATEDB PASSWORD '123456';
-CREATE DATABASE forex;
-CREATE DATABASE log;
 ```
+forex
+```sql
+CREATE DATABASE forex;
+\c forex
+ALTER DATABASE forex OWNER TO forex;
+ALTER SCHEMA public OWNER TO forex;
+GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
+```
+log
+```sql
+CREATE DATABASE log;
+\c log
+ALTER DATABASE log OWNER TO forex;
+ALTER SCHEMA public OWNER TO forex;
+GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
+```
+
+
+
+
 ```sql
 \c log;
 GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
