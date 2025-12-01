@@ -726,7 +726,7 @@ rm -fr History
 ```
 ```bash
 cd /root/forex_api
-python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=False bulk=False dedicate=False clear=False count=100000 datefrom='2020-01-01 00:00:00'
+python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=False bulk=False dedicate=False clear=False count=10000 datefrom='2020-01-01 00:00:00'
 tar -I pigz -cvf history_2025-11-28_xauusd_t1.tar.gz History
 mv history_2025-11-28_xauusd_t1.tar.gz /var/www/html/history_2025-11-28_xauusd_t1.tar.gz
 rm -fr History
