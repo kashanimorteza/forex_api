@@ -212,6 +212,16 @@ echo "" > /etc/resolv.conf
 echo "nameserver 185.51.200.2" > /etc/resolv.conf
 echo "nameserver 178.22.122.100" >> /etc/resolv.conf
 ```
+<!-------------------------- DNS -->
+User
+```bash
+usermod -aG www-data morteza
+chown -R root:www-data /extra
+chmod -R 775 /extra
+chmod -R 777 /extra
+```
+
+
 
 
 
@@ -724,13 +734,6 @@ tar -I pigz -cvf history_2025-11-28.tar.gz History
 mv history_2025-11-28.tar.gz /var/www/html/
 rm -fr History
 ```
-```bash
-cd /root/forex_api
-python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=False bulk=False dedicate=False clear=False count=10000 datefrom='2020-01-01 00:00:00'
-tar -I pigz -cvf history_2025-11-28_xauusd_t1.tar.gz History
-mv history_2025-11-28_xauusd_t1.tar.gz /var/www/html/history_2025-11-28_xauusd_t1.tar.gz
-rm -fr History
-```
 
 Client
 ```bash
@@ -738,12 +741,6 @@ cd /root/forex_api
 aria2c -x 16 http://91.107.245.66/history_2025-11-28.tar.gz
 tar --use-compress-program="pigz -d" -xvf history_2025-11-28.tar.gz -C ./forex_api
 python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1,m30,m15,m5,m1 mode=down save=True bulk=True dedicate=False clear=False count=100000
-```
-```bash
-cd /root/forex_api
-aria2c -x 16 http://91.107.245.66/history_2025-11-28_xauusd_t1.tar.gz
-tar --use-compress-program="pigz -d" -xvf history_2025-11-28_xauusd_t1.tar.gz -C ./forex_api
-python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=True bulk=True dedicate=False clear=False count=100000
 ```
 
 
