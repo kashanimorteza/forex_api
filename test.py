@@ -5,13 +5,12 @@
 # Store
 
 #--------------------------------------------------------------------------------- Import
-from argparse import Action
 import os,sys
-from datetime import datetime
 root_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, f"{root_dir}/myLib")
+sys.path.insert(0, f"{root_dir}/strategy")
 from myLib.forex import Forex
-from myLib.forex_api import Forex_Api
+from strategy.st01 import ST01
 
 # #--------------------------------------------------------------------------------- Action
 # forex = Forex(account="acc-trade")
@@ -25,17 +24,10 @@ forex = Forex(account="acc-trade")
 forex.api.login()
 forex.account_info()
 
-action="sell"
-#action="buy"
 
-symbol="EUR/USD"
-#symbol="XAU/USD"
+st = ST01(forex=forex, symbol="EUR/USD", amount=10000, tp_pips=1, st_pips=5)
+st.start()
 
-amount = 10000
-
-for i in range(1):
-    result = forex.trade_open(action=action, symbol=symbol, amount=amount, tp_pips=1, sl_pips=5)
-    print(result)
 forex.api.logout()
 
 # #--------------------------------------------------------------------------------- Action
