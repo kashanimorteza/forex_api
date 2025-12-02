@@ -46,7 +46,7 @@ class Implementation:
                 output.data["drop"] = self.db.execute(f"DROP TABLE IF EXISTS {tblName}")
                 self.log.log('not',f'{self.this_class}({this_method})', f'Drop   : {tblName} : {output.data["drop"]}')
             if create:
-                query = f"""CREATE UNLOGGED TABLE IF NOT EXISTS {tblName}
+                query = f"""CREATE TABLE IF NOT EXISTS {tblName}
                 (
                     id SERIAL UNIQUE NOT NULL,
                     name VARCHAR (50) UNIQUE NOT NULL PRIMARY KEY,
@@ -141,7 +141,7 @@ class Implementation:
                     tblName =f"{i[0]}_{t}"
                     if t =="t1":
                         query = f"""
-                            CREATE UNLOGGED TABLE IF NOT EXISTS {tblName} (
+                            CREATE TABLE IF NOT EXISTS {tblName} (
                                 id SERIAL UNIQUE NOT NULL,
                                 date TIMESTAMP UNIQUE NOT NULL PRIMARY KEY,
                                 bid real,
@@ -149,7 +149,7 @@ class Implementation:
                             )"""
                     else:                  
                         query = f"""
-                            CREATE UNLOGGED TABLE IF NOT EXISTS {tblName} (
+                            CREATE TABLE IF NOT EXISTS {tblName} (
                                 id SERIAL UNIQUE NOT NULL,
                                 date TIMESTAMP UNIQUE NOT NULL PRIMARY KEY,
                                 bidopen real,

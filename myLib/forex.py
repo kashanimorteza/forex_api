@@ -9,12 +9,11 @@ import inspect, time
 import pandas as pd
 from model import model_output
 from myLib.forex_api import Forex_Api
-from forexconnect import ForexConnect, fxcorepy
 from myLib.log import Log
 from myLib.database import Database
 from myLib.data import Data
-from myLib.utils import config, debug, sort, parse_cli_args, format_dict_block, timeframe_nex_date, to_bool
-
+from myLib.utils import debug, sort, format_dict_block, timeframe_nex_date
+from forexconnect import ForexConnect, fxcorepy
 
 #--------------------------------------------------------------------------------- Action
 class Forex:
@@ -23,6 +22,7 @@ class Forex:
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.account = account
+        self.account_id = None
         #--------------------Instance
         self.log = Log()
         self.db = Database.instance()
@@ -113,6 +113,7 @@ class Forex:
             accounts_table = self.fx.get_table(ForexConnect.ACCOUNTS)
             #--------------Action
             for account in accounts_table:
+                self.account_id = account.account_id
                 output.data["id"] = account.account_id
                 output.data["name"] = account.account_name
                 output.data["balance"] = account.balance
@@ -282,7 +283,7 @@ class Forex:
         return output
     
     #--------------------------------------------- trade_open
-    def trade_open(self, action, symbol, amount):
+    def trade_open(self, action, symbol, amount, tp_pips=0, sl_pips=0):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -303,23 +304,60 @@ class Forex:
                 buy_sell=fxcorepy.Constants.BUY
             elif action=="sell":
                 buy_sell=fxcorepy.Constants.SELL
+            ask = None
+            bid = None
+            spred = None
+            sl = None
+            tp = None
+            #--------------Data
+            #---Offers
+            offers = self.fx.get_table(ForexConnect.OFFERS)
+            for offer in offers:
+                if offer.instrument == symbol:
+                    if offer.subscription_status == fxcorepy.Constants.SubscriptionStatuses.TRADABLE:
+                        ask = offer.ask
+                        bid = offer.bid
+                        point_size = offer.point_size 
+                        spread = (ask-bid) * point_size 
+                        break
+            #---TP/SL
+            if tp_pips or sl_pips:
+                if action == "buy":
+                    tp = ask + (tp_pips * point_size)
+                    sl = bid - (sl_pips * point_size)
+                elif action == "sell":
+                    tp = bid - (tp_pips * point_size)
+                    sl = ask + (sl_pips * point_size)
             #--------------Order
-            request = self.fx.create_order_request(
-                ACCOUNT_ID=self.account["id"],
-                command=command, 
-                order_type=order_type,
-                BUY_SELL= buy_sell,
-                SYMBOL = symbol,
-                AMOUNT= amount
-            )
-            response = self.fx.send_request(request)
-            response_details = {
-                "order_id": getattr(response, "order_id", None) if response else None,
-                "trade_id": getattr(response, "trade_id", None) if response else None,
-                "symbol": symbol,
-                "buy_sell": buy_sell,
-                "amount": amount
-            }
+            if ask and bid :
+                if tp or sl:
+                    request = self.fx.create_order_request(
+                        ACCOUNT_ID=self.account_id,
+                        command=command, 
+                        order_type=order_type,
+                        BUY_SELL= buy_sell,
+                        SYMBOL = symbol,
+                        AMOUNT= amount,
+                        RATE_LIMIT = tp,
+                        RATE_STOP = sl
+                    )
+                else:
+                    request = self.fx.create_order_request(
+                        ACCOUNT_ID=self.account_id,
+                        command=command, 
+                        order_type=order_type,
+                        BUY_SELL= buy_sell,
+                        SYMBOL = symbol,
+                        AMOUNT= amount
+                    )
+                response = self.fx.send_request(request)
+                response_details = {
+                    "order_id": getattr(response, "order_id", None) if response else None,
+                    "trade_id": getattr(response, "trade_id", None) if response else None,
+                    "symbol": symbol,
+                    "buy_sell": buy_sell,
+                    "amount": amount
+                }
             #--------------Output
             output.data = response_details
             output.message = {
