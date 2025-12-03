@@ -79,6 +79,7 @@ download:
   save: False
   bulk: True
   clear: False
+  dedicated: False
   datefrom: '1900-01-01 00:00:00'
   dateto: '2030-01-01 00:00:00'
   
