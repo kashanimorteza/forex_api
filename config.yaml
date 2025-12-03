@@ -76,7 +76,7 @@ download:
   count: 1000
   repeat: 1
   delay: 0
-  save: False
+  save: True
   bulk: True
   clear: False
   dedicate: False
