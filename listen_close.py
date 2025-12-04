@@ -5,6 +5,11 @@
 # listen_close
 
 #--------------------------------------------------------------------------------- Import
+#--------------------------------------------- Warnings
+import logging, warnings
+warnings.filterwarnings("ignore")
+logging.getLogger().setLevel(logging.ERROR)
+logging.getLogger("root").setLevel(logging.CRITICAL)
 #--------------------------------------------- General
 import os, sys, time, ast, threading
 root_dir = os.path.dirname(os.path.abspath(__file__))
@@ -16,6 +21,7 @@ from forexconnect import ForexConnect, fxcorepy
 from forexconnect.TableListener import TableListener
 import forexconnect.lib
 #--------------------------------------------- Me
+from myLib.log import Log
 from myLib.forex_api import Forex_Api
 from myLib.forex import Forex
 from myLib.data_orm import Data_Orm
@@ -23,6 +29,7 @@ from myModel import *
 from myStrategy import *
 
 #--------------------------------------------------------------------------------- Instance
+log = Log()
 data_orm = Data_Orm()
 forex_api = Forex_Api(account="acc-trade")
 forex = Forex(forex_api = forex_api)
@@ -47,6 +54,8 @@ class CloseTradesListener(TableListener):
         if strategy_id == 2:
             strategy = Strategy_02(forex=forex, params=params)
         
+        log.verbose("rep", f"Listen | {action}", profit)
+
         t = threading.Thread(target=strategy.next, args=({"order_id": order_id, "action": action, "profit": profit},))
         t.start()
 

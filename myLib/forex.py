@@ -431,7 +431,7 @@ class Forex:
             request = self.fx.create_order_request(
                 command=command, 
                 order_type=order_type,
-                ACCOUNT_ID=self.account["id"],
+                ACCOUNT_ID=self.account_id,
                 ORDER_ID=order_id,
                 SYMBOL=symbol,
                 TRADE_ID=trade_id,
