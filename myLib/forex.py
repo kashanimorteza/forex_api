@@ -205,21 +205,21 @@ class Forex:
         try:
             if dateto > datefrom:
                 #-----Get
-                while attempt < 10:
+                while attempt < 3:
                     try: 
                         data = self.fx.get_history(instrument, timeframe, date_from=datefrom, date_to=dateto, quotes_count=count)
                         break
                     except Exception as e:
                         self.log.verbose("err", f"{self.this_class} | {this_method}", f"{instrument} | {timeframe} | {datefrom.strftime('%Y-%m-%d %H:%M:%S')} | {dateto.strftime('%Y-%m-%d %H:%M:%S')}")
                         attempt += 1
-                        print(f"Error (attempt {attempt}/10): {e}")
+                        print(f"Error (attempt {attempt}/3): {e}")
                         if attempt > 1: 
                             self.fx.logout()
                             forex_api = Forex_Api(account=self.account)
                             self.fx = forex_api.fx
                             forex_api.login()
                             time.sleep(1)
-                        if attempt >= 10: raise
+                        if attempt >= 3: raise
                         time.sleep(1)
                 #-----Check
                 if len(data)>0:
