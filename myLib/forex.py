@@ -6,6 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
+from turtle import mode
 import pandas as pd
 from model import model_output
 from myLib.forex_api import Forex_Api
@@ -14,21 +15,23 @@ from myLib.database import Database
 from myLib.data import Data
 from myLib.utils import debug, sort, format_dict_block, timeframe_nex_date
 from forexconnect import ForexConnect, fxcorepy
+from myLib.data_orm import data_orm
+from myModel import *
 
 #--------------------------------------------------------------------------------- Action
 class Forex:
     #--------------------------------------------- init
-    def __init__(self, account):
+    def __init__(self, forex_api):
         #--------------------Variable
         self.this_class = self.__class__.__name__
-        self.account = account
         self.account_id = None
         #--------------------Instance
         self.log = Log()
         self.db = Database.instance()
         self.data = Data(log=self.log, db=self.db)
-        self.api = Forex_Api(account=account)
+        self.api = forex_api
         self.fx = self.api.fx
+        self.data_orm = data_orm()
 
     #--------------------------------------------- run
     def store(self, instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto):
@@ -287,7 +290,7 @@ class Forex:
         return output
     
     #--------------------------------------------- trade_open
-    def trade_open(self, symbol, action, amount, tp_pips=0, sl_pips=0):
+    def trade_open(self,symbol, action, amount, tp_pips=0, sl_pips=0, strategy_id=1):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -330,12 +333,19 @@ class Forex:
             if tp_pips or sl_pips:
                 if action == "buy":
                     price = ask
+                    price = f"{price:.{digits}f}"
                     tp = ask + (tp_pips * point_size)
+                    tp = f"{tp:.{digits}f}"
                     sl = bid - (sl_pips * point_size)
+                    sl = f"{sl:.{digits}f}"
                 elif action == "sell":
                     price = bid
+                    price = f"{price:.{digits}f}"
                     tp = bid - (tp_pips * point_size)
+                    tp = f"{tp:.{digits}f}"
                     sl = ask + (sl_pips * point_size)
+                    sl = f"{sl:.{digits}f}"
+
             #--------------Order
             if ask and bid :
                 if tp or sl:
@@ -347,7 +357,8 @@ class Forex:
                         SYMBOL = symbol,
                         AMOUNT= amount,
                         RATE_LIMIT = tp,
-                        RATE_STOP = sl
+                        RATE_STOP = sl,
+                        CUSTOM_ID= strategy_id
                     )
                 else:
                     request = self.fx.create_order_request(
@@ -356,26 +367,31 @@ class Forex:
                         order_type=order_type,
                         BUY_SELL= buy_sell,
                         SYMBOL = symbol,
-                        AMOUNT= amount
+                        AMOUNT= amount,
+                        CUSTOM_ID= strategy_id
                     )
                 response = self.fx.send_request(request)
-                response_details = {
-                    "order_id": getattr(response, "order_id", None) if response else None,
-                    "trade_id": getattr(response, "trade_id", None) if response else None,
-                    "symbol": symbol,
-                    "buy_sell": buy_sell,
-                    "amount": amount
-                }
+                order_id = getattr(response, "order_id", None) if response else None
+                #--------------Database
+                obj = strategy_item_trade_model_db()
+                obj.order_id = order_id
+                obj.strategy_item_id = strategy_id
+                obj.symbol = symbol
+                obj.action = "buy"
+                obj.amount = amount
+                obj.tp = tp
+                obj.sl = sl
+                self.data_orm.add(model=strategy_item_trade_model_db, item=obj)
             #--------------Output
-            output.time = sort(int(time.time() - start_time), 3)
-            output.data = response_details
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = {
                 "symbol": f"{symbol}",
                 "action": f"{action}",
                 "amount": f"{amount}",
-                "price": f"{price:.{digits}f}",
-                "tp": f"{tp:.{digits}f}",
-                "sl": f"{sl:.{digits}f}"
+                "price": price,
+                "tp": tp,
+                "sl": sl,
+                "order_id": order_id
             }
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
@@ -491,3 +507,4 @@ class Forex:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
+    

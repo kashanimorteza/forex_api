@@ -13,8 +13,12 @@ sys.path.insert(0, f"{root_dir}/myStrategy")
 from myLib.database_orm import database_orm
 from myLib.data_orm import data_orm
 from myLib.forex import Forex
+from myLib.listener import Listener
+from myLib.forex_api import Forex_Api
 from myModel import *
 from myStrategy import *
+
+data = data_orm()
 
 # #--------------------------------------------------------------------------------- Action
 # forex = Forex(account="acc-trade")
@@ -26,7 +30,6 @@ from myStrategy import *
 #--------------------------------------------------------------------------------- Database_orm
 # db = database_orm()
 # db.create_tables()
-data = data_orm()
 
 # obj = strategy_model_db(name="ST01", description="ST01", enable=True)
 # data.add(model=strategy_model_db, item=obj)
@@ -40,9 +43,20 @@ data = data_orm()
 # obj = strategy_item_model_db(strategy_id=1, name="ST01-EURUSD", description="ST01-EURUSD", enable=True, params=str(params))
 # data.add(model=strategy_item_model_db, item=obj)
 
+#--------------------------------------------------------------------------------- Listener
+# forex_api = Forex_Api(account="acc-trade")
+# forex_api.login()
+
+# forex = Forex(forex_api = forex_api)
+# forex.account_info()
+
+# obj = Listener(forex=forex)
+# obj.read_trade()
+
 #--------------------------------------------------------------------------------- Action
-forex = Forex(account="acc-trade")
-forex.api.login()
+forex_api = Forex_Api(account="acc-trade")
+forex_api.login()
+forex = Forex(forex_api = forex_api)
 forex.account_info()
 
 obj = data.item(model=strategy_item_model_db, id=1)
