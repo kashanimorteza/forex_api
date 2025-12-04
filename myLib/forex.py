@@ -25,6 +25,7 @@ class Forex:
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.account_id = None
+        self.account = forex_api.account
         #--------------------Instance
         self.log = Log()
         self.db = Database.instance()

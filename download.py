@@ -68,6 +68,7 @@ try:
                 forex_api = Forex_Api(account="acc-trade")
                 forex_api.login()
                 forex = Forex(forex_api=forex_api)
+                forex.account_info()
                 forex.db.open()
                 forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
                 forex.db.close()
@@ -76,6 +77,7 @@ try:
         forex_api = Forex_Api(account="acc-trade")
         forex_api.login()
         forex = Forex(forex_api=forex_api)
+        forex.account_info()
         forex.db.open()
         for timeframe in timeframes:
             for instrument in instruments:

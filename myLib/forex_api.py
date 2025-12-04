@@ -22,6 +22,7 @@ class Forex_Api:
         self.fx = ForexConnect()
         #--------------------Data
         self.account = account
+        self.id = None
         self.server = config['forex_connect'][account]['server']
         self.username = config['forex_connect'][account]['username']
         self.password = config['forex_connect'][account]['password']
