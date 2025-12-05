@@ -65,7 +65,7 @@ try:
             for instrument in instruments:
                 if clear : 
                     if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
-                forex_api = Forex_Api(account="acc-trade")
+                forex_api = Forex_Api(account=account)
                 forex_api.login()
                 forex = Forex(forex_api=forex_api)
                 forex.account_info()
@@ -74,7 +74,7 @@ try:
                 forex.db.close()
                 forex_api.logout()
     else :
-        forex_api = Forex_Api(account="acc-trade")
+        forex_api = Forex_Api(account=account)
         forex_api.login()
         forex = Forex(forex_api=forex_api)
         forex.account_info()
