@@ -56,7 +56,7 @@ class Strategy_02:
             elif mode == "close":
                 self.forex.trade_close_all()
             #--------------Output
-            output.time = sort(int(time.time() - start_time), 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = {
                 "mode": mode,
             }
@@ -95,7 +95,7 @@ class Strategy_02:
             #--------------Action
             self.action(mode="buy")
             #--------------Output
-            output.time = sort(int(time.time() - start_time), 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = {
 
             }
@@ -143,7 +143,7 @@ class Strategy_02:
                 terget = "buy" if profit > 0 else "sell"
             self.action(mode=terget)
             #--------------Output
-            output.time = sort(int(time.time() - start_time), 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = {
                 "order_id": order_id,
                 "action": action,

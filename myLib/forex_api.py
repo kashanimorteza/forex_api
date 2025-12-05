@@ -55,7 +55,7 @@ class Forex_Api:
             #--------------Action
             self.fx.login(self.username, self.password, self.url, self.server, self.session_status_changed)
             #--------------Output
-            output.time = sort(int(time.time() - start_time), 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = self.account
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
@@ -92,7 +92,7 @@ class Forex_Api:
             #--------------Action
             self.fx.logout()
             #--------------Output
-            output.time = sort(int(time.time() - start_time), 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = self.account
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)

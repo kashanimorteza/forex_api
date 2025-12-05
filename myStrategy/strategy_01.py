@@ -49,7 +49,7 @@ class Strategy_01:
             result_buy = self.forex.trade_open(action="buy", symbol=self.symbol, amount=self.amount, tp_pips=self.tp_pips, sl_pips=self.st_pips, strategy_id=self.id, ac=ac)
             result_sell = self.forex.trade_open(action="sell", symbol=self.symbol, amount=self.amount, tp_pips=self.tp_pips, sl_pips=self.st_pips, strategy_id=self.id, ac=ac)
             #--------------Output
-            output.time = sort(int(time.time() - start_time), 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = {
                 "buy": result_buy.status,
                 "sell": result_sell.status
@@ -89,7 +89,7 @@ class Strategy_01:
             #--------------Action
             self.action(ac=True)
             #--------------Output
-            output.time = sort(int(time.time() - start_time), 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = {
                 "order_id": order_id,
             }

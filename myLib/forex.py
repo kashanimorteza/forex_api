@@ -126,7 +126,7 @@ class Forex:
                 output.data["equity"] = account.equity
                 break
             #--------------Output
-            output.time = sort(int(time.time() - start_time), 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = output.data
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
