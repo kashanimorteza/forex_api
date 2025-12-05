@@ -44,9 +44,14 @@ class Forex:
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        #-------------- Output
         output = model_output()
-        #-------------- Action
-        try:            
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Variable
+            start_time = time.time()
             #---Check
             if mode == "up":
                 d = self.data.get_max_min(instrument=instrument, timeframe=timeframe, mode="max", filed="Date")
@@ -80,22 +85,23 @@ class Forex:
                                 if mode == "once" : 
                                     break
                             else : break
-                            #time.sleep(2)
                         else: break
                 if delay == 0: break; 
                 time.sleep(delay)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
-            #--------------Output
-            return output
         except Exception as e:  
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
 
     #--------------------------------------------- account_info
     def account_info(self):
@@ -165,13 +171,13 @@ class Forex:
                 symbol = getattr(offer, "symbol", None)
                 if instrument_name and symbol : instruments[instrument_name] = symbol
             #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = instruments
             output.message = {
-                "Time": sort(int(time.time() - start_time), 3),
                 "count": len(instruments)
             }
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -181,7 +187,7 @@ class Forex:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
-        return output 
+        return output
 
     #--------------------------------------------- history
     def history(self, instrument, timeframe, datefrom=None, dateto=None, count=None):
@@ -230,9 +236,10 @@ class Forex:
                     output.status = False
             else:
                 output.status = False
-            output.message = f"{sort(int(time.time() - start_time), 3)} | {instrument} | {timeframe} | {sort(len(data), 6)} | {start} | {end} |"
+
+            output.message = f"{sort(f"{(time.time() - start_time):.3f}", 3)} | {instrument} | {timeframe} | {sort(len(data), 6)} | {start} | {end} |"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method}", output.message)
+            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
