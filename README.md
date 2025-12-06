@@ -138,6 +138,7 @@ python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,
 ```
 Save
 ```bash
+python download.py account=acc-history1 instrument=EUR/USD,XAU/USD,/XAG/USD,USOil,UKOil timeframe=t1 mode=down save=True bulk=True dedicate=False clear=False count=25000 datefrom='2025-01-01 00:00:00'
 python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,H3,H2,H1,m30,m15,m5,m1 mode=down save=True bulk=True dedicate=False clear=False count=100000
 python download.py account=acc-history1 instrument=XAU/USD timeframe=t1 mode=down save=True bulk=True dedicate=False clear=False count=50000 datefrom='2025-01-01 00:00:00'
 ```

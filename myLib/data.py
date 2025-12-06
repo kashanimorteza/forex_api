@@ -16,7 +16,7 @@ class Data:
     #--------------------------------------------- init
     def __init__(self, log, db):
         #--------------------Variable
-        self.this_class = utils.sort(self.__class__.__name__, 8)
+        self.this_class = self.__class__.__name__
 
         #--------------------Instance
         self.db = db
@@ -68,7 +68,7 @@ class Data:
         # OUT    : 
         # Action :
         #-------------- Debug
-        this_method = utils.sort(inspect.currentframe().f_code.co_name, 8)
+        this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
@@ -121,7 +121,7 @@ class Data:
             output.time = utils.sort(f"{(time.time() - start_time):.3f}", 3)
             output.message =f"{instrument} | {timeframe} | {utils.sort(insert, 6)}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{self.this_class} | {this_method} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{utils.sort(self.this_class, 8)} | {utils.sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
