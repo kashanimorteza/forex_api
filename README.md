@@ -521,9 +521,6 @@ pigz -dc /Volumes/data/forex/backup_2025-12-06.tar.gz | psql -d forex
 ```bash
 psql -d forex -f /Volumes/data/forex/backup_2025-12-06
 ```
-```bash
-psql -d forex -f /Volumes/data/forex/backup_2025-12-06
-```
 
 <!-------------------------- Download Backup -->
 Download Backup
