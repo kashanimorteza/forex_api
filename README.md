@@ -486,8 +486,8 @@ sudo -i -u postgres
 pigz -dc backup_2025-11-28.tar.gz | psql -U postgres -d forex
 pigz -dc xauusd_t1.gz | psql -U forex -d forex
 ```
-
-Mac
+<!-------------------------- Restore -->
+Restore : Mac
 ```bash
 psql -d postgres
 ```
