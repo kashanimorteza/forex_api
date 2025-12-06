@@ -22,7 +22,7 @@ class Forex:
     #--------------------------------------------- init
     def __init__(self, forex_api):
         #--------------------Variable
-        self.this_class = self.__class__.__name__
+        self.this_class = sort(self.__class__.__name__, 8)
         self.account_id = None
         self.account = forex_api.account
         #--------------------Instance
@@ -196,7 +196,7 @@ class Forex:
         # OUT    : 
         # Action :
         #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
+        this_method = sort(inspect.currentframe().f_code.co_name, 8)
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)

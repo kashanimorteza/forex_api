@@ -16,7 +16,8 @@ class Data:
     #--------------------------------------------- init
     def __init__(self, log, db):
         #--------------------Variable
-        self.this_class = self.__class__.__name__
+        self.this_class = utils.sort(self.__class__.__name__, 8)
+
         #--------------------Instance
         self.db = db
         self.log = log
@@ -67,7 +68,7 @@ class Data:
         # OUT    : 
         # Action :
         #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
+        this_method = utils.sort(inspect.currentframe().f_code.co_name, 8)
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
