@@ -486,6 +486,40 @@ sudo -i -u postgres
 pigz -dc backup_2025-11-28.tar.gz | psql -U postgres -d forex
 pigz -dc xauusd_t1.gz | psql -U forex -d forex
 ```
+
+Mac
+```bash
+psql -d postgres
+```
+```sql
+SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'forex' AND pid <> pg_backend_pid();
+DROP DATABASE IF EXISTS forex;
+```
+```sql
+CREATE DATABASE forex WITH OWNER = forex;
+\c forex
+```
+```sql
+ALTER ROLE forex WITH CONNECTION LIMIT -1;
+ALTER DATABASE forex OWNER TO forex;
+ALTER SCHEMA public OWNER TO forex;
+GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
+GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
+GRANT USAGE ON SCHEMA public TO forex;
+GRANT CREATE ON SCHEMA public TO forex;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO forex;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO forex;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
+\q
+```
+```bash
+scp root@10.10.10.114:/extra/backup_2025-12-06.tar.gz /Volumes/data/forex/
+```
+```bash
+pigz -dc /Volumes/data/forex/backup_2025-12-06.tar.gz | psql -d forex
+```
+
+
 <!-------------------------- Download Backup -->
 Download Backup
 ```bash
