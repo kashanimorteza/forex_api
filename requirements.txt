@@ -1,8 +1,12 @@
 psycopg2-binary
 numpy
 pandas
-pydantic
 PyYAML
 fxcmpy
 forexconnect
+flask
+uvicorn
+requests
+fastapi[all]
 sqlalchemy
+pydantic

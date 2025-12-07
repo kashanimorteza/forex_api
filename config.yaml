@@ -11,6 +11,19 @@ database:
     pass: "&WnA8v!(THG%)czK"
     name: forex
 
+#--------------------------------------------------------------------------------- Api
+api:
+  title: forex_api
+  description: This is my custom API schema description
+  version: '1.0.0'
+  openapi_url: /schema
+  docs_url: /doc1
+  redoc_url: /doc2
+  key: e21d6dfd-85cf-4886-a512-8c6e432bf9c9
+  host: 127.0.0.1 
+  port: 7001
+  workers: 3
+
 #--------------------------------------------------------------------------------- Log
 log:
   #---------------------------------Database

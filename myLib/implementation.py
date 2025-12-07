@@ -5,11 +5,16 @@
 # Implementation
 
 #--------------------------------------------------------------------------------- Import
-import inspect
+import inspect, time
 import myLib.utils as utils
 from myLib.debug import debug
 from myLib.model import model_output
 from myLib.log import Log
+from myLib.data_orm import Data_Orm
+from myModel import *
+from myModel.model_instrument import model_instrument_db
+from myLib.forex import Forex
+from myLib.utils import debug, sort, format_dict_block, timeframe_nex_date
 
 #--------------------------------------------------------------------------------- Action
 class Implementation:
@@ -22,69 +27,65 @@ class Implementation:
         #--------------------database
         self.db = db
     
-    #--------------------------------------------- create_instrument_table
-    def create_instrument_table(self, drop=None, create=None, add=None):
-        #-------------------- Description
+    #--------------------------------------------- instrument
+    def instrument(self, drop=None, create=None, add=None):
+        #-------------- Description
         # IN     : 
         # OUT    : 
-        # Action : Create instrument table and fill it with data 
-        #-------------------- Debug
+        # Action :
+        #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
         log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
         output = model_output()
-        #-------------------- Variable
-        count = 0
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Variable
+        data_orm = Data_Orm()
+        #-------------- Data
         cfgData = utils.config.get("instrument", {})
-        tblName = cfgData.get("table")
-        useDefaultSymbols = cfgData.get("useDefaultSymbols")
         defaultSymbols = cfgData.get("defaultSymbols")
-        #-------------------- Execute
+
         try:
-            if drop:
-                output.data["drop"] = self.db.execute(f"DROP TABLE IF EXISTS {tblName}")
-                self.log.log('not',f'{self.this_class}({this_method})', f'Drop   : {tblName} : {output.data["drop"]}')
-            if create:
-                query = f"""CREATE TABLE IF NOT EXISTS {tblName}
-                (
-                    id SERIAL UNIQUE NOT NULL,
-                    name VARCHAR (50) UNIQUE NOT NULL PRIMARY KEY,
-                    instrument VARCHAR (50),
-                    category smallint DEFAULT 100
-                )"""
-                output.data["create"] = self.db.execute(query)
-                self.log.log('not',f'{self.this_class}({this_method})', f'Create : {tblName} : {output.data["create"]}')
-            if add:
-                if useDefaultSymbols:
-                    instruments = defaultSymbols 
-                else:
-                    from myLib.forex import Forex
-                    instruments = Forex().instruments()
-                query = f'INSERT INTO {tblName} (name, instrument, category) VALUES '
-                for i in instruments:
-                    name = i.replace('/', '')
-                    name = name.replace('.', '')
-                    if self.db.getDataOne(f"SELECT id FROM {tblName} WHERE name='{name}'") is None:
-                        query += f"('{name}' , '{i}', 5),"
-                        count += 1
-                if count > 0 :
-                    query = query[:-1]
-                    output.data["add"] = -1 if self.db.execute(query) is False else count
-                else:
-                    output.data["add"] = 0
-                self.log.log('not',f'{self.this_class}({this_method})', f'Add    : {tblName} : {output.data["add"]}')
+            for instrument in defaultSymbols:
+                name = instrument.replace('/', '')
+                name = name.replace('.', '')
+                category = 100
+                priority = 100
+                if instrument == "XAU/USD" : 
+                    category = 1
+                    priority = 1 
+                if instrument == "XAG/USD" : 
+                    category = 1
+                    priority = 2
+                if instrument == "USOil" : 
+                    category = 1
+                    priority = 3
+                if instrument == "UKOil" : 
+                    category = 1
+                    priority = 4
+                if instrument == "EUR/USD" : 
+                    category = 1
+                    priority = 5
+                obj = model_instrument_db(name=name, instrument=instrument,  category=category,  priority=priority, description="", enable=True)
+                data_orm.add(model=model_instrument_db, item=obj)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message =len(defaultSymbols)
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
         except Exception as e:  
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Verbose
-        if verbose : print(output)
-        #--------------Log
-        if log : self.log.log(log_model, output)
-        #--------------Output
+        #--------------Return
         return output
     
     #--------------------------------------------- set_instrument_category

@@ -6,31 +6,33 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from myLib.database_orm import database_orm as database 
+from myLib.data_orm import Data_Orm
 from myLib.model import model_output
 from myLib.utils import debug, sort
 from myLib.log import Log
 
 #--------------------------------------------------------------------------------- Class
-class Data_Orm:
+class Logic:
     #-------------------------- [Init]
     def __init__(
             self, 
             verbose: bool = False, 
             log: bool = False, 
-            instance_db : database = None, 
-            instance_log : Log =None
+            instance_data : Data_Orm = None, 
+            instance_log : Log =None,
+            model = None
         ):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.log = log
         self.verbose = verbose
+        self.model = model
         #--------------------Instance
         self.instance_log = instance_log if instance_log else Log()
-        self.instance_db = instance_db if instance_db else database(verbose=verbose, log=log)
+        self.instance_data = instance_data if instance_data else Data_Orm(verbose=verbose, log=log)
 
     #-------------------------- [Add]
-    def add(self, model, item) -> model_output:
+    def add(self, item) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -48,10 +50,10 @@ class Data_Orm:
 
         try:
             #--------------Action
-            output:model_output = self.instance_db.add(model=model, item=item)
+            output:model_output = self.instance_data.add(model=self.model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model} | {item}"
+            output.message =f"{self.model} | {item}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -66,7 +68,7 @@ class Data_Orm:
         return output
 
     #--------------------------[Items]
-    def items(self, model, **filters) -> model_output:
+    def items(self, **filters) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -84,10 +86,10 @@ class Data_Orm:
 
         try:
             #--------------Action
-            output:model_output = self.instance_db.items(model=model, **filters)
+            output:model_output = self.instance_data.items(model=self.model, **filters)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model}"
+            output.message =f"{self.model}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -102,7 +104,7 @@ class Data_Orm:
         return output
 
     #--------------------------[Item]
-    def item(self, model, id:int) -> model_output:
+    def item(self, id:int) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -120,10 +122,10 @@ class Data_Orm:
 
         try:
             #--------------Action
-            output:model_output = self.instance_db.items(model=model, id=id)
+            output:model_output = self.instance_data.items(model=self.model, id=id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model}"
+            output.message =f"{self.model}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -138,7 +140,7 @@ class Data_Orm:
         return output
     
     #--------------------------[Update]
-    def update(self, model, item) -> model_output:
+    def update(self, item) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -156,10 +158,10 @@ class Data_Orm:
 
         try:
             #--------------Action
-            output:model_output = self.instance_db.update(model=model, item=item)
+            output:model_output = self.instance_data.update(model=self.model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model} | {item}"
+            output.message =f"{self.model} | {item}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -174,7 +176,7 @@ class Data_Orm:
         return output
 
     #--------------------------[Delete]
-    def delete(self, model, id:int) -> model_output:
+    def delete(self, id:int) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -192,10 +194,10 @@ class Data_Orm:
 
         try:
             #--------------Action
-            output:model_output = self.instance_db.delete(model=model, id=id)
+            output:model_output = self.instance_data.delete(model=self.model, id=id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model}"
+            output.message =f"{self.model}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -210,7 +212,7 @@ class Data_Orm:
         return output
 
     #--------------------------[Enable]
-    def enable(self, model, id:int) -> model_output:
+    def enable(self, id:int) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -228,10 +230,10 @@ class Data_Orm:
         
         try:
             #--------------Action
-            output:model_output = self.instance_db.delete(model=model, id=id)
+            output:model_output = self.instance_data.delete(model=self.model, id=id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model}"
+            output.message =f"{self.model}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -246,7 +248,7 @@ class Data_Orm:
         return output
 
     #--------------------------[Disable]
-    def disable(self, model, id:int) -> model_output:
+    def disable(self, id:int) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -264,10 +266,10 @@ class Data_Orm:
         
         try:
             #--------------Action
-            output:model_output = self.instance_db.delete(model=model, id=id)
+            output:model_output = self.instance_data.delete(model=self.model, id=id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model}"
+            output.message =f"{self.model}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -282,7 +284,7 @@ class Data_Orm:
         return output
     
     #--------------------------[Dead]
-    def dead(self, model, id:int) -> model_output:
+    def dead(self, id:int) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -300,10 +302,10 @@ class Data_Orm:
         
         try:
             #--------------Action
-            output:model_output = self.instance_db.delete(model=model, id=id)
+            output:model_output = self.instance_data.delete(model=self.model, id=id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{model}"
+            output.message =f"{self.model}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
