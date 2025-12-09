@@ -26,6 +26,12 @@ debug = {
         "save":{"log":False, "verbose":True, "model":"Data"},
         "get_max_min":{"log":False, "verbose":False, "model":"Data"},
     },
+    "Database_Orm" : 
+    {
+        "drop":{"log":False, "verbose":True, "model":"Database_Orm"},
+        "create":{"log":False, "verbose":False, "model":"Database_Orm"},
+        "truncate":{"log":False, "verbose":False, "model":"Database_Orm"},
+    },
     "ST01" : 
     {
         "start":{"log":False, "verbose":True, "model":"Data"},

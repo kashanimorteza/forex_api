@@ -11,13 +11,13 @@ sys.path.insert(0, f"{root_dir}/myLib")
 from myLib.log import Log
 from myLib.database import Database
 from myLib.implementation import Implementation
-from myLib.database_orm import database_orm
+from myLib.database_orm import Database_Orm
 
 #--------------------------------------------------------------------------------- Variable
 start_time = time.time()
 
 #--------------------------------------------------------------------------------- Log
-db = database_orm()
+db = Database_Orm()
 db.create_tables()
 
 #--------------------------------------------------------------------------------- Log
@@ -31,7 +31,7 @@ db.open(name="Implement")
 impelment = Implementation(db=db)
 
 #-------------------- Instrument
-instrument = impelment.instrument(drop=False, create=False, add=True)
+instrument = impelment.instrument(drop=True, create=True,truncate=True, add=True)
 print(instrument)
 
 # lst = ["EUR/USD", "EUR/GBP", "EUR/CHF", "EUR/JPY", "EUR/AUD", "EUR/CAD", "EUR/NZD"]

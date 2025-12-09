@@ -50,31 +50,48 @@ class Implementation:
         defaultSymbols = cfgData.get("defaultSymbols")
 
         try:
-            for instrument in defaultSymbols:
-                name = instrument.replace('/', '')
-                name = name.replace('.', '')
-                category = 100
-                priority = 100
-                if instrument == "XAU/USD" : 
-                    category = 1
-                    priority = 1 
-                if instrument == "XAG/USD" : 
-                    category = 1
-                    priority = 2
-                if instrument == "USOil" : 
-                    category = 1
-                    priority = 3
-                if instrument == "UKOil" : 
-                    category = 1
-                    priority = 4
-                if instrument == "EUR/USD" : 
-                    category = 1
-                    priority = 5
-                obj = model_instrument_db(name=name, instrument=instrument,  category=category,  priority=priority, description="", enable=True)
-                data_orm.add(model=model_instrument_db, item=obj)
+            #-------------- Drop Table
+            if drop:
+                data_orm.drop(model=model_instrument_db)
+                if verbose: self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)}", "Table dropped")
+
+            #-------------- Create Table
+            if create:
+                data_orm.create(model=model_instrument_db)
+                if verbose: self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)}", "Table created")
+
+            #-------------- Truncate Table
+            if truncate:
+                data_orm.truncate(model=model_instrument_db)
+                if verbose: self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)}", "Table truncated")
+            
+            #-------------- Add Data
+            if add:
+                for instrument in defaultSymbols:
+                    name = instrument.replace('/', '')
+                    name = name.replace('.', '')
+                    category = 100
+                    priority = 100
+                    if instrument == "XAU/USD" : 
+                        category = 1
+                        priority = 1 
+                    if instrument == "XAG/USD" : 
+                        category = 1
+                        priority = 2
+                    if instrument == "USOil" : 
+                        category = 1
+                        priority = 3
+                    if instrument == "UKOil" : 
+                        category = 1
+                        priority = 4
+                    if instrument == "EUR/USD" : 
+                        category = 1
+                        priority = 5
+                    obj = model_instrument_db(name=name, instrument=instrument,  category=category,  priority=priority, description="", enable=True)
+                    data_orm.add(model=model_instrument_db, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =len(defaultSymbols)
+            output.message = f"Instruments added: {len(defaultSymbols) if add else 0}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

@@ -5,37 +5,46 @@
 # database_orm
 
 #--------------------------------------------------------------------------------- Import
-import inspect
+from pyexpat import model
+import inspect, time
+from tty import CFLAG
+from myLib.log import Log
 from myLib.utils import config, debug
 from myLib.model import model_output
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import or_, and_
+from myLib.utils import debug, sort
 
 #--------------------------------------------------------------------------------- Variable
 BaseModel = declarative_base()
-dbData = {}
-dbCfg = config.get("database", {}).get("main", {})
-host = dbCfg.get("host", "127.0.0.1")
-port = dbCfg.get("port", "5432")
-username = dbCfg.get("user", "forex")
-password= dbCfg.get("pass", "&WnA8v!(THG%)czK")
-name = dbCfg.get("name", "forex")
+cfg = config.get("database", {}).get("main", {})
+host = cfg.get("host")
+port = cfg.get("port")
+username = cfg.get("user")
+password= cfg.get("pass",)
+name = cfg.get("name")
 
 #--------------------------------------------------------------------------------- Instance
 engine = create_engine(f"postgresql://{username}:{password}@{host}:{port}/{name}", echo=False, pool_size=100, max_overflow=100)
 session = sessionmaker(bind=engine)()
 
 #--------------------------------------------------------------------------------- Class
-class database_orm:
+class Database_Orm:
     #-------------------------- [Init]
-    def __init__(self, type=None, verbose: bool = False, log: bool = False):
-        #--------------Variable
+    def __init__(
+            self, 
+            verbose: bool = False, 
+            log: bool = False,  
+            instance_log : Log =None
+        ):
+        #--------------------Variable
         self.this_class = self.__class__.__name__
-        self.modoule = "database_orm"
-        self.verbose = verbose
         self.log = log
+        self.verbose = verbose
+        #--------------------Instance
+        self.instance_log = instance_log if instance_log else Log()
 
     #-------------------------- [Create tables]
     def create_tables(self) -> model_output:
@@ -86,17 +95,23 @@ class database_orm:
         
     #-------------------------- [Items]
     def items(self, model, **filters) -> model_output:
-        #--------------Description
+        #-------------- Description
         # IN     : 
-        # OUT    : model_output
-        # Action : return list of models
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
         try:
-            #--------------Debug
-            this_method = inspect.currentframe().f_code.co_name
-            output = model_output()
-            #--------------Variable
-            #session = sessionmaker(bind=self.engine)()
-            #--------------Data
+            #--------------Action
             query = session.query(model)
             if filters:
                 for attr, value in filters.items() : 
@@ -104,20 +119,21 @@ class database_orm:
             query = query.order_by(model.id)
             result = query.all()
             #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.status = True if result else False
+            output.message =f"{model}"
             output.data = result
+            #--------------Verbose
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.instance_log.log(log_model, output)
         except Exception as e:  
             #--------------Error
             output.status = False
-            output.data = {"class":self.this_class, "method":this_method, "error": str(e)}
-            print(output)
-        # finally:
-        #         session.close()
-        #--------------Verbose
-        if self.verbose : print(output)
-        #--------------Log
-        if self.log : print(output)
-        #--------------Output
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
         return output
 
     #-------------------------- [Update]
@@ -263,33 +279,110 @@ class database_orm:
 
     #-------------------------- [truncate]
     def truncate(self, model) -> model_output:
-        #--------------Description
+        #-------------- Description
         # IN     : 
-        # OUT    : model_output
-        # Action : return list of models
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
         try:
-            #--------------Debug
-            this_method = inspect.currentframe().f_code.co_name
-            output = model_output()
-            #--------------Variable
-            #session = sessionmaker(bind=self.engine)()
             #--------------Action
-            session.execute(text(f"DELETE FROM {model.__tablename__}"))
-            session.commit()
+            model.__table__.truncate(engine, checkfirst=True)
             #--------------Output
-            output.data = {model.__name__: f'Truncate:{model.__tablename__}'}
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message =f"Truncate table : {model}"
+            #--------------Verbose
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.instance_log.log(log_model, output)
         except Exception as e:  
             #--------------Error
             output.status = False
-            output.data = {"class":self.this_class, "method":this_method, "error": str(e)}
-            print(output)
-        # finally:
-        #         session.close()
-        #--------------Verbose
-        if self.verbose : print(output)
-        #--------------Log
-        if self.log : print(output)
-        #--------------Output
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #-------------------------- [create]
+    def create(self, model) -> model_output:
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Action
+            model.__table__.create(engine, checkfirst=True)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message =f"Create table : {model}"
+            #--------------Verbose
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.instance_log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #-------------------------- [drop]
+    def drop(self, model) -> model_output:
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Action
+            model.__table__.drop(engine, checkfirst=True)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message =f"Drop table : {model}"
+            #--------------Verbose
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.instance_log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
         return output
     
     #-------------------------- [pydantic_to_sqlalchemy]
