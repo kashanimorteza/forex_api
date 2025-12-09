@@ -494,9 +494,10 @@ pigz -dc backup_2025-11-28.tar.gz | psql -U postgres -d forex
 pigz -dc xauusd_t1.gz | psql -U forex -d forex
 ```
 <!-------------------------- Restore -->
-Restore : Mac
+Restore
 ```bash
-psql -d postgres
+Linux : sudo -u postgres psql
+Mac   : psql -d postgres
 ```
 ```sql
 SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'forex' AND pid <> pg_backend_pid();
@@ -526,9 +527,9 @@ scp root@10.10.10.114:/extra/backup_2025-12-06 /Volumes/data/forex/
 pigz -dc /Volumes/data/forex/backup_2025-12-06.tar.gz | psql -d forex
 ```
 ```bash
-psql -d forex -f /Volumes/data/forex/backup_2025-12-06
+Linux : sudo -u postgres psql -d forex -f /extra/backup_2025-12-06
+Mac   : psql -d forex -f /Volumes/data/forex/backup_2025-12-06
 ```
-
 <!-------------------------- Download Backup -->
 Download Backup
 ```bash
