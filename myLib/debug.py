@@ -29,8 +29,8 @@ debug = {
     "Database_Orm" : 
     {
         "drop":{"log":False, "verbose":True, "model":"Database_Orm"},
-        "create":{"log":False, "verbose":False, "model":"Database_Orm"},
-        "truncate":{"log":False, "verbose":False, "model":"Database_Orm"},
+        "create":{"log":False, "verbose":True, "model":"Database_Orm"},
+        "truncate":{"log":False, "verbose":True, "model":"Database_Orm"},
     },
     "ST01" : 
     {

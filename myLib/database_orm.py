@@ -296,10 +296,11 @@ class Database_Orm:
 
         try:
             #--------------Action
-            model.__table__.truncate(engine, checkfirst=True)
+            session.execute(text(f"TRUNCATE TABLE {model.__tablename__} RESTART IDENTITY CASCADE"))
+            session.commit()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"Truncate table : {model}"
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)            
+            output.message = f"Truncate table : {model.__tablename__}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -335,7 +336,7 @@ class Database_Orm:
             model.__table__.create(engine, checkfirst=True)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"Create table : {model}"
+            output.message =f"Create table : {model.__tablename__}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -371,7 +372,7 @@ class Database_Orm:
             model.__table__.drop(engine, checkfirst=True)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"Drop table : {model}"
+            output.message =f"Drop table : {model.__tablename__}"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
