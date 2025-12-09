@@ -317,6 +317,42 @@ class Data_Orm:
         #--------------Return
         return output
     
+    #--------------------------[Truncate]
+    def truncate(self, model) -> model_output:
+        #-------------- Description
+        # IN     : model
+        # OUT    : model_output
+        # Action : Truncate (empty) table for the model
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        
+        try:
+            #--------------Action
+            output:model_output = self.instance_db_orm.truncate(model=model)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message = f"{model.__tablename__} table truncated"
+            #--------------Verbose
+            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.instance_log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
     #--------------------------[Create]
     def create(self, model) -> model_output:
         #-------------- Description
@@ -376,42 +412,6 @@ class Data_Orm:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"{model.__tablename__} table dropped"
-            #--------------Verbose
-            if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.instance_log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.instance_log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.instance_log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-    
-    #--------------------------[Truncate]
-    def truncate(self, model) -> model_output:
-        #-------------- Description
-        # IN     : model
-        # OUT    : model_output
-        # Action : Truncate (empty) table for the model
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-        
-        try:
-            #--------------Action
-            output:model_output = self.instance_db_orm.truncate(model=model)
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = f"{model.__tablename__} table truncated"
             #--------------Verbose
             if verbose : self.instance_log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

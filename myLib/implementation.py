@@ -82,7 +82,7 @@ class Implementation:
                     data_orm.add(model=model_instrument_db, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = f"Drop:{drop} | Truncate:{truncate} | Create:{create} | Add:{add}"
+            output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

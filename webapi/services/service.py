@@ -24,8 +24,8 @@ class Service:
         return output
 
     #-------------------------- [Items]
-    def items(self) -> model_output:
-        output:model_output = self.logic.items()
+    def items(self, **filters) -> model_output:
+        output:model_output = self.logic.items(**filters)
         if output.status : 
             data = []
             for item in output.data : data.append(item.toDict())

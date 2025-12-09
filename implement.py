@@ -31,7 +31,7 @@ db.open(name="Implement")
 impelment = Implementation(db=db)
 
 #-------------------- Instrument
-impelment.instrument(drop=True, create=True,truncate=True, add=True)
+impelment.instrument(drop=False, create=False,truncate=True, add=True)
 
 # lst = ["EUR/USD", "EUR/GBP", "EUR/CHF", "EUR/JPY", "EUR/AUD", "EUR/CAD", "EUR/NZD"]
 # for n in lst: impelment.set_instrument_category(n, 1)
