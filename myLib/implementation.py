@@ -50,22 +50,13 @@ class Implementation:
         defaultSymbols = cfgData.get("defaultSymbols")
 
         try:
-            #-------------- Drop Table
-            if drop:
-                data_orm.drop(model=model_instrument_db)
-                if verbose: self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)}", "Table dropped")
-
-            #-------------- Create Table
-            if create:
-                data_orm.create(model=model_instrument_db)
-                if verbose: self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)}", "Table created")
-
-            #-------------- Truncate Table
-            if truncate:
-                data_orm.truncate(model=model_instrument_db)
-                if verbose: self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)}", "Table truncated")
-            
-            #-------------- Add Data
+            #-------------- Drop
+            if drop : data_orm.drop(model=model_instrument_db)
+            #-------------- Create
+            if create : data_orm.create(model=model_instrument_db)
+            #-------------- Truncate
+            if truncate : data_orm.truncate(model=model_instrument_db)            
+            #-------------- Add
             if add:
                 for instrument in defaultSymbols:
                     name = instrument.replace('/', '')
@@ -91,7 +82,7 @@ class Implementation:
                     data_orm.add(model=model_instrument_db, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = f"Instruments added: {len(defaultSymbols) if add else 0}"
+            output.message = f"Drop:{drop} | Truncate:{truncate} | Create:{create} | Add:{add}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

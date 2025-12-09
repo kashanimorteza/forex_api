@@ -1,9 +1,10 @@
 debug = {
     "Implementation" : 
     {
+        "instrument":{"log":False, "verbose":True, "model":"Implementation"},
         "create_symbol_table":{"log":False, "verbose":False, "model":"Implementation"},
         "set_symbol_category":{"log":False, "verbose":False, "model":"Implementation"},
-        "create_symbol_timeframe_table":{"log":False, "verbose":False, "model":"Implementation"},
+        "create_symbol_timeframe_table":{"log":False, "verbose":False, "model":"Implementation"}
     },
     "Forex_Api" : 
     {
@@ -28,9 +29,9 @@ debug = {
     },
     "Database_Orm" : 
     {
-        "drop":{"log":False, "verbose":True, "model":"Database_Orm"},
-        "create":{"log":False, "verbose":True, "model":"Database_Orm"},
-        "truncate":{"log":False, "verbose":True, "model":"Database_Orm"},
+        "drop":{"log":False, "verbose":False, "model":"Database_Orm"},
+        "create":{"log":False, "verbose":False, "model":"Database_Orm"},
+        "truncate":{"log":False, "verbose":False, "model":"Database_Orm"},
     },
     "ST01" : 
     {
