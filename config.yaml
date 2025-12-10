@@ -83,7 +83,7 @@ forex_connect:
 
 #--------------------------------------------------------------------------------- Download
 download:
-  instrument: EUR/USD
+  instrument: XAU/USD
   timeframe: t1
   mode: up
   count: 1000

@@ -55,14 +55,10 @@ class Forex:
             #---Check
             if mode == "up":
                 d = self.data.get_max_min(instrument=instrument, timeframe=timeframe, mode="max", filed="Date")
-                if d.status and d.data: 
-                    datefrom = d.data
-                    datefrom = timeframe_nex_date(mode=mode, date=datefrom, timeframe=timeframe)
+                if d.status and d.data: datefrom = timeframe_nex_date(date=d.data, timeframe=timeframe)
             elif mode == "down":
                 d = self.data.get_max_min(instrument=instrument, timeframe=timeframe, mode="min", filed="Date")
-                if d.status and d.data : 
-                    dateto = d.data
-                    dateto = timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
+                if d.status and d.data : dateto = timeframe_nex_date(date=d.data, timeframe=timeframe)
             #---Display
             params = {"account": self.account,"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
             print(format_dict_block("Store", params))
@@ -76,14 +72,8 @@ class Forex:
                             history:model_output = self.history(instrument, timeframe, datefrom=start, dateto=end, count=count)
                             if history.status:
                                 if save : self.data.save(instrument=instrument, timeframe=timeframe, data=history.data, bulk=bulk)
-                                if mode == "complete" : 
-                                    end = timeframe_nex_date(mode ="complete", date=history.data["Date"].iloc[0] , timeframe=timeframe)
-                                if mode == "up" : 
-                                    start = timeframe_nex_date(mode ="up", date=history.data["Date"].iloc[-1] , timeframe=timeframe)
-                                if mode == "down" : 
-                                    end = timeframe_nex_date(mode ="down", date=history.data["Date"].iloc[0] , timeframe=timeframe)
-                                if mode == "once" : 
-                                    break
+                                end = timeframe_nex_date(date=history.data["Date"].iloc[0] , timeframe=timeframe)
+                                if mode == "once" : break
                             else : break
                         else: break
                 if delay == 0: break; 

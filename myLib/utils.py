@@ -81,7 +81,7 @@ def format_dict_block(title, data: dict) -> str:
     return "\n".join(lines)
 
 #--------------------------------------------- timeframe_nex_date
-def timeframe_nex_date(mode, timeframe, date):
+def timeframe_nex_date(timeframe, date):
     #-------------- Description
     # IN     : 
     # OUT    : 
@@ -89,48 +89,19 @@ def timeframe_nex_date(mode, timeframe, date):
     #-------------- Data
     timeframe = timeframe.lower()
     #--------------Action
-    if mode == "up":
-        if timeframe == "w1" : date = (date + timedelta(days=7))
-        elif timeframe == "d1" : date = (date + timedelta(days=1))
-        elif timeframe == "h8": date = (date + timedelta(hours=8))
-        elif timeframe == "h6": date = (date + timedelta(hours=6))
-        elif timeframe == "h4": date = (date + timedelta(hours=4))
-        elif timeframe == "h3": date = (date + timedelta(hours=3))
-        elif timeframe == "h2": date = (date + timedelta(hours=2))
-        elif timeframe == "h1": date = (date + timedelta(hours=1))
-        elif timeframe == "m30": date = (date + timedelta(minutes=30))
-        elif timeframe == "m15": date = (date + timedelta(minutes=15))
-        elif timeframe == "m5": date = (date + timedelta(minutes=5))
-        elif timeframe == "m1": date = (date + timedelta(minutes=1))
-        elif timeframe == "t1": date = (date + timedelta(milliseconds=1))
-    elif mode == "down":
-        if timeframe == "w1" : date = (date - timedelta(days=7))
-        elif timeframe == "d1" : date = (date - timedelta(days=1))
-        elif timeframe == "h8": date = (date - timedelta(hours=8))
-        elif timeframe == "h6": date = (date - timedelta(hours=6))
-        elif timeframe == "h4": date = (date - timedelta(hours=4))
-        elif timeframe == "h3": date = (date - timedelta(hours=3))
-        elif timeframe == "h2": date = (date - timedelta(hours=4))
-        elif timeframe == "h1": date = (date - timedelta(hours=1))
-        elif timeframe == "m30": date = (date - timedelta(minutes=30))
-        elif timeframe == "m15": date = (date - timedelta(minutes=15))
-        elif timeframe == "m5": date = (date - timedelta(minutes=5))
-        elif timeframe == "m1": date = (date - timedelta(minutes=1))
-        elif timeframe == "t1": date = (date - timedelta(milliseconds=1))
-    elif mode == "complete":
-        if timeframe == "w1" : date = (date - timedelta(days=7))
-        elif timeframe == "d1" : date = (date - timedelta(days=1))
-        elif timeframe == "h8": date = (date - timedelta(hours=8))
-        elif timeframe == "h6": date = (date - timedelta(hours=6))
-        elif timeframe == "h4": date = (date - timedelta(hours=4))
-        elif timeframe == "h3": date = (date - timedelta(hours=3))
-        elif timeframe == "h2": date = (date - timedelta(hours=4))
-        elif timeframe == "h1": date = (date - timedelta(hours=1))
-        elif timeframe == "m30": date = (date - timedelta(minutes=30))
-        elif timeframe == "m15": date = (date - timedelta(minutes=15))
-        elif timeframe == "m5": date = (date - timedelta(minutes=5))
-        elif timeframe == "m1": date = (date - timedelta(minutes=1))
-        elif timeframe == "t1": date = (date - timedelta(milliseconds=1))
+    if timeframe == "w1" : date = (date - timedelta(days=7))
+    elif timeframe == "d1" : date = (date - timedelta(days=1))
+    elif timeframe == "h8": date = (date - timedelta(hours=8))
+    elif timeframe == "h6": date = (date - timedelta(hours=6))
+    elif timeframe == "h4": date = (date - timedelta(hours=4))
+    elif timeframe == "h3": date = (date - timedelta(hours=3))
+    elif timeframe == "h2": date = (date - timedelta(hours=4))
+    elif timeframe == "h1": date = (date - timedelta(hours=1))
+    elif timeframe == "m30": date = (date - timedelta(minutes=30))
+    elif timeframe == "m15": date = (date - timedelta(minutes=15))
+    elif timeframe == "m5": date = (date - timedelta(minutes=5))
+    elif timeframe == "m1": date = (date - timedelta(minutes=1))
+    elif timeframe == "t1": date = (date - timedelta(milliseconds=1))
     #--------------Output
     return date
     
