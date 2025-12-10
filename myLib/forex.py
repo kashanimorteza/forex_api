@@ -65,7 +65,7 @@ class Forex:
                     dateto = timeframe_nex_date(mode=mode,date=dateto, timeframe=timeframe)
             #---Display
             params = {"account": self.account,"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
-            print(format_dict_block("Store", params))            
+            print(format_dict_block("Store", params))
             #---Action
             while(True):
                 for r in range(repeat):
