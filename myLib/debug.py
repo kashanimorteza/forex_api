@@ -5,10 +5,7 @@ debug = {
         "account":{"log":False, "verbose":True, "model":"Implementation"},
         "strategy":{"log":False, "verbose":True, "model":"Implementation"},
         "strategy_item":{"log":False, "verbose":True, "model":"Implementation"},
-        "strategy_item_trade":{"log":False, "verbose":True, "model":"Implementation"},
-        "create_symbol_table":{"log":False, "verbose":False, "model":"Implementation"},
-        "set_symbol_category":{"log":False, "verbose":False, "model":"Implementation"},
-        "create_symbol_timeframe_table":{"log":False, "verbose":False, "model":"Implementation"}
+        "test_live":{"log":False, "verbose":True, "model":"Implementation"},
     },
     "Forex_Api" : 
     {

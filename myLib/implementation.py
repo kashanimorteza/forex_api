@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-
+from turtle import mode
 from fastapi import params
 import myLib.utils as utils
 from myLib.debug import debug
@@ -18,6 +18,7 @@ from myModel.model_instrument import model_instrument_db
 from myModel.model_account import model_account_db
 from myLib.forex import Forex
 from myLib.utils import debug, sort, format_dict_block, timeframe_nex_date
+from myModel.model_test_live import model_test_live_db
 
 #--------------------------------------------------------------------------------- Managemnet
 class Implementation_Management:
@@ -294,6 +295,52 @@ class Implementation_Management:
         #--------------Return
         return output
 
+    #--------------------------------------------- test_live
+    def test_live(self, drop=False, truncate=False,  create=True, add=True):
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Variable
+        model = model_test_live_db
+        #-------------- Data
+        try:
+            #-------------- Drop
+            if drop : self.data.drop(model=model)
+            #-------------- Create
+            if create : self.data.create(model=model)
+            #-------------- Truncate
+            if truncate : self.data.truncate(model=model)
+            #-------------- Add
+            if add:
+                obj = model(name="test-1", strategy_item_id=1, account_id=1, status="none", enable=True)
+                self.data.add(model=model, item=obj)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
 #--------------------------------------------------------------------------------- Action
 class Implementation:
     #---------------------------------------- init
