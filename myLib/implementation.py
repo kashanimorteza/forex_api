@@ -13,6 +13,7 @@ from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myModel import *
 from myModel.model_instrument import model_instrument_db
+from myModel.model_account import model_account_db
 from myLib.forex import Forex
 from myLib.utils import debug, sort, format_dict_block, timeframe_nex_date
 
@@ -26,6 +27,7 @@ class Implementation:
         self.log = Log() if log is None else log
         #--------------------database
         self.db = db
+        self.data_orm = Data_Orm()
     
     #--------------------------------------------- instrument
     def instrument(self, drop=False, truncate=False,  create=True, add=True):
@@ -44,18 +46,18 @@ class Implementation:
         output.class_name = self.this_class
         output.method_name = this_method
         #-------------- Variable
-        data_orm = Data_Orm()
+        model = model_account_db
         #-------------- Data
         cfgData = utils.config.get("instrument", {})
         defaultSymbols = cfgData.get("defaultSymbols")
 
         try:
             #-------------- Drop
-            if drop : data_orm.drop(model=model_instrument_db)
+            if drop : self.data_orm.drop(model=model_instrument_db)
             #-------------- Create
-            if create : data_orm.create(model=model_instrument_db)
+            if create : self.data_orm.create(model=model_instrument_db)
             #-------------- Truncate
-            if truncate : data_orm.truncate(model=model_instrument_db)            
+            if truncate : self.data_orm.truncate(model=model_instrument_db)            
             #-------------- Add
             if add:
                 for instrument in defaultSymbols:
@@ -79,7 +81,59 @@ class Implementation:
                         category = 1
                         priority = 5
                     obj = model_instrument_db(name=name, instrument=instrument,  category=category,  priority=priority, description="", enable=True)
-                    data_orm.add(model=model_instrument_db, item=obj)
+                    self.data_orm.add(model=model_instrument_db, item=obj)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------------------------- instrument
+    def account(self, drop=False, truncate=False,  create=True, add=True):
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Variable
+        model = model_account_db
+        #-------------- Data
+        try:
+            #-------------- Drop
+            if drop : self.data_orm.drop(model=model)
+            #-------------- Create
+            if create : self.data_orm.create(model=model)
+            #-------------- Truncate
+            if truncate : self.data_orm.truncate(model=model)
+            #-------------- Add
+            if add:
+                obj = model(name='acc-history1', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52030299', password='2idfycj', description="", enable=True)
+                self.data_orm.add(model=model, item=obj)
+                obj = model(name='acc-history2', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52032860', password='aq8iwnf', description="", enable=True)
+                self.data_orm.add(model=model, item=obj)
+                obj = model(name='acc-live', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035533', password='iaee0at', description="", enable=True)
+                self.data_orm.add(model=model, item=obj)
+                obj = model(name='acc-trade', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035534', password='fjf0tzq', description="", enable=True)
+                self.data_orm.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

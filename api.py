@@ -42,6 +42,7 @@ app.add_middleware(
 
 #-------------------------- [Route]
 routes = [
+    (account, "/account", ["Account"]),
     (instrument, "/instrument", ["Instrument"]),
     (strategy, "/strategy", ["Strategy"]),
     (strategy_item, "/strategy_item", ["Strategy Item"]),

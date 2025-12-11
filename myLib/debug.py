@@ -2,6 +2,7 @@ debug = {
     "Implementation" : 
     {
         "instrument":{"log":False, "verbose":True, "model":"Implementation"},
+        "account":{"log":False, "verbose":True, "model":"Implementation"},
         "create_symbol_table":{"log":False, "verbose":False, "model":"Implementation"},
         "set_symbol_category":{"log":False, "verbose":False, "model":"Implementation"},
         "create_symbol_timeframe_table":{"log":False, "verbose":False, "model":"Implementation"}
