@@ -1,58 +1,71 @@
 #--------------------------------------------------------------------------------- location
-# webapi/routes/route_instrument.py
+# webapi/routes/route_strategy_item_trade.py
 
 #--------------------------------------------------------------------------------- Description
-# This is route for instrument
+# This is route for strategy_item_trade
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
+from myLib.utils import config
+from myLib.data_orm import Data_Orm
 from fastapi import APIRouter, Request
-from webapi.service.service import Service
-from myModel.model_instrument import model_instrument_py as model_py
-from myModel.model_instrument import model_instrument_db as model_db
+from myModel.model_strategy_item_trade import model_strategy_item_trade_py as model_py
+from myModel.model_strategy_item_trade import model_strategy_item_trade_db as model_db
+
+#--------------------------------------------------------------------------------- Variable
+database = config.get("general", {}).get("database_management", {})
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
-service = Service(model=model_db)
+data_orm = Data_Orm(database=database)
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)
 def add(item:model_py) : 
-    return service.add(item=item)
+    item = item.dict()
+    if 'id' in item : del item['id']
+    output:model_output = data_orm.add(model=model_db, item=model_db(**item))
+    return output
 
 #-------------------------- [Items]
 @route.get("/items", description="items", response_model=model_output)
 def items(request: Request) : 
     filters = dict(request.query_params)
-    return service.items(**filters)
+    output:model_output = data_orm.items(model=model_db, **filters)
+    if output.status : 
+        data = []
+        for item in output.data : data.append(item.toDict())
+        output.data = data
+    return output
 
 #-------------------------- [Update]
 @route.put("", description="update", response_model=model_output)
 def update(item: model_py): 
-    return service.update(item=item)
+    return data_orm.update(model=model_db, item=model_db(**item.dict()))
+
 
 #-------------------------- [Delete]
 @route.delete("/{id}", description="delete", response_model=model_output)
 def delete(id:int): 
-    return service.delete(id=id)
+    return data_orm.delete(model=model_db, id=id)
 
 #-------------------------- [Enable]
 @route.get("/enable/{id}", description="enable", response_model=model_output)
 def enable(id:int): 
-    return service.enable(id=id)
+    return data_orm.enable(model=model_db, id=id)
 
 #-------------------------- [Disable]
 @route.get("/disable/{id}", description="disable", response_model=model_output)
 def disable(id:int): 
-    return service.disable(id=id)
+    return data_orm.disable(model=model_db, id=id)
 
 #-------------------------- [Status]
 @route.get("/status/{id}", description="status", response_model=model_output)
 def status(id:int): 
-    return service.status(id=id)
+    return data_orm.status(model=model_db, id=id)
 
 #-------------------------- [Dead]
 @route.get("/dead/{id}", description="dead", response_model=model_output)
 def dead(id:int): 
-    return service.dead(id=id)
+    return data_orm.dead(model=model_db, id=id)
