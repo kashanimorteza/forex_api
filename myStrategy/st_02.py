@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------------- Location
-# myStrategy/strategy_02.py
+# myStrategy/st_02.py
 
 #--------------------------------------------------------------------------------- Description
-# strategy_02
+# st_02
 
 #--------------------------------------------------------------------------------- Import
 from ast import mod
@@ -12,7 +12,7 @@ from myLib.utils import debug, sort
 from myLib.log import Log
 
 #--------------------------------------------------------------------------------- Action
-class Strategy_02:
+class ST_02:
     #--------------------------------------------- init
     def __init__(self, forex, params):
         #--------------------Debug
@@ -28,8 +28,8 @@ class Strategy_02:
         self.forex = forex
         self.log = Log()
     
-    #--------------------------------------------- action
-    def action(self, mode=None):
+    #--------------------------------------------- start
+    def start(self, mode=None):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -113,7 +113,7 @@ class Strategy_02:
         return output
     
     #--------------------------------------------- Next
-    def next(self, params):
+    def order_close(self, params):
         #-------------- Description
         # IN     : 
         # OUT    : 

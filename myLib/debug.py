@@ -34,10 +34,39 @@ debug = {
         "create":{"log":False, "verbose":False, "model":"Database_Orm"},
         "truncate":{"log":False, "verbose":False, "model":"Database_Orm"},
     },
-    "ST01" : 
+    "ST_01" : 
     {
         "start":{"log":False, "verbose":True, "model":"Data"},
-        "next":{"log":False, "verbose":False, "model":"Data"},
-        "close":{"log":False, "verbose":False, "model":"Data"}
+        "order_close":{"log":False, "verbose":True, "model":"Data"},
+        "price_change":{"log":False, "verbose":True, "model":"Data"},
+        "end":{"log":False, "verbose":True, "model":"Data"}
+    },
+    "ST_02" : 
+    {
+        "start":{"log":False, "verbose":True, "model":"Data"},
+        "order_close":{"log":False, "verbose":True, "model":"Data"},
+        "price_change":{"log":False, "verbose":True, "model":"Data"},
+        "end":{"log":False, "verbose":True, "model":"Data"}
+    },
+    "ST_03" : 
+    {
+        "start":{"log":False, "verbose":True, "model":"Data"},
+        "order_close":{"log":False, "verbose":True, "model":"Data"},
+        "price_change":{"log":False, "verbose":True, "model":"Data"},
+        "end":{"log":False, "verbose":True, "model":"Data"}
+    },
+    "ST_04" : 
+    {
+        "start":{"log":False, "verbose":True, "model":"Data"},
+        "order_close":{"log":False, "verbose":True, "model":"Data"},
+        "price_change":{"log":False, "verbose":True, "model":"Data"},
+        "end":{"log":False, "verbose":True, "model":"Data"}
+    },
+    "ST_05" : 
+    {
+        "start":{"log":False, "verbose":True, "model":"Data"},
+        "order_close":{"log":False, "verbose":True, "model":"Data"},
+        "price_change":{"log":False, "verbose":True, "model":"Data"},
+        "end":{"log":False, "verbose":True, "model":"Data"}
     },
 }

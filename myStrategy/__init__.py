@@ -1,2 +1,2 @@
-from .strategy_01 import Strategy_01
-from .strategy_02 import Strategy_02
+from .st_01 import Strategy_01
+from .st_02 import Strategy_02

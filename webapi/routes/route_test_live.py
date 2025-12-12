@@ -56,3 +56,8 @@ def status(id:int):
 @route.get("/dead/{id}", description="dead", response_model=model_output)
 def dead(id:int): 
     return service.dead(id=id)
+
+#-------------------------- [Start]
+@route.get("/start/{id}", description="start", response_model=model_output)
+def start(id:int): 
+    return service.dead(id=id)

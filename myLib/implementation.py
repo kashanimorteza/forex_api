@@ -214,15 +214,15 @@ class Implementation_Management:
             if truncate : self.data.truncate(model=model)
             #-------------- Add
             if add:
-                obj = model(name='strategy_01')
+                obj = model(name='st_01')
                 self.data.add(model=model, item=obj)
-                obj = model(name='strategy_02')
+                obj = model(name='st_02')
                 self.data.add(model=model, item=obj)
-                obj = model(name='strategy_03')
+                obj = model(name='st_03')
                 self.data.add(model=model, item=obj)
-                obj = model(name='strategy_04')
+                obj = model(name='st_04')
                 self.data.add(model=model, item=obj)
-                obj = model(name='strategy_05')
+                obj = model(name='st_05')
                 self.data.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -268,16 +268,16 @@ class Implementation_Management:
             if truncate : self.data.truncate(model=model)
             #-------------- Add
             if add:
-                params = "{'symbol': 'EUR/USD','amount': 10000,'tp_pips': 1,'st_pips': 10}"
-                obj = model(name='st_01_itm_01', strategy_id=1, params=params)
+                params = "{'symbol': 'EUR/USD','action': 'buy','amount': 10000,'tp_pips': 1,'st_pips': 10}"
+                obj = model(name='it_1', strategy_id=1, params=params)
                 self.data.add(model=model, item=obj)
-                obj = model(name='st_02_itm_01', strategy_id=2, params=params)
+                obj = model(name='it_1', strategy_id=2, params=params)
                 self.data.add(model=model, item=obj)
-                obj = model(name='st_03_itm_01', strategy_id=3, params=params)
+                obj = model(name='it_1', strategy_id=3, params=params)
                 self.data.add(model=model, item=obj)
-                obj = model(name='st_04_itm_01', strategy_id=4, params=params)
+                obj = model(name='it_1', strategy_id=4, params=params)
                 self.data.add(model=model, item=obj)
-                obj = model(name='st_05_itm_01', strategy_id=5, params=params)
+                obj = model(name='it_1', strategy_id=5, params=params)
                 self.data.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -323,7 +323,7 @@ class Implementation_Management:
             if truncate : self.data.truncate(model=model)
             #-------------- Add
             if add:
-                obj = model(name="test-1", strategy_item_id=1, account_id=1)
+                obj = model(name="tst_1", strategy_item_id=1, account_id=4)
                 self.data.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)

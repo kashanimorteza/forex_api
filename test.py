@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 import os,sys, ast
 
-from myStrategy.strategy_01 import Strategy_01
+from myStrategy.st_01 import Strategy_01
 root_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, f"{root_dir}/myLib")
 sys.path.insert(0, f"{root_dir}/myModel")
