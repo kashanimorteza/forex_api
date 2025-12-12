@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
 from myLib.model import model_output
-from myLib.utils import config
+from myLib.utils import config, forex_apis
 from myLib.log import Log
 from myLib.utils import debug, sort, get_strategy_instance
 from myLib.data_orm import Data_Orm
@@ -49,7 +49,6 @@ class Logic_Test_Live:
         start_time = time.time()
         #--------------Data
         data = self.instance_data_orm.items(model=model_live_execute_db, id=id)
-        from api import forex_apis
 
         try:
             #--------------Action

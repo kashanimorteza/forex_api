@@ -6,19 +6,15 @@
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
-from myLib.utils import config
-from myLib.data_orm import Data_Orm
 from fastapi import APIRouter, Request
 from myModel.model_strategy import model_strategy_py as model_py
 from myModel.model_strategy import model_strategy_db as model_db
-
-#--------------------------------------------------------------------------------- Variable
-database = config.get("general", {}).get("database_management", {})
+from myLib.data_orm import Data_Orm
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
-data_orm = Data_Orm(database=database)
+data_orm = Data_Orm()
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)
@@ -43,7 +39,6 @@ def items(request: Request) :
 @route.put("", description="update", response_model=model_output)
 def update(item: model_py): 
     return data_orm.update(model=model_db, item=model_db(**item.dict()))
-
 
 #-------------------------- [Delete]
 @route.delete("/{id}", description="delete", response_model=model_output)

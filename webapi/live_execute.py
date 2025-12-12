@@ -6,20 +6,16 @@
 
 #--------------------------------------------------------------------------------- Import
 from myLib.model import model_output
-from myLib.utils import config
-from myLib.data_orm import Data_Orm
-from myLib.logic_live_execute import Logic_Test_Live
 from fastapi import APIRouter, Request
 from myModel.model_live_execute import model_live_execute_py as model_py
 from myModel.model_live_execute import model_live_execute_db as model_db
-
-#--------------------------------------------------------------------------------- Variable
-database = config.get("general", {}).get("database_management", {})
+from myLib.data_orm import Data_Orm
+from myLib.logic_live_execute import Logic_Test_Live
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
-data_orm = Data_Orm(database=database)
+data_orm = Data_Orm()
 logic_test_live = Logic_Test_Live(instance_data_orm=data_orm)
 
 #-------------------------- [Add]

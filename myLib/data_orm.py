@@ -8,16 +8,13 @@
 import inspect, time
 from myLib.database_orm import Database_Orm 
 from myLib.model import model_output
-from myLib.utils import config, debug, sort
+from myLib.utils import debug, sort, database_management
 from myLib.log import Log
-
-#--------------------------------------------------------------------------------- Variable
-database = config.get("general", {}).get("database_management", {})
 
 #--------------------------------------------------------------------------------- Class
 class Data_Orm:
     #-------------------------- [Init]
-    def __init__(self, database=database, verbose:bool=False, log:bool=False, instance_db:Database_Orm=None, instance_log:Log=None):
+    def __init__(self, database=database_management, verbose:bool=False, log:bool=False, instance_db:Database_Orm=None, instance_log:Log=None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.log = log

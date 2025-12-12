@@ -18,6 +18,22 @@ def load_config():
     with open(config_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
+#-------------------------- load_config
+def load_forex_apis():
+    from myLib.data_orm import Data_Orm
+    from myModel.model_account import model_account_db
+    from myLib.forex_api import Forex_Api
+
+    data_orm = Data_Orm()
+
+    forex_apis = {}
+    forex_accounts = data_orm.items(model=model_account_db, enable=True)
+    for acc in forex_accounts.data :
+        forex_api = Forex_Api(name=acc.name, type=acc.type, username=acc.username, password=acc.password, url=acc.url, key=acc.key)
+        forex_api.login()
+        forex_apis[acc.id] = forex_api
+    return forex_apis
+
 #-------------------------- get_tbl_name
 def get_tbl_name(symbol, timeFrame):
     symbol=symbol.replace('/', '')
@@ -125,3 +141,6 @@ def get_strategy_instance(strategy, forex, params):
 
 #--------------------------------------------------------------------------------- Variable
 config = load_config()
+forex_apis = load_forex_apis()
+database_management = config.get("general", {}).get("database_management", {})
+database_data = config.get("general", {}).get("database_data", {})
