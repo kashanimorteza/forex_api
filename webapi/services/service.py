@@ -19,6 +19,9 @@ class Service:
     def add(self, item) -> model_output:
         item = item.dict()
         del item['id']
+        # Remove date if it's None or empty string to use database default
+        if 'date' in item and (item['date'] is None or item['date'] == ''):
+            del item['date']
         item = self.model(**item)
         output:model_output = self.logic.add(item=item)
         return output

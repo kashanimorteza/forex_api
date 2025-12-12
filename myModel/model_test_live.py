@@ -19,7 +19,7 @@ class model_test_live_db(BaseModel_db):
     __tablename__ = 'test_live'
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
-    date = Column(DateTime, default=func.now())
+    date = Column(DateTime, default=func.now(), server_default=func.now())
     name = Column(String, default='')
     strategy_item_id = Column(Integer, default=0)
     account_id = Column(Integer, default=0)
@@ -29,12 +29,16 @@ class model_test_live_db(BaseModel_db):
     #---Display
     def __repr__(self) : return f"{self.toDict()}"
     #---Json
-    def toDict(self) : return {column.key: getattr(self, column.key) for column in inspect(self).mapper.column_attrs}
+    def toDict(self):
+        data = {column.key: getattr(self, column.key) for column in inspect(self).mapper.column_attrs}
+        if data.get('date') and isinstance(data['date'], datetime):
+            data['date'] = data['date'].strftime('%Y-%m-%d %H:%M:%S')
+        return data
 
 #--------------------------------------------------------------------------------- Python
 class model_test_live_py(BaseModel_py):
     id : int = 0
-    date : datetime = None
+    date : Optional[str] = None
     name : str = ''
     strategy_item_id : int = 0
     account_id : int = 0

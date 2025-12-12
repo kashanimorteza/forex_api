@@ -323,7 +323,7 @@ class Implementation_Management:
             if truncate : self.data.truncate(model=model)
             #-------------- Add
             if add:
-                obj = model(name="test-1", strategy_item_id=1, account_id=1, status="none", enable=True)
+                obj = model(name="test-1", strategy_item_id=1, account_id=1)
                 self.data.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
