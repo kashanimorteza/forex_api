@@ -76,8 +76,8 @@ def start(id:int):
     strategy_name = detaile.data.get("strategy_name")
     params = detaile.data.get("params")
     account_id = detaile.data.get("account_id")
-    strategy = logic_management.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id)
-    result = strategy.start()
+    strategy = logic_management.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id).data
+    result = strategy.start(execute_id=id)
     return result
 
 #-------------------------- [end]
@@ -87,6 +87,6 @@ def end(id:int):
     strategy_name = detaile.data.get("strategy_name")
     params = detaile.data.get("params")
     account_id = detaile.data.get("account_id")
-    strategy = logic_management.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id)
-    result = strategy.end()
+    strategy = logic_management.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id).data
+    result = strategy.end(execute_id=id)
     return result

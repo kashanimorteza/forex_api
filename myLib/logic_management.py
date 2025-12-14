@@ -68,7 +68,7 @@ class Logic_Management:
             #--------------Action
             forex_api = forex_apis[account_id]
             forex = Forex(forex_api=forex_api)
-            strategy = self.get_strategy_instance(self, strategy_name)
+            strategy = self.get_strategy_instance(strategy_name)
             strategy.forex = forex
             strategy.params = params
             #--------------Output

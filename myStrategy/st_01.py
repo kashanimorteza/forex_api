@@ -6,6 +6,8 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
+
+from fastapi import params
 from myLib.model import model_output
 from myLib.logic_global import debug, log_instance, data_instance
 from myLib.utils import sort
@@ -30,16 +32,11 @@ class ST_01:
         self.this_class = self.__class__.__name__
         self.id = 1
         self.forex = forex
+        self.params = params
         #-------------- Instance
         self.log = log if log else log_instance
         self.data_orm = data_orm if data_orm else data_instance["management_orm"]
         self.data_sql = data_sql if data_sql else data_instance["management_sql"]
-        #-------------- Params
-        self.symbol = params["symbol"]
-        self.action = params["action"]
-        self.amount = int(params["amount"])
-        self.tp_pips = int(params["tp_pips"])
-        self.st_pips = int(params["st_pips"])
 
     #--------------------------------------------- start
     def start(self, execute_id:int):
@@ -60,11 +57,17 @@ class ST_01:
         
         try:
             #--------------Action
-            result:model_output = self.forex.trade_open(action=self.action, symbol=self.symbol, amount=self.amount, tp_pips=self.tp_pips, sl_pips=self.st_pips, execute_id=execute_id)
+            result:model_output = self.forex.trade_open(
+                action=self.params["action"], 
+                symbol=self.params["symbol"],
+                amount=int(self.params["amount"]),
+                tp_pips=int(self.params["tp_pips"]),
+                sl_pips=int(self.params["st_pips"]),
+                execute_id=execute_id)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None
-            output.message = {self.action: result.status}
+            output.message = {self.params["action"]: result.status}
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
