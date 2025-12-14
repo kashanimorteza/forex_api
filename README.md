@@ -26,61 +26,7 @@ Auto-trading robots
 
 # Install
 [Python](https://github.com/kashanimorteza/python_document/blob/main/doc/install.md)  
-[Postgres](https://github.com/kashanimorteza/postgresql_documents/blob/main/install.md)
-```bash
-sudo -u postgres psql
-```
-user
-```sql
-ALTER USER postgres WITH PASSWORD '&WnA8v!(THG%)czK';
-CREATE ROLE forex WITH LOGIN CREATEDB PASSWORD '&WnA8v!(THG%)czK';
-```
-forex
-```sql
-CREATE DATABASE forex WITH OWNER = forex;
-\c forex
-ALTER ROLE forex WITH CONNECTION LIMIT -1;
-ALTER DATABASE forex OWNER TO forex;
-ALTER SCHEMA public OWNER TO forex;
-GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
-GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
-GRANT USAGE ON SCHEMA public TO forex;
-GRANT CREATE ON SCHEMA public TO forex;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO forex;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO forex;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
-```
-management
-```sql
-CREATE DATABASE management;
-\c management
-ALTER DATABASE management OWNER TO forex;
-ALTER SCHEMA public OWNER TO forex;
-GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
-GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
-GRANT USAGE ON SCHEMA public TO forex;
-GRANT CREATE ON SCHEMA public TO forex;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO forex;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO forex;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
-GRANT pg_read_server_files TO forex;
-```
-log
-```sql
-CREATE DATABASE log;
-\c log
-ALTER DATABASE log OWNER TO forex;
-ALTER SCHEMA public OWNER TO forex;
-GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
-
-GRANT ALL PRIVILEGES ON SCHEMA public TO forex;
-GRANT USAGE ON SCHEMA public TO forex;
-GRANT CREATE ON SCHEMA public TO forex;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO forex;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO forex;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
-GRANT pg_read_server_files TO forex;
-```
+[Database](https://github.com/kashanimorteza/forex_api/blob/main/database.md)
 
 
 
@@ -529,6 +475,8 @@ python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,
     Strategy_Item
     Strategy_Item_Trade
     Test_Live
+
+
 
 <!--------------------------------------------------------------------------------- Task --->
 <br><br>
