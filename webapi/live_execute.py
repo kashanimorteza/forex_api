@@ -11,13 +11,13 @@ from fastapi import APIRouter, Request
 from myModel.model_live_execute import model_live_execute_py as model_py
 from myModel.model_live_execute import model_live_execute_db as model_db
 from myLib.data_orm import Data_Orm
-from myLib.logic_live_execute import Logic_Test_Live
+from myLib.logic_management import Logic_Management
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
 data_orm = Data_Orm(database=database_management)
-logic_test_live = Logic_Test_Live()
+logic_management = Logic_Management()
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)
@@ -72,19 +72,21 @@ def dead(id:int):
 #-------------------------- [start]
 @route.get("/start/{id}", description="start", response_model=model_output)
 def start(id:int):
-    return logic_test_live.start(id=id)
+    detaile = logic_management.execute_detaile(execute_id=id)
+    strategy_name = detaile.data.get("strategy_name")
+    params = detaile.data.get("params")
+    account_id = detaile.data.get("account_id")
+    strategy = logic_management.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id)
+    result = strategy.start()
+    return result
 
 #-------------------------- [end]
 @route.get("/end/{id}", description="end", response_model=model_output)
 def end(id:int):
-    return logic_test_live.end(id=id)
-
-#-------------------------- [order_close]
-@route.get("/order_close/{id}", description="order_close", response_model=model_output)
-def order_close(id:int):
-    return logic_test_live.order_close(id=id)
-
-#-------------------------- [price_change]
-@route.get("/price_change/{id}", description="price_change", response_model=model_output)
-def price_change(id:int):
-    return logic_test_live.price_change(id=id)
+    detaile = logic_management.execute_detaile(execute_id=id)
+    strategy_name = detaile.data.get("strategy_name")
+    params = detaile.data.get("params")
+    account_id = detaile.data.get("account_id")
+    strategy = logic_management.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id)
+    result = strategy.end()
+    return result

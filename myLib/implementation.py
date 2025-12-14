@@ -6,25 +6,29 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-import myLib.utils as utils
-from myLib.debug import debug
 from myLib.model import model_output
+from myLib.logic_global import config, debug, log_instance, data_instance, forex_apis
+from myLib.utils import sort
 from myLib.log import Log
 from myLib.data_orm import Data_Orm
+from myLib.data_sql import Data_SQL
 from myModel import *
-from myModel.model_instrument import model_instrument_db
-from myModel.model_account import model_account_db
-from myLib.utils import debug, sort
 
 #--------------------------------------------------------------------------------- Managemnet
 class Implementation_Management:
-    #---------------------------------------- init
-    def __init__(self):
-        #--------------------Variable
+    #-------------------------- [Init]
+    def __init__(
+            self,
+            data_orm=None, 
+            data_sql=None,
+            log=None
+        ):
+        #-------------- Variable
         self.this_class = self.__class__.__name__
-        #--------------------Instance
-        self.log = Log()
-        self.data = Data_Orm(database="management")
+        #-------------- Instance
+        self.log:Log = log if log else log_instance
+        self.data_orm:Data_Orm = data_orm if data_orm else data_instance["management_orm"]
+        self.data_sql:Data_SQL = data_sql if data_sql else data_instance["management_sql"]
 
     #--------------------------------------------- tables
     def tables(self):
@@ -44,7 +48,7 @@ class Implementation_Management:
         output.method_name = this_method
 
         try:
-            self.data.instance_db.create_tables()
+            self.data_orm.create_all_tables()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Tables created"
@@ -80,16 +84,16 @@ class Implementation_Management:
         #-------------- Variable
         model = model_instrument_db
         #-------------- Data
-        cfgData = utils.config.get("instrument", {})
+        cfgData = config.get("instrument", {})
         defaultSymbols = cfgData.get("defaultSymbols")
 
         try:
             #-------------- Drop
-            if drop : self.data.drop(model=model)
+            if drop : self.data_orm.drop(model=model)
             #-------------- Create
-            if create : self.data.create(model=model)
+            if create : self.data_orm.create(model=model)
             #-------------- Truncate
-            if truncate : self.data.truncate(model=model)
+            if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
                 for instrument in defaultSymbols:
@@ -113,7 +117,7 @@ class Implementation_Management:
                         category = 1
                         priority = 5
                     obj = model_instrument_db(name=name, instrument=instrument,  category=category,  priority=priority, description="", enable=True)
-                    self.data.add(model=model_instrument_db, item=obj)
+                    self.data_orm.add(model=model_instrument_db, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -151,21 +155,21 @@ class Implementation_Management:
         #-------------- Data
         try:
             #-------------- Drop
-            if drop : self.data.drop(model=model)
+            if drop : self.data_orm.drop(model=model)
             #-------------- Create
-            if create : self.data.create(model=model)
+            if create : self.data_orm.create(model=model)
             #-------------- Truncate
-            if truncate : self.data.truncate(model=model)
+            if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
                 obj = model(name='acc-history1', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52030299', password='2idfycj', description="", enable=False)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='acc-history2', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52032860', password='aq8iwnf', description="", enable=False)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='acc-live', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035533', password='iaee0at', description="", enable=False)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='acc-trade', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035534', password='fjf0tzq', description="", enable=True)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -203,23 +207,23 @@ class Implementation_Management:
         #-------------- Data
         try:
             #-------------- Drop
-            if drop : self.data.drop(model=model)
+            if drop : self.data_orm.drop(model=model)
             #-------------- Create
-            if create : self.data.create(model=model)
+            if create : self.data_orm.create(model=model)
             #-------------- Truncate
-            if truncate : self.data.truncate(model=model)
+            if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
                 obj = model(name='st_01')
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='st_02')
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='st_03')
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='st_04')
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='st_05')
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -257,24 +261,24 @@ class Implementation_Management:
         #-------------- Data
         try:
             #-------------- Drop
-            if drop : self.data.drop(model=model)
+            if drop : self.data_orm.drop(model=model)
             #-------------- Create
-            if create : self.data.create(model=model)
+            if create : self.data_orm.create(model=model)
             #-------------- Truncate
-            if truncate : self.data.truncate(model=model)
+            if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
                 params = "{'symbol': 'EUR/USD','action': 'buy','amount': 10000,'tp_pips': 1,'st_pips': 10}"
                 obj = model(name='it_1', strategy_id=1, params=params)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='it_1', strategy_id=2, params=params)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='it_1', strategy_id=3, params=params)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='it_1', strategy_id=4, params=params)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='it_1', strategy_id=5, params=params)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -312,15 +316,15 @@ class Implementation_Management:
         #-------------- Data
         try:
             #-------------- Drop
-            if drop : self.data.drop(model=model)
+            if drop : self.data_orm.drop(model=model)
             #-------------- Create
-            if create : self.data.create(model=model)
+            if create : self.data_orm.create(model=model)
             #-------------- Truncate
-            if truncate : self.data.truncate(model=model)
+            if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
                 obj = model(name="tst_1", strategy_item_id=1, account_id=4)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -368,16 +372,16 @@ class Implementation:
         #-------------- Variable
         model = model_account_db
         #-------------- Data
-        cfgData = utils.config.get("instrument", {})
+        cfgData = config.get("instrument", {})
         defaultSymbols = cfgData.get("defaultSymbols")
 
         try:
             #-------------- Drop
-            if drop : self.data.drop(model=model)
+            if drop : self.data_orm.drop(model=model)
             #-------------- Create
-            if create : self.data.create(model=model)
+            if create : self.data_orm.create(model=model)
             #-------------- Truncate
-            if truncate : self.data.truncate(model=model)
+            if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
                 for instrument in defaultSymbols:
@@ -401,7 +405,7 @@ class Implementation:
                         category = 1
                         priority = 5
                     obj = model_instrument_db(name=name, instrument=instrument,  category=category,  priority=priority, description="", enable=True)
-                    self.data.add(model=model_instrument_db, item=obj)
+                    self.data_orm.add(model=model_instrument_db, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -439,21 +443,21 @@ class Implementation:
         #-------------- Data
         try:
             #-------------- Drop
-            if drop : self.data.drop(model=model)
+            if drop : self.data_orm.drop(model=model)
             #-------------- Create
-            if create : self.data.create(model=model)
+            if create : self.data_orm.create(model=model)
             #-------------- Truncate
-            if truncate : self.data.truncate(model=model)
+            if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
                 obj = model(name='acc-history1', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52030299', password='2idfycj', description="", enable=True)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='acc-history2', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52032860', password='aq8iwnf', description="", enable=True)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='acc-live', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035533', password='iaee0at', description="", enable=True)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='acc-trade', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035534', password='fjf0tzq', description="", enable=True)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -491,23 +495,23 @@ class Implementation:
         #-------------- Data
         try:
             #-------------- Drop
-            if drop : self.data.drop(model=model)
+            if drop : self.data_orm.drop(model=model)
             #-------------- Create
-            if create : self.data.create(model=model)
+            if create : self.data_orm.create(model=model)
             #-------------- Truncate
-            if truncate : self.data.truncate(model=model)
+            if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
                 obj = model(name='strategy_01')
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='strategy_02')
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='strategy_03')
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='strategy_04')
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='strategy_05')
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -545,24 +549,24 @@ class Implementation:
         #-------------- Data
         try:
             #-------------- Drop
-            if drop : self.data.drop(model=model)
+            if drop : self.data_orm.drop(model=model)
             #-------------- Create
-            if create : self.data.create(model=model)
+            if create : self.data_orm.create(model=model)
             #-------------- Truncate
-            if truncate : self.data.truncate(model=model)
+            if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
                 params = "{'symbol': 'EUR/USD','amount': 10000,'tp_pips': 1,'st_pips': 10}"
                 obj = model(name='st_01_itm_01', strategy_id=1, params=params)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='st_02_itm_01', strategy_id=2, params=params)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='st_03_itm_01', strategy_id=3, params=params)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='st_04_itm_01', strategy_id=4, params=params)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
                 obj = model(name='st_05_itm_01', strategy_id=5, params=params)
-                self.data.add(model=model, item=obj)
+                self.data_orm.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -592,7 +596,7 @@ class Implementation:
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
         output = model_output()
         #-------------------- Variable
-        cfgData = utils.config.get("instrument", {})
+        cfgData = config.get("instrument", {})
         tblName = cfgData.get("table")
         #-------------------- Action
         try:
@@ -623,8 +627,8 @@ class Implementation:
         log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
         output = model_output()
         #-------------------- Variable
-        tbl_instrument = utils.config["instrument"]["table"]
-        timeframes =utils.config["timeframe"]
+        tbl_instrument = config["instrument"]["table"]
+        timeframes =config["timeframe"]
         #-------------------- Action
         try:
             tblList = self.db.getData(f"SELECT name FROM {tbl_instrument}")
