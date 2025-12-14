@@ -413,7 +413,7 @@ class Forex:
         return output
     
     #--------------------------------------------- trade_open
-    def trade_open(self, symbol:str, action:str, amount:int, tp_pips:int=0, sl_pips:int=0, execute_id:int=0):
+    def trade_open(self, symbol, action, amount, tp_pips, sl_pips, execute_id):
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -518,6 +518,7 @@ class Forex:
                 self.data_orm.add(model=model_live_order_db, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = order_id
             output.message = {
                 "execute_id": execute_id,
                 "order_id": order_id,

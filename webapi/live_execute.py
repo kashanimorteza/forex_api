@@ -81,12 +81,12 @@ def start(id:int):
     return result
 
 #-------------------------- [end]
-@route.get("/end/{id}", description="end", response_model=model_output)
+@route.get("/stop/{id}", description="stop", response_model=model_output)
 def end(id:int):
     detaile = logic_management.execute_detaile(execute_id=id)
     strategy_name = detaile.data.get("strategy_name")
     params = detaile.data.get("params")
     account_id = detaile.data.get("account_id")
     strategy = logic_management.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id).data
-    result = strategy.end(execute_id=id)
+    result = strategy.stop(execute_id=id)
     return result

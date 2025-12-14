@@ -6,8 +6,6 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-
-from fastapi import params
 from myLib.model import model_output
 from myLib.logic_global import debug, log_instance, data_instance
 from myLib.utils import sort
@@ -15,6 +13,7 @@ from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
 from myLib.forex import Forex
+from myModel.model_live_execute import model_live_execute_db
 from myModel.model_live_order import model_live_order_db
 
 #--------------------------------------------------------------------------------- Action
@@ -56,6 +55,8 @@ class ST_01:
         output.method_name = this_method
         
         try:
+            #--------------Data
+            item_execute = self.data_orm.item(model=model_live_execute_db, id=execute_id).data
             #--------------Action
             result:model_output = self.forex.trade_open(
                 action=self.params["action"], 
@@ -64,6 +65,9 @@ class ST_01:
                 tp_pips=int(self.params["tp_pips"]),
                 sl_pips=int(self.params["st_pips"]),
                 execute_id=execute_id)
+            if result.status:
+                item_execute.status = 'start'
+                self.data_orm.update(model=model_live_execute_db, item=item_execute)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None
@@ -81,8 +85,8 @@ class ST_01:
         #--------------Return
         return output
 
-    #--------------------------------------------- end
-    def end(self, execute_id:int):
+    #--------------------------------------------- stop
+    def stop(self, execute_id:int):
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -102,6 +106,8 @@ class ST_01:
 
         try:
             #--------------Data
+            item_execute = self.data_orm.item(model=model_live_execute_db, id=execute_id).data
+            #--------------Data
             orders:list[model_live_order_db] = self.data_orm.items(model=model_live_order_db, execute_id=execute_id, status='open').data
             for order in orders:
                 order_ids.append(order.order_id)
@@ -109,12 +115,11 @@ class ST_01:
             result:model_output = self.forex.order_close_all(order_ids=order_ids)
             #--------------Update
             if result.status:
-                for order in orders:
-                    order.status = 'close'
-                    self.data_orm.update(model=model_live_order_db, item=order)
+                item_execute.status = 'stop'
+                self.data_orm.update(model=model_live_execute_db, item=item_execute)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = None
+            output.data = execute_id
             output.message = {
                 "Orders": len(order_ids),
                 "Close": result.message["Close"]
