@@ -231,7 +231,8 @@ class Forex:
                             history:model_output = self.history(instrument, timeframe, datefrom=start, dateto=end, count=count)
                             if history.status:
                                 if save : self.save(instrument=instrument, timeframe=timeframe, data=history.data, bulk=bulk)
-                                end = self.timeframe_nex_date(date=history.data["Date"].iloc[0] , timeframe=timeframe)
+                                end = date=history.data["Date"].iloc[0]
+                                end = self.timeframe_nex_date(end , timeframe=timeframe)
                                 if mode == "once" : break
                             else : break
                         else: break

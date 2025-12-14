@@ -97,18 +97,18 @@ forex_connect:
 
 #--------------------------------------------------------------------------------- Download
 download:
-  instrument: EUR/USD
+  instrument: USOil
   timeframe: t1
   mode: complete
-  count: 1000
+  count: 100000
   repeat: 1
   delay: 0
   save: True
   bulk: False
   clear: False
   dedicate: False
-  datefrom: '2025-12-10 00:00:00'
-  dateto: '2030-01-01 00:00:00'
+  datefrom: '2025-12-01 00:00:00'
+  dateto: '2025-12-01 21:00:00'
   
 #--------------------------------------------------------------------------------- instrument
 instrument:
