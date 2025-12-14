@@ -191,6 +191,9 @@ pigz -dc backup_xauusd_t1_2025-12-14.tar.gz | psql -U forex -d forex
 Size
 ```bash
 SELECT pg_size_pretty(pg_database_size('forex'));
+```
+```bash
+\c forex
 SELECT pg_size_pretty( pg_total_relation_size('xauusd_t1'));
 ```
 
