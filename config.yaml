@@ -97,7 +97,7 @@ forex_connect:
 
 #--------------------------------------------------------------------------------- Download
 download:
-  instrument: USOil
+  instrument: UKOil
   timeframe: t1
   mode: complete
   count: 100000

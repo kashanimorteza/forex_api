@@ -9,7 +9,7 @@ import inspect, time
 from datetime import timedelta
 import pandas as pd
 from myLib.model import model_output
-from myLib.logic_global import debug, log_instance, data_instance
+from myLib.logic_global import config, debug, log_instance, data_instance
 from myLib.utils import sort, get_tbl_name, format_dict_block
 from myLib.log import Log
 from myLib.data_orm import Data_Orm
@@ -299,6 +299,8 @@ class Forex:
         attempt = 0
         start = ''
         end = ''
+        data_count = 0
+        data = None
         
         try:
             #--------------Action
@@ -309,30 +311,46 @@ class Forex:
                         data = self.fx.get_history(instrument, timeframe, date_from=datefrom, date_to=dateto, quotes_count=count)
                         break
                     except Exception as e:
-                        self.log.verbose("err", f"{self.this_class} | {this_method}", f"{instrument} | {timeframe} | {datefrom.strftime('%Y-%m-%d %H:%M:%S')} | {dateto.strftime('%Y-%m-%d %H:%M:%S')}")
-                        attempt += 1
-                        print(f"Error (attempt {attempt}/3): {e}")
-                        if attempt > 1: 
-                            self.api.logout()
-                            forex_api = Forex_Api(account=self.account)
-                            self.api = forex_api
-                            self.fx = forex_api.fx
-                            self.api.login()
-                        if attempt >= 3: raise
-                        time.sleep(1)
-                #-----Check
-                if len(data)>0:
-                    df = pd.DataFrame(data)
-                    output.data = df
-                    start=df["Date"].iloc[0].strftime('%Y-%m-%d %H:%M:%S')
-                    end=df["Date"].iloc[-1].strftime('%Y-%m-%d %H:%M:%S')
+                        data = None
+                        if "No data found" in str(e):
+                            break
+                        else:
+                            self.log.verbose("err", f"{self.this_class} | {this_method}", f"{instrument} | {timeframe} | {datefrom.strftime('%Y-%m-%d %H:%M:%S')} | {dateto.strftime('%Y-%m-%d %H:%M:%S')}")
+                            attempt += 1
+                            print(f"Error (attempt {attempt}/3): {e}")
+                            if attempt > 1: 
+                                self.api.logout()
+                                account_cfg = config.get("forex_connect", {}).get(self.api.name, {})
+                                forex_api = Forex_Api(
+                                    name=self.api.name, 
+                                    type=account_cfg.get("type"), 
+                                    username=account_cfg.get("username"), 
+                                    password=account_cfg.get("password"), 
+                                    url=account_cfg.get("url"), 
+                                    key=account_cfg.get("key")
+                                )
+                                self.api = forex_api
+                                self.fx = forex_api.fx
+                                self.api.login()
+                            if attempt >= 3: raise
+                            time.sleep(1)
+                #-----Check   
+                if data !=None: 
+                    if data.size>0:
+                        df = pd.DataFrame(data)
+                        output.data = df
+                        start=df["Date"].iloc[0].strftime('%Y-%m-%d %H:%M:%S')
+                        end=df["Date"].iloc[-1].strftime('%Y-%m-%d %H:%M:%S')
+                        data_count = len(data)
+                    else:
+                        output.status = False
                 else:
                     output.status = False
             else:
                 output.status = False
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message =f"{instrument} | {timeframe} | {sort(len(data), 6)} | {start} | {end}"
+            output.message =f"{instrument} | {timeframe} | {sort(data_count, 6)} | {start} | {end}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -341,8 +359,8 @@ class Forex:
             #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+            #self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            #self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
 
