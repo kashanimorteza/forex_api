@@ -67,25 +67,29 @@ log:
 forex_connect:
   default: acc-history1
   acc-history1:
-    server    : 'Demo'
+    broker    : 'fxcm'
+    type      : 'Demo'
     username  : '52030299'
     password  : '2idfycj'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'
     key       : ''
   acc-history2:
-    server    : 'Demo'
+    broker    : 'fxcm'
+    type      : 'Demo'
     username  : '52032860'
     password  : 'aq8iwnf'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'
     key       : ''
   acc-live:
-    server    : 'Demo'
+    broker    : 'fxcm'
+    type      : 'Demo'
     username  : '52035533'
     password  : 'iaee0at'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'
     key       : ''
   acc-trade:
-    server    : 'Demo'
+    broker    : 'fxcm'
+    type      : 'Demo'
     username  : '52035534'
     password  : 'fjf0tzq'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'

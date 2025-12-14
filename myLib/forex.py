@@ -6,10 +6,11 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
+from datetime import timedelta
 import pandas as pd
 from myLib.model import model_output
 from myLib.logic_global import debug, log_instance, data_instance
-from myLib.utils import sort, format_dict_block, timeframe_nex_date
+from myLib.utils import sort, get_tbl_name, format_dict_block
 from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
@@ -33,8 +34,166 @@ class Forex:
         #--------------------Instance
         self.log:Log = log if log else log_instance
         self.data_orm = data_orm if data_orm else data_instance["management_orm"]
-        self.data_sql = data_sql if data_sql else data_instance["management_sql"]
+        self.data_sql = data_sql if data_sql else data_instance["data_sql"]
 
+    #--------------------------------------------- timeframe_nex_date
+    def timeframe_nex_date(self, timeframe, date):
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Data
+        timeframe = timeframe.lower()
+        #--------------Action
+        if timeframe == "w1" : date = (date - timedelta(days=7))
+        elif timeframe == "d1" : date = (date - timedelta(days=1))
+        elif timeframe == "h8": date = (date - timedelta(hours=8))
+        elif timeframe == "h6": date = (date - timedelta(hours=6))
+        elif timeframe == "h4": date = (date - timedelta(hours=4))
+        elif timeframe == "h3": date = (date - timedelta(hours=3))
+        elif timeframe == "h2": date = (date - timedelta(hours=4))
+        elif timeframe == "h1": date = (date - timedelta(hours=1))
+        elif timeframe == "m30": date = (date - timedelta(minutes=30))
+        elif timeframe == "m15": date = (date - timedelta(minutes=15))
+        elif timeframe == "m5": date = (date - timedelta(minutes=5))
+        elif timeframe == "m1": date = (date - timedelta(minutes=1))
+        elif timeframe == "t1": date = (date - timedelta(milliseconds=1))
+        #--------------Output
+        return date
+
+    #--------------------------------------------- get_strategy_instance
+    def get_strategy_instance(self, strategy, forex, params):
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        from myStrategy.st_01 import ST_01
+        from myStrategy.st_02 import ST_02
+        from myStrategy.st_03 import ST_03
+        from myStrategy.st_04 import ST_04
+        from myStrategy.st_05 import ST_05
+        #--------------Action
+        if strategy == "st_01" : return ST_01(forex=forex, params=params)
+        if strategy == "st_02" : return ST_02(forex=forex, params=params)
+        if strategy == "st_03" : return ST_03(forex=forex, params=params)
+        if strategy == "st_04" : return ST_04(forex=forex, params=params)
+        if strategy == "st_05" : return ST_05(forex=forex, params=params)
+
+    #-------------------------- [get_max_min]
+    def get_max_min(self, instrument, timeframe, mode, filed) -> model_output:
+        #-------------- Description
+        # IN     : order_id
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #-------------- Data
+            tblName = get_tbl_name(instrument, timeframe)
+            if mode == "max" : query = f"SELECT max({filed}) FROM {tblName}"
+            if mode == "min" : query = f"SELECT min({filed}) FROM {tblName}"
+            #--------------Action
+            result = self.data_sql.db.item(query)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = result.data
+            output.message=f"{instrument} | {timeframe} | {mode} | {filed}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #-------------------------- [save]
+    def save(self, instrument, timeframe, data, bulk=False) -> model_output:
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #-------------- Data
+            tblName = get_tbl_name(instrument, timeframe)
+            if timeframe == "t1":
+                query = f'INSERT INTO {tblName} (date, bid, ask) VALUES '
+            else:
+                query = f'INSERT INTO {tblName} (date, bidopen, bidclose, bidhigh, bidlow, askopen, askclose, askhigh, asklow) VALUES '
+            #--------------Action
+            if timeframe == "t1":
+                if bulk :
+                    data = data.drop_duplicates(subset=["Date"], keep="first")
+                    for index, row in data.iloc[::-1].iterrows(): 
+                        query += f"('{row['Date']}',{row['Bid']},{row['Ask']}),"
+                        iter += 1
+                        insert += 1
+                    if iter > 0 : query = query[:-1]
+                    output.status = self.data_sql.db.execute(query)
+                    if not output.status : insert = 0
+                else:
+                    for index, row in data.iloc[::-1].iterrows(): 
+                        q = query + (f"('{row['Date']}',{row['Bid']},{row['Ask']})")
+                        iter += 1
+                        if self.data_sql.db.execute(q) : 
+                            insert += 1
+                        else:
+                            pass
+            else:
+                if bulk :
+                    for index, row in data.iloc[::-1].iterrows(): 
+                        query += f"('{row['Date']}',{row['BidOpen']},{row['BidClose']},{row['BidHigh']},{row['BidLow']},{row['AskOpen']},{row['AskClose']},{row['AskHigh']},{row['AskLow']}),"
+                        iter += 1
+                        insert += 1
+                    if iter > 0 : query = query[:-1]
+                    output.status = self.data_sql.db.execute(query)
+                    if not output.status : insert = 0
+                else:
+                    for index, row in data.iloc[::-1].iterrows(): 
+                        q = query + (f"('{row['Date']}',{row['BidOpen']},{row['BidClose']},{row['BidHigh']},{row['BidLow']},{row['AskOpen']},{row['AskClose']},{row['AskHigh']},{row['AskLow']})")
+                        iter += 1
+                        if self.data_sql.db.execute(q) : insert += 1
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = None
+            output.message==f"{instrument} | {timeframe} | {sort(insert, 6)}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
     #--------------------------------------------- run
     def store(self, instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto):
         #-------------- Description
@@ -53,19 +212,17 @@ class Forex:
         output.method_name = this_method
 
         try:
-            #--------------Variable
-            start_time = time.time()
-            #---Check
+            #--------------Check
             if mode == "up":
-                d = self.data.get_max_min(instrument=instrument, timeframe=timeframe, mode="max", filed="Date")
-                if d.status and d.data: datefrom = timeframe_nex_date(date=d.data, timeframe=timeframe)
+                d = self.get_max_min(instrument=instrument, timeframe=timeframe, mode="max", filed="Date")
+                if d.status and d.data: datefrom = self.timeframe_nex_date(date=d.data, timeframe=timeframe)
             elif mode == "down":
-                d = self.data.get_max_min(instrument=instrument, timeframe=timeframe, mode="min", filed="Date")
-                if d.status and d.data : dateto = timeframe_nex_date(date=d.data, timeframe=timeframe)
-            #---Display
-            params = {"account": self.account,"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
+                d = self.get_max_min(instrument=instrument, timeframe=timeframe, mode="min", filed="Date")
+                if d.status and d.data : dateto = self.timeframe_nex_date(date=d.data, timeframe=timeframe)
+            #--------------Display
+            params = {"account": self.api.id,"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
             print(format_dict_block("Store", params))
-            #---Action
+            #--------------Action
             while(True):
                 for r in range(repeat):
                     start = datefrom
@@ -74,8 +231,8 @@ class Forex:
                         if end > start:
                             history:model_output = self.history(instrument, timeframe, datefrom=start, dateto=end, count=count)
                             if history.status:
-                                if save : self.data.save(instrument=instrument, timeframe=timeframe, data=history.data, bulk=bulk)
-                                end = timeframe_nex_date(date=history.data["Date"].iloc[0] , timeframe=timeframe)
+                                if save : self.save(instrument=instrument, timeframe=timeframe, data=history.data, bulk=bulk)
+                                end = self.timeframe_nex_date(date=history.data["Date"].iloc[0] , timeframe=timeframe)
                                 if mode == "once" : break
                             else : break
                         else: break
@@ -83,6 +240,8 @@ class Forex:
                 time.sleep(delay)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = None
+            output.message=None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

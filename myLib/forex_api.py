@@ -20,7 +20,7 @@ class Forex_Api:
         self.this_class = self.__class__.__name__
         self.id = None
         self.name = name
-        self.server = type
+        self.type = type
         self.username = username
         self.password = password
         self.url = url
@@ -54,7 +54,7 @@ class Forex_Api:
 
         try:
             #--------------Action
-            self.fx.login(self.username, self.password, self.url, self.server, self.session_status_changed)
+            self.fx.login(self.username, self.password, self.url, self.type, self.session_status_changed)
             self.info()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)

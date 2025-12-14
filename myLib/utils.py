@@ -6,14 +6,13 @@
 
 #--------------------------------------------------------------------------------- Import
 from __future__ import annotations
-from datetime import timedelta
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- get_tbl_name
 def get_tbl_name(symbol, timeFrame):
     symbol=symbol.replace('/', '')
     symbol=symbol.replace('.', '')
-    res = f"{symbol}_{timeFrame}"
+    res = f"{symbol}_{timeFrame}".lower()
     if res[0].isdigit() : res = f'"{res}"'
     return res
 
@@ -70,46 +69,3 @@ def format_dict_block(title, data: dict) -> str:
         lines.append(f"{key.ljust(max_key_len)} = {value}")
     lines.append("-" * 46)
     return "\n".join(lines)
-
-#--------------------------------------------- timeframe_nex_date
-def timeframe_nex_date(timeframe, date):
-    #-------------- Description
-    # IN     : 
-    # OUT    : 
-    # Action :
-    #-------------- Data
-    timeframe = timeframe.lower()
-    #--------------Action
-    if timeframe == "w1" : date = (date - timedelta(days=7))
-    elif timeframe == "d1" : date = (date - timedelta(days=1))
-    elif timeframe == "h8": date = (date - timedelta(hours=8))
-    elif timeframe == "h6": date = (date - timedelta(hours=6))
-    elif timeframe == "h4": date = (date - timedelta(hours=4))
-    elif timeframe == "h3": date = (date - timedelta(hours=3))
-    elif timeframe == "h2": date = (date - timedelta(hours=4))
-    elif timeframe == "h1": date = (date - timedelta(hours=1))
-    elif timeframe == "m30": date = (date - timedelta(minutes=30))
-    elif timeframe == "m15": date = (date - timedelta(minutes=15))
-    elif timeframe == "m5": date = (date - timedelta(minutes=5))
-    elif timeframe == "m1": date = (date - timedelta(minutes=1))
-    elif timeframe == "t1": date = (date - timedelta(milliseconds=1))
-    #--------------Output
-    return date
-
-#--------------------------------------------- get_strategy_instance
-def get_strategy_instance(strategy, forex, params):
-    #-------------- Description
-    # IN     : 
-    # OUT    : 
-    # Action :
-    from myStrategy.st_01 import ST_01
-    from myStrategy.st_02 import ST_02
-    from myStrategy.st_03 import ST_03
-    from myStrategy.st_04 import ST_04
-    from myStrategy.st_05 import ST_05
-    #--------------Action
-    if strategy == "st_01" : return ST_01(forex=forex, params=params)
-    if strategy == "st_02" : return ST_02(forex=forex, params=params)
-    if strategy == "st_03" : return ST_03(forex=forex, params=params)
-    if strategy == "st_04" : return ST_04(forex=forex, params=params)
-    if strategy == "st_05" : return ST_05(forex=forex, params=params)

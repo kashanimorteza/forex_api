@@ -5,7 +5,7 @@
 # test
 
 #--------------------------------------------------------------------------------- Import
-from myLib.logic_global import load_forex_api
+from myLib.logic_global import load_forex_api, load_data
 from myLib.logic_management import Logic_Management
 
 #--------------------------------------------------------------------------------- Action  : Order cloese

@@ -7,14 +7,12 @@
 #--------------------------------------------------------------------------------- Import
 import os, sys, shutil
 from datetime import datetime
-
 root_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, f"{root_dir}/myLib")
-
+from myLib.logic_global import config, log_instance, data_instance
 from myLib.model import model_output
 from myLib.forex import Forex
-from myLib.utils import config, parse_cli_args, format_dict_block, to_bool
-from myLib.log import Log
+from myLib.utils import parse_cli_args, format_dict_block, to_bool
 from myLib.forex_api import Forex_Api
 
 #--------------------------------------------------------------------------------- Debug
@@ -65,26 +63,36 @@ try:
             for instrument in instruments:
                 if clear : 
                     if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
-                forex_api = Forex_Api(account=account)
+                account_cfg = config.get("forex_connect", {}).get(account, {})
+                forex_api = Forex_Api(
+                    name=account_cfg.get("name"), 
+                    type=account_cfg.get("type"), 
+                    username=account_cfg.get("username"), 
+                    password=account_cfg.get("password"), 
+                    url=account_cfg.get("url"), 
+                    key=account_cfg.get("key")
+                )
                 forex_api.login()
                 forex = Forex(forex_api=forex_api)
-                forex.account_info()
-                forex.db.open()
                 forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
-                forex.db.close()
                 forex_api.logout()
     else :
-        forex_api = Forex_Api(account=account)
+        account_cfg = config.get("forex_connect", {}).get(account, {})
+        forex_api = Forex_Api(
+            name=account_cfg.get("name"), 
+            type=account_cfg.get("type"), 
+            username=account_cfg.get("username"), 
+            password=account_cfg.get("password"), 
+            url=account_cfg.get("url"), 
+            key=account_cfg.get("key")
+        )
         forex_api.login()
         forex = Forex(forex_api=forex_api)
-        forex.account_info()
-        forex.db.open()
         for timeframe in timeframes:
             for instrument in instruments:
                 if clear : 
                     if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
                 forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)        
-        forex.db.close()
         forex_api.logout()
 except Exception as e:
     #--------------Error
