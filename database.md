@@ -159,10 +159,10 @@ pg_dump --dbname=forex --verbose --no-owner --table=public.xauusd_t1 | pigz > ba
 <!-------------------------- simple -->
 simple
 ```bash
-sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f  backup_2025-12-14.sql
+sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f backup_2025-12-14.sql
 ```
 ```bash
-sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f  backup_xauusd_t1_2025-12-14.sql
+sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f backup_xauusd_t1_2025-12-14.sql
 ```
 
 <!-------------------------- gzip -->
@@ -192,53 +192,6 @@ SELECT pg_size_pretty(pg_database_size('forex'));
 ```bash
 \c forex
 SELECT pg_size_pretty( pg_total_relation_size('xauusd_t1'));
-```
-
-<!-------------------------- Table-->
-Tanble
-```sql
-DO $$
-DECLARE
-    sym    text;
-    tf     text;
-    prefix text;
-    tbl    text;
-BEGIN
-    -- List of symbols
-    FOR sym IN SELECT unnest(ARRAY[
-        'EUR/USD','EUR/GBP','EUR/CHF','EUR/JPY','EUR/AUD','EUR/CAD','EUR/NZD',
-        'GBP/USD','GBP/JPY','GBP/CHF','GBP/NZD','GBP/AUD','GBP/CAD',
-        'AUD/USD','AUD/CAD','AUD/JPY','AUD/NZD','AUD/CHF',
-        'NZD/USD','NZD/JPY','NZD/CHF','NZD/CAD',
-        'USD/JPY','USD/CHF','USD/CAD',
-        'CAD/JPY','CAD/CHF',
-        'CHF/JPY',
-        'USOil','UKOil','XAU/USD','XAG/USD'
-    ])
-    LOOP
-        prefix := lower(replace(sym, '/', ''));
-
-        -- Loop timeframes
-        FOR tf IN SELECT unnest(ARRAY[
-            'w1','d1','h8','h6','h4','h3','h2','h1','m30','m15','m5','m1','t1'
-        ])
-        LOOP
-            tbl := prefix || '_' || tf;
-
-            BEGIN
-                EXECUTE format('ALTER TABLE %I SET UNLOGGED', tbl);
-                RAISE NOTICE 'Table % set to UNLOGGED', tbl;
-
-            EXCEPTION
-                WHEN undefined_table THEN
-                    RAISE NOTICE 'Table % does NOT exist - skipped', tbl;
-                WHEN insufficient_privilege THEN
-                    RAISE NOTICE 'No permission for table % - skipped', tbl;
-            END;
-
-        END LOOP;
-    END LOOP;
-END $$;
 ```
 <!-------------------------- Truncate-->
 Truncate
