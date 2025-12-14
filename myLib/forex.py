@@ -61,24 +61,6 @@ class Forex:
         #--------------Output
         return date
 
-    #--------------------------------------------- get_strategy_instance
-    def get_strategy_instance(self, strategy, forex, params):
-        #-------------- Description
-        # IN     : 
-        # OUT    : 
-        # Action :
-        from myStrategy.st_01 import ST_01
-        from myStrategy.st_02 import ST_02
-        from myStrategy.st_03 import ST_03
-        from myStrategy.st_04 import ST_04
-        from myStrategy.st_05 import ST_05
-        #--------------Action
-        if strategy == "st_01" : return ST_01(forex=forex, params=params)
-        if strategy == "st_02" : return ST_02(forex=forex, params=params)
-        if strategy == "st_03" : return ST_03(forex=forex, params=params)
-        if strategy == "st_04" : return ST_04(forex=forex, params=params)
-        if strategy == "st_05" : return ST_05(forex=forex, params=params)
-
     #-------------------------- [get_max_min]
     def get_max_min(self, instrument, timeframe, mode, filed) -> model_output:
         #-------------- Description

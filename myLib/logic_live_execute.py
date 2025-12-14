@@ -8,7 +8,7 @@
 import inspect, time, ast
 from myLib.model import model_output
 from myLib.logic_global import debug, forex_apis
-from myLib.utils import sort, get_strategy_instance
+from myLib.utils import sort
 from myLib.log import Log
 from myLib.logic_global import forex_apis
 from myLib.data_orm import Data_Orm

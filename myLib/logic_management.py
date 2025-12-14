@@ -33,6 +33,19 @@ class Logic_Management:
         self.data_orm = data_orm if data_orm else data_instance["management_orm"]
         self.data_sql = data_sql if data_sql else data_instance["management_sql"]
 
+    #--------------------------------------------- get_strategy_instance
+    def get_strategy_instance(self, strategy, forex, params):
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #--------------Action
+        if strategy == "st_01" : return ST_01(forex=forex, params=params)
+        if strategy == "st_02" : return ST_02(forex=forex, params=params)
+        if strategy == "st_03" : return ST_03(forex=forex, params=params)
+        if strategy == "st_04" : return ST_04(forex=forex, params=params)
+        if strategy == "st_05" : return ST_05(forex=forex, params=params)
+        
     #-------------------------- [order_close]
     def order_close(self, order_id) -> model_output:
         #-------------- Description
