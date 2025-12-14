@@ -45,7 +45,6 @@ CREATE ROLE forex WITH LOGIN CREATEDB PASSWORD '&WnA8v!(THG%)czK';
 forex
 ```sql
 SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'forex' AND pid <> pg_backend_pid();
-DROP DATABASE IF EXISTS forex;
 ```
 ```sql
 Drop DATABASE forex;
@@ -72,7 +71,6 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
 management
 ```sql
 SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'management' AND pid <> pg_backend_pid();
-DROP DATABASE IF EXISTS management;
 ```
 ```sql
 Drop DATABASE management;
@@ -99,7 +97,6 @@ GRANT pg_read_server_files TO forex;
 log
 ```sql
 SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'log' AND pid <> pg_backend_pid();
-DROP DATABASE IF EXISTS log;
 ```
 ```sql
 Drop DATABASE log;
@@ -132,10 +129,10 @@ GRANT pg_read_server_files TO forex;
 <!-------------------------- simple -->
 simple
 ```bash
-sudo -u postgres pg_dump -v -O -a -d forex -f backup_2025-12-14.sql
+sudo -u postgres pg_dump -v -O -d forex -f backup_2025-12-14.sql
 ```
 ```bash
-sudo -u postgres pg_dump -v -O -a -d forex forex -t public.xauusd_t1 -f backup_xauusd_t1_2025-12-14.sql
+sudo -u postgres pg_dump -v -O -d forex forex -t public.xauusd_t1 -f backup_xauusd_t1_2025-12-14.sql
 ```
 
 <!-------------------------- gzip -->
