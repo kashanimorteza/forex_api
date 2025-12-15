@@ -22,19 +22,19 @@ from myModel import *
 class Forex:
     #--------------------------------------------- init
     def __init__(self,
-            forex_api:Forex_Api,
-            data_orm:Data_Orm=None,
-            data_sql:Data_SQL=None,
-            log:Log=None
+            forex_api,
+            data_orm=None,
+            data_sql=None,
+            log=None
         ):
         #--------------------Variable
         self.this_class = self.__class__.__name__
-        self.api = forex_api
-        self.fx = self.api.fx
+        self.api:Forex_Api = forex_api
+        self.fx:ForexConnect = self.api.fx
         #--------------------Instance
         self.log:Log = log if log else log_instance
-        self.data_orm = data_orm if data_orm else data_instance["management_orm"]
-        self.data_sql = data_sql if data_sql else data_instance["data_sql"]
+        self.data_orm:Data_Orm = data_orm if data_orm else data_instance["management_orm"]
+        self.data_sql:Data_SQL = data_sql if data_sql else data_instance["data_sql"]
 
     #--------------------------------------------- timeframe_nex_date
     def timeframe_nex_date(self, timeframe, date):
@@ -412,12 +412,12 @@ class Forex:
         #--------------Return
         return output
     
-    #--------------------------------------------- trade_open
-    def trade_open(self, symbol, action, amount, tp_pips, sl_pips, execute_id):
+    #--------------------------------------------- order_open
+    def order_open(self, symbol, action, amount, tp_pips, sl_pips, execute_id):
         #-------------- Description
-        # IN     : order_id
-        # OUT    : 
-        # Action :
+        # IN     : symbol, action, amount, tp_pips, sl_pips, execute_id
+        # OUT    : model_output
+        # Action : forex order open
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
@@ -432,58 +432,43 @@ class Forex:
         try:
             #--------------Variable
             buy_sell = None
-            start_time = time.time()
+            ask = None
+            bid = None
+            sl = None
+            tp = None
+            #--------------Check
+            amount = int(amount)
+            tp_pips = int(tp_pips) 
+            sl_pips = int(sl_pips)
+            #--------------Data
             command = fxcorepy.Constants.Commands.CREATE_ORDER
             order_type = fxcorepy.Constants.Orders.TRUE_MARKET_OPEN
             if action == "buy" : buy_sell=fxcorepy.Constants.BUY
-            elif action == "sell": buy_sell=fxcorepy.Constants.SELL
-            ask = None
-            bid = None
-            spred = None
-            sl = None
-            tp = None
-            #--------------Data
-            #---Offers
+            if action == "sell": buy_sell=fxcorepy.Constants.SELL
+            #--------------Ask/Bid
             offers = self.fx.get_table(ForexConnect.OFFERS)
             for offer in offers:
                 if offer.instrument == symbol:
                     if offer.subscription_status == fxcorepy.Constants.SubscriptionStatuses.TRADABLE:
                         point_size = offer.point_size 
                         digits = offer.digits
-                        ask = offer.ask
-                        ask = f"{ask:.{digits}f}"
-                        ask = float(ask)
-                        bid = offer.bid
-                        bid = f"{bid:.{digits}f}"
-                        bid = float(bid)
+                        bid = float(f"{offer.bid:.{digits}f}")
+                        ask = float(f"{offer.ask:.{digits}f}")
                         spread = (ask-bid) * point_size 
                         break
-            #---TP/SL
+            #--------------TP/SL
             if tp_pips or sl_pips:
                 if action == "buy":
-                    price = ask
-                    price = f"{price:.{digits}f}"
-                    tp = ask + (tp_pips * point_size)
-                    tp = f"{tp:.{digits}f}"
-                    tp = float(tp)
-                    sl = bid - (sl_pips * point_size)
-                    sl = f"{sl:.{digits}f}"
-                    sl = float(sl)
+                    tp = float(ask + (tp_pips * point_size))
+                    sl = float(bid - (sl_pips * point_size))
                 elif action == "sell":
-                    price = bid
-                    price = f"{price:.{digits}f}"
-                    tp = bid - (tp_pips * point_size)
-                    tp = f"{tp:.{digits}f}"
-                    tp = float(tp)
-                    sl = ask + (sl_pips * point_size)
-                    sl = f"{sl:.{digits}f}"
-                    sl = float(sl)
-
+                    tp = float(bid - (tp_pips * point_size))
+                    sl = float(ask + (sl_pips * point_size))
             #--------------Order
             if ask and bid :
                 if tp or sl:
                     request = self.fx.create_order_request(
-                        ACCOUNT_ID=self.account_id,
+                        ACCOUNT_ID=self.api.id,
                         command=command, 
                         order_type=order_type,
                         BUY_SELL= buy_sell,
@@ -494,7 +479,7 @@ class Forex:
                     )
                 else:
                     request = self.fx.create_order_request(
-                        ACCOUNT_ID=self.account_id,
+                        ACCOUNT_ID=self.api.id,
                         command=command, 
                         order_type=order_type,
                         BUY_SELL= buy_sell,
@@ -503,7 +488,8 @@ class Forex:
                     )
                 response = self.fx.send_request(request)
                 order_id = getattr(response, "order_id", None) if response else None
-                #--------------Database
+            #--------------Result
+            if order_id:
                 obj = model_live_order_db()
                 obj.execute_id = execute_id
                 obj.order_id = order_id
@@ -516,6 +502,8 @@ class Forex:
                 obj.sl = sl
                 obj.status = 'open'
                 self.data_orm.add(model=model_live_order_db, item=obj)
+            else:
+                output.status = False
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = order_id
@@ -528,8 +516,7 @@ class Forex:
                 "bid": bid,
                 "ask": ask,
                 "tp": tp,
-                "sl": sl,
-                "status": 'open'
+                "sl": sl
             }
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)

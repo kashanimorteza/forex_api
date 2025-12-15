@@ -1,1 +1,2 @@
-I want to change the name of the data file to data_sql and class Data rename to Data_SQL on mylib
+look at database_orm.py on method truncate_all_tables
+i need truncate all tables

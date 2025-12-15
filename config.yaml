@@ -184,7 +184,7 @@ debug:
     symbol: {log: false, verbose: true, model: "Forex"}
     account_info: {log: false, verbose: true, model: "Forex"}
     trade_list: {log: false, verbose: true, model: "Forex"}
-    trade_open: {log: false, verbose: true, model: "Forex"}
+    order_open: {log: false, verbose: true, model: "Forex"}
     order_close: {log: false, verbose: true, model: "Forex"}
     order_close_all: {log: false, verbose: true, model: "Forex"}
     

@@ -30,8 +30,43 @@ class Implementation_Management:
         self.data_orm:Data_Orm = data_orm if data_orm else data_instance["management_orm"]
         self.data_sql:Data_SQL = data_sql if data_sql else data_instance["management_sql"]
 
-    #--------------------------------------------- tables
-    def tables(self):
+    #--------------------------------------------- create_all_table
+    def create_all_table(self):
+        #-------------- Description
+        # IN     : 
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            self.data_orm.create_all_tables()
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message = f"Tables created"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+
+    #--------------------------------------------- truncate_all_table
+    def truncate_all_table(self):
         #-------------- Description
         # IN     : 
         # OUT    : 

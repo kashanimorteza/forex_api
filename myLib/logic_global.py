@@ -45,7 +45,7 @@ def load_forex_api():
     forex_accounts = data_orm.items(model=model_account_db, enable=True)
     for acc in forex_accounts.data :
         forex_api = Forex_Api(name=acc.name, type=acc.type, username=acc.username, password=acc.password, url=acc.url, key=acc.key)
-        #forex_api.login()
+        forex_api.login()
         forex_apis[acc.id] = forex_api
 
 #--------------------------------------------------------------------------------- Action

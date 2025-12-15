@@ -160,7 +160,7 @@ class Logic_Management:
         return output
     
     #-------------------------- [execute_detaile]
-    def execute_detaile(self, execute_id) -> model_output:
+    def execute_detaile(self, id) -> model_output:
         #-------------- Description
         # IN     : execute_id
         # OUT    : 
@@ -180,7 +180,7 @@ class Logic_Management:
 
         try:
             #--------------Action
-            cmd = f"SELECT strategy.name, strategy_item.params, live_execute.account_id, live_execute.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN live_execute ON strategy_item.id = live_execute.strategy_item_id WHERE live_execute.id = '{execute_id}';"
+            cmd = f"SELECT strategy.name, strategy_item.params, live_execute.account_id, live_execute.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN live_execute ON strategy_item.id = live_execute.strategy_item_id WHERE live_execute.id = '{id}';"
             result:model_output = self.data_sql.db.items(cmd=cmd)
             #--------------Data
             if result.status and len(result.data) > 0 :
@@ -191,7 +191,7 @@ class Logic_Management:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = detaile
-            output.message=execute_id
+            output.message=id
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

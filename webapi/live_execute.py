@@ -5,6 +5,8 @@
 # This is route for live_execute
 
 #--------------------------------------------------------------------------------- Import
+import time
+from myLib.utils import sort
 from myLib.model import model_output
 from myLib.logic_global import database_management
 from fastapi import APIRouter, Request
@@ -72,21 +74,25 @@ def dead(id:int):
 #-------------------------- [start]
 @route.get("/start/{id}", description="start", response_model=model_output)
 def start(id:int):
-    detaile = logic_management.execute_detaile(execute_id=id)
+    start_time = time.time()
+    detaile = logic_management.execute_detaile(id=id)
     strategy_name = detaile.data.get("strategy_name")
     params = detaile.data.get("params")
     account_id = detaile.data.get("account_id")
     strategy = logic_management.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id).data
-    result = strategy.start(execute_id=id)
-    return result
+    output:model_output = strategy.start(id=id)
+    output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+    return output
 
 #-------------------------- [end]
 @route.get("/stop/{id}", description="stop", response_model=model_output)
 def end(id:int):
-    detaile = logic_management.execute_detaile(execute_id=id)
+    start_time = time.time()
+    detaile = logic_management.execute_detaile(id=id)
     strategy_name = detaile.data.get("strategy_name")
     params = detaile.data.get("params")
     account_id = detaile.data.get("account_id")
     strategy = logic_management.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id).data
-    result = strategy.stop(execute_id=id)
-    return result
+    output:model_output = strategy.stop(id=id)
+    output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+    return output
