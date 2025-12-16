@@ -26,12 +26,19 @@ forex_api = forex_apis[1]
 forex = Forex(forex_api = forex_api)
 logic_management = Logic_Management()
 
+# a = forex.orader_open_list()
+# order_id = '1827018726'
+# profit = 100
+# logic_management.order_close(order_id=order_id, profit=profit)
+
+
 #--------------------------------------------------------------------------------- Class
 class CloseTradesListener(TableListener):
     def on_added(self, row_id, row):
+        print("--------------------------------- Trade Closed -------------------------------")
         order_id = row.open_order_id
         profit = row.gross_pl
-        logic_management.order_close(order_id=order_id, profit=profit)
+        #logic_management.order_close(order_id=order_id, profit=profit)
 
 #--------------------------------------------------------------------------------- Action
 listener = CloseTradesListener()

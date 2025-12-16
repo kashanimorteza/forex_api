@@ -531,8 +531,13 @@ class Forex:
                         SYMBOL = symbol,
                         AMOUNT= amount
                     )
+                print("------------befor response")
                 response = self.fx.send_request(request)
+                print("------------after response")
                 order_id = getattr(response, "order_id", None) if response else None
+                print("------------order_id:", order_id)
+
+
             #--------------Result
             if order_id:
                 obj = model_live_order_db()

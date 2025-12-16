@@ -331,14 +331,18 @@ class Logic_Management:
             account_id = execute_detaile.get("account_id")
             strategy = self.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id,execute_id=execute_id).data
             #--------------Action
-            def run_order():
-                if action == "start" : strategy.start()
-                if action == "stop" : strategy.stop()
-                if action == "order_close" : strategy.order_close(order_detaile=order_detaile)
-                if action == "price_change" : strategy.price_change(order_detaile=order_detaile)
-            thread = threading.Thread(target=run_order)
-            thread.start()
-            thread.join()
+            # def run_order():
+            #     if action == "start" : strategy.start()
+            #     if action == "stop" : strategy.stop()
+            #     if action == "order_close" : strategy.order_close(order_detaile=order_detaile)
+            #     if action == "price_change" : strategy.price_change(order_detaile=order_detaile)
+            # thread = threading.Thread(target=run_order)
+            # thread.start()
+            # thread.join()
+            if action == "start" : strategy.start()
+            if action == "stop" : strategy.stop()
+            if action == "order_close" : strategy.order_close(order_detaile=order_detaile)
+            if action == "price_change" : strategy.price_change(order_detaile=order_detaile)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose

@@ -16,8 +16,9 @@ from myLib.logic_global import forex_apis
 def run() :
     command = fxcorepy.Constants.Commands.CREATE_ORDER
     order_type = fxcorepy.Constants.Orders.TRUE_MARKET_OPEN
-
     fx = forex_apis[1]
+    
+    # Create and send request
     request = fx.fx.create_order_request(
         ACCOUNT_ID=fx.id,
         command=command, 
@@ -26,9 +27,19 @@ def run() :
         SYMBOL = "EUR/USD",
         AMOUNT= 1000
     )
-    response = fx.fx.send_request_async(request)
+    
+    # Send synchronous request - waits for response
+    response = fx.fx.send_request(request)
+    
+    # Get order_id directly from response
     order_id = getattr(response, "order_id", None) if response else None
-    print(order_id)
+    
+    if order_id:
+        print(f"Order ID: {order_id}")
+    else:
+        print("Failed to get order ID from response")
+    
+    return order_id
 
 run()
 
