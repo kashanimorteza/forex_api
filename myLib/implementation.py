@@ -200,13 +200,7 @@ class Implementation_Management:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                obj = model(name='acc-history1', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52030299', password='2idfycj', description="", enable=False)
-                self.data_orm.add(model=model, item=obj)
-                obj = model(name='acc-history2', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52032860', password='aq8iwnf', description="", enable=False)
-                self.data_orm.add(model=model, item=obj)
-                obj = model(name='acc-live', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035533', password='iaee0at', description="", enable=False)
-                self.data_orm.add(model=model, item=obj)
-                obj = model(name='acc-trade', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035534', password='fjf0tzq', description="", enable=True)
+                obj = model(name='acc-trade', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035533', password='iaee0at', description="", enable=True)
                 self.data_orm.add(model=model, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -301,8 +295,8 @@ class Implementation_Management:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name='buy', strategy_id=1, params="{'symbol':'EUR/USD','action':'buy','amount':10000,'tp_pips':1,'st_pips':1}", description="Start buy"))
-                self.data_orm.add(model=model, item=model(name='sell', strategy_id=1, params="{'symbol':'EUR/USD','action':'sell','amount':10000,'tp_pips':1,'st_pips':1}", description="Start sell"))
+                self.data_orm.add(model=model, item=model(name='buy', strategy_id=1, params="{'symbol':'EUR/USD','action':'buy','amount':10000,'tp_pips':10,'st_pips':10}", description="Start buy"))
+                self.data_orm.add(model=model, item=model(name='sell', strategy_id=1, params="{'symbol':'EUR/USD','action':'sell','amount':10000,'tp_pips':10,'st_pips':10}", description="Start sell"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -347,8 +341,8 @@ class Implementation_Management:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="test-1", strategy_item_id=1, account_id=4))
-                self.data_orm.add(model=model, item=model(name="test-1", strategy_item_id=2, account_id=4))
+                self.data_orm.add(model=model, item=model(name="test-1", strategy_item_id=1, account_id=1))
+                self.data_orm.add(model=model, item=model(name="test-1", strategy_item_id=2, account_id=1))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

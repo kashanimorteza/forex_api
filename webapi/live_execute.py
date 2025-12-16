@@ -74,7 +74,7 @@ def dead(id:int):
 
 #-------------------------- [start]
 @route.get("/start/{id}", description="start", response_model=model_output)
-def start(id):
+def start(id:int):
     start_time = time.time()
     output:model_output = logic_management.strategy_action(execute_id=id, action="start")
     output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -82,7 +82,7 @@ def start(id):
 
 #-------------------------- [end]
 @route.get("/stop/{id}", description="stop", response_model=model_output)
-def end(id):
+def end(id:int):
     start_time = time.time()
     output:model_output = logic_management.strategy_action(execute_id=id, action="stop")
     output.time = sort(f"{(time.time() - start_time):.3f}", 3)

@@ -1,8 +1,9 @@
 #--------------------------------------------------------------------------------- General
 general:
   name: forex_download
-  database_data: data
   database_management: management
+  database_data: data
+  database_log: log
 
 #--------------------------------------------------------------------------------- Database
 database:
@@ -20,6 +21,13 @@ database:
     username: forex
     password: "&WnA8v!(THG%)czK"
     database: management
+  log:
+    server: postgresql
+    host: 127.0.0.1
+    port: 5432
+    username: forex
+    password: "&WnA8v!(THG%)czK"
+    database: log
 
 #--------------------------------------------------------------------------------- Api
 api:
@@ -36,13 +44,7 @@ api:
 
 #--------------------------------------------------------------------------------- Log
 log:
-  #---------------------------------Database
-  database:
-    host: 127.0.0.1
-    port: 5432
-    user: forex
-    pass: "&WnA8v!(THG%)czK"
-    name: log
+
   #---------------------------------General
   general:
     table: forex
@@ -69,8 +71,8 @@ forex_connect:
   acc-history1:
     broker    : 'fxcm'
     type      : 'Demo'
-    username  : '52030299'
-    password  : '2idfycj'
+    username  : '52035534'
+    password  : 'fjf0tzq'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'
     key       : ''
   acc-history2:
@@ -90,8 +92,8 @@ forex_connect:
   acc-trade:
     broker    : 'fxcm'
     type      : 'Demo'
-    username  : '52035534'
-    password  : 'fjf0tzq'
+    username  : '52030299'
+    password  : '2idfycj'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'
     key       : ''
 
@@ -174,8 +176,10 @@ debug:
     strategy_item: {log: false, verbose: true, model: "Implementation"}
     live_execute: {log: false, verbose: true, model: "Implementation"}
   Logic_Management:
-    order_close: {log: false, verbose: false, model: "Logic_Management"}
-    order_detaile: {log: false, verbose: false, model: "Logic_Management"}
+    order_close: {log: false, verbose: true, model: "Logic_Management"}
+    order_detaile: {log: false, verbose: true, model: "Logic_Management"}
+    strategy_action: {log: false, verbose: true, model: "Logic_Management"}
+    get_strategy_item_instance: {log: false, verbose: true, model: "Logic_Management"}
   Forex_Api:
     login: {log: false, verbose: true, model: "Forex"}
     logout: {log: false, verbose: true, model: "Forex"}
@@ -194,27 +198,27 @@ debug:
     save: {log: false, verbose: true, model: "Data"}
     get_max_min: {log: false, verbose: false, model: "Data"}
   ST_01:
-    start: {log: false, verbose: false, model: "Data"}
-    order_close: {log: false, verbose: false, model: "Data"}
-    price_change: {log: false, verbose: false, model: "Data"}
-    end: {log: false, verbose: false, model: "Data"}
+    start: {log: false, verbose: true, model: "ST_01"}
+    stop: {log: false, verbose: true, model: "ST_01"}
+    order_close: {log: false, verbose: true, model: "ST_01"}
+    price_change: {log: false, verbose: true, model: "ST_01"}
   ST_02:
-    start: {log: false, verbose: true, model: "Data"}
-    order_close: {log: false, verbose: true, model: "Data"}
-    price_change: {log: false, verbose: true, model: "Data"}
-    end: {log: false, verbose: true, model: "Data"}
+    start: {log: false, verbose: true, model: "ST_02"}
+    stop: {log: false, verbose: true, model: "ST_02"}
+    order_close: {log: false, verbose: true, model: "ST_02"}
+    price_change: {log: false, verbose: true, model: "ST_02"}
   ST_03:
-    start: {log: false, verbose: true, model: "Data"}
-    order_close: {log: false, verbose: true, model: "Data"}
-    price_change: {log: false, verbose: true, model: "Data"}
-    end: {log: false, verbose: true, model: "Data"}
+    start: {log: false, verbose: true, model: "ST_03"}
+    stop: {log: false, verbose: true, model: "ST_03"}
+    order_close: {log: false, verbose: true, model: "ST_03"}
+    price_change: {log: false, verbose: true, model: "ST_03"}
   ST_04:
-    start: {log: false, verbose: true, model: "Data"}
-    order_close: {log: false, verbose: true, model: "Data"}
-    price_change: {log: false, verbose: true, model: "Data"}
-    end: {log: false, verbose: true, model: "Data"}
+    start: {log: false, verbose: true, model: "ST_04"}
+    stop: {log: false, verbose: true, model: "ST_04"}
+    order_close: {log: false, verbose: true, model: "ST_04"}
+    price_change: {log: false, verbose: true, model: "ST_04"}
   ST_05:
-    start: {log: false, verbose: true, model: "Data"}
-    order_close: {log: false, verbose: true, model: "Data"}
-    price_change: {log: false, verbose: true, model: "Data"}
-    end: {log: false, verbose: true, model: "Data"}
+    start: {log: false, verbose: true, model: "ST_05"}
+    stop: {log: false, verbose: true, model: "ST_05"}
+    order_close: {log: false, verbose: true, model: "ST_05"}
+    price_change: {log: false, verbose: true, model: "ST_05"}

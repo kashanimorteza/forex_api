@@ -73,7 +73,7 @@ class Logic_Management:
         return output
 
     #--------------------------------------------- get_strategy_item_instance
-    def get_strategy_item_instance(self, strategy_name, params, account_id) -> model_output:
+    def get_strategy_item_instance(self, strategy_name, params, account_id, execute_id) -> model_output:
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -98,6 +98,7 @@ class Logic_Management:
             strategy = self.get_strategy_instance(strategy_name).data
             strategy.forex = forex
             strategy.params = params
+            strategy.execute_id = execute_id
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = strategy
@@ -109,6 +110,7 @@ class Logic_Management:
         except Exception as e:  
             #--------------Error
             output.status = False
+            output.data = None
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
@@ -226,24 +228,25 @@ class Logic_Management:
 
         try:
             #--------------Action
-            cmd = f"SELECT strategy.name, strategy_item.params, live_execute.account_id, live_order.id, live_order.date, live_order.symbol, live_order.action, live_order.amount, live_order.bid, live_order.ask, live_order.tp, live_order.sl, live_order.profit, live_order.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN live_execute ON strategy_item.id = live_execute.strategy_item_id JOIN live_order ON live_order.execute_id = live_execute.id WHERE live_order.order_id = '{order_id}';"
+            cmd = f"SELECT strategy.name, strategy_item.params, live_execute.id, live_execute.account_id, live_order.id, live_order.date, live_order.symbol, live_order.action, live_order.amount, live_order.bid, live_order.ask, live_order.tp, live_order.sl, live_order.profit, live_order.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN live_execute ON strategy_item.id = live_execute.strategy_item_id JOIN live_order ON live_order.execute_id = live_execute.id WHERE live_order.order_id='{order_id}'"
             result:model_output = self.data_sql.db.items(cmd=cmd)
             #--------------Data
             if result.status and len(result.data) > 0 :
                 detaile["strategy_name"] = result.data[0][0]
                 detaile["params"] = result.data[0][1]
-                detaile["account_id"] = result.data[0][2]
-                detaile["live_order_id"] = result.data[0][3]
-                detaile["date"] = result.data[0][4]
-                detaile["symbol"] = result.data[0][5]
-                detaile["action"] = result.data[0][6]
-                detaile["amount"] = result.data[0][7]
-                detaile["bid"] = result.data[0][8]
-                detaile["ask"] = result.data[0][9]
-                detaile["tp"] = result.data[0][10]
-                detaile["sl"] = result.data[0][11]
-                detaile["profit"] = result.data[0][12]
-                detaile["status"] = result.data[0][13]
+                detaile["execute_id"] = result.data[0][2]
+                detaile["account_id"] = result.data[0][3]
+                detaile["live_order_id"] = result.data[0][4]
+                detaile["date"] = result.data[0][5]
+                detaile["symbol"] = result.data[0][6]
+                detaile["action"] = result.data[0][7]
+                detaile["amount"] = result.data[0][8]
+                detaile["bid"] = result.data[0][9]
+                detaile["ask"] = result.data[0][10]
+                detaile["tp"] = result.data[0][11]
+                detaile["sl"] = result.data[0][12]
+                detaile["profit"] = result.data[0][13]
+                detaile["status"] = result.data[0][14]
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = detaile
@@ -264,9 +267,9 @@ class Logic_Management:
     #-------------------------- [order_close]
     def order_close(self, order_id, profit) -> model_output:
         #-------------- Description
-        # IN     : order_id, profit
-        # OUT    : 
-        # Action :
+        # IN     : order_id | profit
+        # OUT    : model_output
+        # Action : update order on database(status/profit) | get strategy and run action order_close
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
@@ -279,13 +282,17 @@ class Logic_Management:
         output.method_name = this_method
 
         try:
-            #--------------Action
-            cmd = f"UPDATE live_order SET status='close', profit={profit} WHERE order_id = '{order_id}';"
-            result:model_output = self.data_sql.db.execute(cmd=cmd)
+            #--------------Database
+            cmd = f"UPDATE live_order SET status='close', profit={profit} WHERE order_id='{order_id}'"
+            self.data_sql.db.execute(cmd=cmd)
+            #--------------Strategy
+            detaile = self.order_detaile(order_id=order_id).data
+            execute_id = detaile["execute_id"]
+            self.strategy_action(execute_id=execute_id, action="order_close", order_detaile=detaile)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = order_id
-            output.message=f"{order_id} | {profit}"
+            output.data = detaile
+            output.message = f"{order_id} | {profit} | {execute_id}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -300,9 +307,9 @@ class Logic_Management:
         return output
     
     #-------------------------- [strategy_action]
-    def strategy_action(self, execute_id, action) -> model_output:
+    def strategy_action(self, execute_id, action, order_detaile=None) -> model_output:
         #-------------- Description
-        # IN     : execute_id, action(start,stop,price_change,order_close)
+        # IN     : execute_id, action(start|stop|price_change|order_close)
         # OUT    : model_output
         # Action :
         #-------------- Debug
@@ -318,14 +325,16 @@ class Logic_Management:
 
         try:
             #--------------Data
-            detaile = self.execute_detaile(id=execute_id)
-            strategy_name = detaile.data.get("strategy_name")
-            params = detaile.data.get("params")
-            account_id = detaile.data.get("account_id")
-            strategy = self.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id).data
+            execute_detaile = self.execute_detaile(id=execute_id).data
+            strategy_name = execute_detaile.get("strategy_name")
+            params = execute_detaile.get("params")
+            account_id = execute_detaile.get("account_id")
+            strategy = self.get_strategy_item_instance(strategy_name=strategy_name, params=params, account_id=account_id,execute_id=execute_id).data
             #--------------Action
-            if action == "start" : output:model_output = strategy.start(id=execute_id)
-            if action == "stop" : output:model_output = strategy.stop(id=execute_id)
+            if action == "start" : output:model_output = strategy.start()
+            if action == "stop" : output:model_output = strategy.stop()
+            if action == "order_close" : output:model_output = strategy.order_close(order_detaile=order_detaile)
+            if action == "price_change" : output:model_output = strategy.price_change(order_detaile=order_detaile)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose

@@ -19,21 +19,28 @@ def load_config():
 #-------------------------- load_log
 def load_log():
     from myLib.log import Log
-    return Log()
+    return Log(config=config)
 
 #-------------------------- load_data
 def load_data():
     from myLib.data_orm import Data_Orm
     from myLib.data_sql import Data_SQL
     data_instance = {}
+    #---Management
     data_instance['management_orm'] = Data_Orm(database=database_management)
     data_instance['data_orm'] = Data_Orm(database=database_data)
     management_sql = Data_SQL(database=database_management)
     management_sql.db.open()
     data_instance['management_sql'] = management_sql
+    #---Data
     data_sql = Data_SQL(database=database_data)
     data_sql.db.open()
     data_instance['data_sql'] = data_sql
+    #---Log
+    log_sql = Data_SQL(database=database_log)
+    log_sql.db.open()
+    data_instance['log_sql'] = log_sql
+
     return data_instance
 
 #-------------------------- load_forex_api
@@ -53,6 +60,8 @@ def load_forex_api():
 config = load_config()
 database_management = config.get("general", {}).get("database_management", {})
 database_data = config.get("general", {}).get("database_data", {})
+database_log = config.get("general", {}).get("database_log", {})
 debug = config.get("debug", {})
 log_instance = load_log()
 data_instance = load_data()
+log_instance.db =data_instance['log_sql']

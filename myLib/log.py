@@ -1,36 +1,23 @@
 #--------------------------------------------------------------------------------- Location
-# code/myLib/log.py
+# myLib/log.py
 
 #--------------------------------------------------------------------------------- Description
 # Log
 
 #--------------------------------------------------------------------------------- Import
-import re
+import inspect, re
 from datetime import datetime as dt
 from myLib.utils import sort
-
-def load_config():
-    import os, yaml
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    config_path = os.environ.get("CONFIG_PATH", os.path.join(root_dir, "config.yaml"))
-    with open(config_path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
-    
 
 #--------------------------------------------------------------------------------- Action
 class Log:
     #------------------------------------------------------------------- [ Constructor ]
-    def __init__(self):
-        config = load_config()
-        dbData = {}
-        dbCfg = config.get("log", {}).get("database", {})
-        dbData["host"] = dbCfg.get("host", "127.0.0.1")
-        dbData["port"] = dbCfg.get("port", "5432")
-        dbData["user"] = dbCfg.get("user", "forex")
-        dbData["pass"] = dbCfg.get("pass", "&WnA8v!(THG%)czK")
-        dbData["name"] = dbCfg.get("name", "forex")
-
-        self.className = "Log"
+    def __init__(self, config, db=None):
+        #-------------- Variable
+        self.this_class = self.__class__.__name__
+        self.className = self.this_class
+        self.config = config
+        self.db = db
         #--------------------------------- General
         generalCfg = config.get("log", {}).get("general", {})
         self.fileName = generalCfg.get("file", "n")
@@ -50,29 +37,18 @@ class Log:
         self.rep_verbose = reportCfg.get("verbose", "False")
         self.rep_toFile = reportCfg.get("file", "False")
         self.rep_toDatabase = reportCfg.get("database", "False")
-        #--------------------------------- Database
-        self.dbHost = dbData["host"]
-        self.dbPort = dbData["port"]
-        self.dbUser = dbData["user"]
-        self.dbPass = dbData["pass"]
-        self.dbName = dbData["name"]
         #--------------------------------- Object
         self.fileOpen()
 
-    #------------------------------------------------------------------- [ Database ]    
+    #------------------------------------------------------------------- [ Database ]
     def database(self, drop, create, add):
         
         #--------------------------------- variable
-        methodName = "Database"
+        methodName = inspect.currentframe().f_code.co_name
         res = False
-        from myLib.database_sql import Database_SQL as Database
-        self.db = Database(self.dbHost, self.dbUser, self.dbPass, self.dbName, log=None)
-        self.db.open(name=self.className)
-
-        db = Database(self.dbHost, self.dbUser, self.dbPass, self.dbName)
+        db =self.db
         #--------------------------------- execution
-        try:            
-            db.open(connFree=True)
+        try:
             res=db.getDataOne(f"SELECT oid FROM pg_database WHERE datname='{self.dbName}'")
             if drop and res!=None:
                 res = db.execute(f'DROP DATABASE "{self.dbName}"')                
@@ -82,7 +58,6 @@ class Log:
                 res = db.execute(f'CREATE DATABASE "{self.dbName}"')                
                 self.verbose('not',f'{self.className}({methodName}) ', f'Create Database {self.dbName} : {res}')                       
             res = True
-            db.close()
         except Exception as e:
             res = False
             self.verbose('err', f'{self.className}({methodName}) ', f"Database({self.dbName}) | Drop({drop}) | Create({create}) | Add({add}) | Error({re.sub(r'W+', ' ', str(e))})")            
@@ -131,7 +106,7 @@ class Log:
             #----------- toFile        
             self.toFile(model, subject, data)                       
             #----------- toDatabase             
-            self.toDatabase(model, subject, data)
+            #self.toDatabase(model, subject, data)
             res = True
         except Exception as e:
             res = False

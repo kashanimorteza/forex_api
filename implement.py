@@ -5,13 +5,12 @@
 # Implement
 
 #--------------------------------------------------------------------------------- Import
-from myLib.log import Log
+from myLib.logic_global import log_instance
 from myLib.implementation import Implementation_Management
 
 #--------------------------------------------------------------------------------- Log
-log = Log()
-log.fileClear()
-log.table(drop=True, create=True, add=True)
+log_instance.fileClear()
+log_instance.table(drop=True, create=True, add=True)
 
 #--------------------------------------------------------------------------------- Implementation_Management
 IM = Implementation_Management()

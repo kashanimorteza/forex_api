@@ -6,65 +6,38 @@
 
 #--------------------------------------------------------------------------------- Import
 #--------------------------------------------- Warnings
-import logging, warnings
+import re
+import logging, warnings, time
 warnings.filterwarnings("ignore")
 logging.getLogger().setLevel(logging.ERROR)
 logging.getLogger("root").setLevel(logging.CRITICAL)
-#--------------------------------------------- General
-import os, sys, time, ast, threading
-root_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, f"{root_dir}/myLib")
-sys.path.insert(0, f"{root_dir}/myModel")
-sys.path.insert(0, f"{root_dir}/myStrategy")
 #--------------------------------------------- Forex
 from forexconnect import ForexConnect, fxcorepy
 from forexconnect.TableListener import TableListener
 import forexconnect.lib
-#--------------------------------------------- Me
-from myLib.log import Log
-from myLib.forex_api import Forex_Api
 from myLib.forex import Forex
-from myLib.data_orm import Data_Orm
-from myModel import *
-from myStrategy import *
+#--------------------------------------------- Logic
+from myLib.logic_global import config, load_forex_api
+from myLib.logic_global import debug, log_instance, data_instance, forex_apis
+from myLib.logic_management import Logic_Management
 
 #--------------------------------------------------------------------------------- Instance
-log = Log()
-data_orm = Data_Orm()
-forex_api = None
-
-forex_accounts = data_orm.items(model=model_account_db, enable=True)
-for acc in forex_accounts.data :
-    forex_api = Forex_Api(name=acc.name, type=acc.type, username=acc.username, password=acc.password, url=acc.url, key=acc.key)
-    forex_api.login()
-
+load_forex_api()
+forex_api = forex_apis[1]
 forex = Forex(forex_api = forex_api)
-forex.account_info()
+logic_management = Logic_Management()
 
+# order_id = '1826945977'
+# profit = 100
+# logic_management.order_close(order_id=order_id, profit=profit)
 
 
 #--------------------------------------------------------------------------------- Class
 class CloseTradesListener(TableListener):
     def on_added(self, row_id, row):
         order_id = row.open_order_id
-        action = row.buy_sell
         profit = row.gross_pl
-
-        strategy_item_id = data_orm.items(model=model_live_order_db, order_id=order_id).data[0].strategy_item_id
-        strategy_id = data_orm.items(model=model_strategy_item_db, id=strategy_item_id).data[0].strategy_id
-        params = data_orm.items(model=model_strategy_item_db, id=strategy_item_id).data[0].params
-        params = ast.literal_eval(params)
-        params["item_id"] = strategy_item_id
-
-        if strategy_id == 1:
-            strategy = st_01(forex=forex, params=params)
-        if strategy_id == 2:
-            strategy = st_02(forex=forex, params=params)
-        
-        log.verbose("rep", f"Listen | {action}", profit)
-
-        t = threading.Thread(target=strategy.next, args=({"order_id": order_id, "action": action, "profit": profit},))
-        t.start()
+        logic_management.order_close(order_id=order_id, profit=profit)
 
 #--------------------------------------------------------------------------------- Action
 listener = CloseTradesListener()
