@@ -19,6 +19,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from webapi import *
 from listen_close import Listen_Close
+from listen_close_execute import Listen_Close_Execute
 
 #--------------------------------------------------------------------------------- Variable
 title = config.get("api", {}).get("title", {})
@@ -50,18 +51,26 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-#--------------------------------------------------------------------------------- Listen_Close
+#--------------------------------------------------------------------------------- Listeners
 listener_close = None
+listener_close_execute = None
 listener_thread = None
+listener_execute_thread = None
 
 @app.on_event("startup")
 async def startup_event():
-    global listener_close, listener_thread
+    global listener_close, listener_close_execute, listener_thread, listener_execute_thread
     from myLib.logic_global import forex_apis
     
+    # Start Listen_Close
     listener_close = Listen_Close(forex_api=forex_apis[1], items=list_close)
     listener_thread = threading.Thread(target=listener_close.start, daemon=True)
     listener_thread.start()
+    
+    # Start Listen_Close_Execute
+    listener_close_execute = Listen_Close_Execute(items=list_close, sleep_time=0.5)
+    listener_execute_thread = threading.Thread(target=listener_close_execute.start, daemon=True)
+    listener_execute_thread.start()
 
 @app.on_event("shutdown")
 async def shutdown_event():

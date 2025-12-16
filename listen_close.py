@@ -5,13 +5,23 @@
 # listen_close
 
 #--------------------------------------------------------------------------------- Import
-#--------------------------------------------- Forex
 import datetime, time
 from forexconnect import ForexConnect, fxcorepy
 from forexconnect.TableListener import TableListener
 import forexconnect.lib
 
-#--------------------------------------------------------------------------------- Listen_Close
+#--------------------------------------------------------------------------------- Class
+class CloseTradesListener(TableListener):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        
+    def on_added(self, row_id, row):
+        item = {"date": datetime.datetime.now().timestamp(), "order_id": row.open_order_id, "profit": row.gross_pl}
+        self.parent.items.append(item)
+        print(f"Trade closed: {item}")
+
+#--------------------------------------------------------------------------------- Class
 class Listen_Close:
     #--------------------------------------------- __init__
     def __init__(self, forex_api, items):
@@ -20,54 +30,27 @@ class Listen_Close:
         self.listener = None
         self.close_table = None
         self.is_running = False
-        
-    #--------------------------------------------- CloseTradesListener
-    class CloseTradesListener(TableListener):
-        def __init__(self, parent):
-            super().__init__()
-            self.parent = parent
-            
-        def on_added(self, row_id, row):
-            item = {
-                "date": datetime.datetime.now().timestamp(), 
-                "order_id": row.open_order_id, 
-                "profit": row.gross_pl
-            }
-            self.parent.items.append(item)
-            print(f"Trade closed: {item}")
     
     #--------------------------------------------- start
     def start(self):
-        if self.is_running:
-            print("Listener is already running.")
-            return
-            
-        print("Listen_Close : Starting")
-        self.listener = self.CloseTradesListener(self)
+        print("Listen_Close : Started")
+        self.listener = CloseTradesListener(self)
         table_manager = self.forex_api.fx.table_manager
-        
-        # Wait for tables to load
-        while table_manager.status != forexconnect.lib.fxcorepy.O2GTableManagerStatus.TABLES_LOADED:
-            time.sleep(0.1)
-        
-        # Subscribe to closed trades
+        while table_manager.status != forexconnect.lib.fxcorepy.O2GTableManagerStatus.TABLES_LOADED : time.sleep(0.1)
         self.close_table = table_manager.get_table(ForexConnect.CLOSED_TRADES)
         self.close_table.subscribe_update(fxcorepy.O2GTableUpdateType.INSERT, self.listener)
         self.is_running = True
-        
-        print("Listen_Close : Started")
         try:
-            while True:
-                time.sleep(1)
+            while True : time.sleep(1)
         except KeyboardInterrupt:
             print("\nStopping listener...")
             self.stop()
     
     #--------------------------------------------- stop
     def stop(self):
+        print("Listen_Close : Stopped")
         if self.close_table and self.listener:
             self.close_table.unsubscribe_update(fxcorepy.O2GTableUpdateType.INSERT, self.listener)
         if self.forex_api:
             self.forex_api.logout()
         self.is_running = False
-        print("Listener stopped.")
