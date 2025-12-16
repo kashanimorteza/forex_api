@@ -27,7 +27,7 @@ forex_api = forex_apis[1]
 forex = Forex(forex_api = forex_api)
 logic_management = Logic_Management()
 
-# order_id = '1826945977'
+# order_id = '1826948985'
 # profit = 100
 # logic_management.order_close(order_id=order_id, profit=profit)
 
