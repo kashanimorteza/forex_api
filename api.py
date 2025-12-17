@@ -41,7 +41,7 @@ app = FastAPI(
     openapi_url=openapi_url,
     docs_url=docs_url,
     redoc_url=redoc_url,
-    root_path=f"/"
+    root_path=f"/{key}"
 )
 app.add_middleware(
     CORSMiddleware, 
