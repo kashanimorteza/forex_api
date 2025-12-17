@@ -504,7 +504,6 @@ service_create_webapi()
     api_host=$webapi_host
     api_port=$webapi_port
     api_workers=$webapi_workers
-    echo -e "${BLUE}$name"_"webapi${ENDCOLOR}"
     echo """[Unit]
     Description=$name"_"webapi
 

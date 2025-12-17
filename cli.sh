@@ -63,14 +63,16 @@ menu_main()
         echo -e  ${YELLOW}"2)  ${GREEN}Menu Install" ${ENDCOLOR}
         echo -e  ${YELLOW}"3)  ${GREEN}Menu Config"  ${ENDCOLOR}
         echo -e  ${YELLOW}"4)  ${GREEN}Menu Service" ${ENDCOLOR}
+        echo -e  ${YELLOW}"5)  ${GREEN}Monitor"      ${ENDCOLOR}
         echo -e "${YELLOW}${LINE2}                   ${ENDCOLOR}"
         echo -e  ${YELLOW}"q)  ${GREEN}Exit"         ${ENDCOLOR}
-        read -p "Enter your choice [1-4]: " choice
+        read -p "Enter your choice [1-5]: " choice
         case $choice in
             1)  clear && all;;
             2)  clear && menu_install;;
             3)  clear && menu_config;;
             4)  clear && menu_service;;
+            5)  clear && monitor;;
             q)  clear && exit;;
             *)  exit;;
         esac
@@ -215,7 +217,6 @@ menu_service()
         echo -e "\n"
     done
 }
-
 
 #---------------------------------------------------------------------------------api_interface
 api_interface()
