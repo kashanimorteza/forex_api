@@ -618,24 +618,6 @@ service_create_nginx_create_gui()
     nginx -t
     systemctl reload nginx
     systemctl restart nginx
-    
-    # echo "server {
-    # listen $port;
-
-    # root /var/www/forex_gui;
-    # index index.html;
-    
-    # server_name _;
-    #     location /$key {
-    #         alias /var/www/$name"_"gui;
-    #         index index.html;
-    #         try_files \$uri \$uri/ =404;
-    #     }
-    # }" > /etc/nginx/sites-available/$name"_"gui.conf
-    # ln -s /etc/nginx/sites-available/$name"_"gui.conf /etc/nginx/sites-enabled/
-    # nginx -t
-    # systemctl reload nginx
-    # systemctl restart nginx
 }
 #-----------------------------nginx_remove_gui
 nginx_remove_gui()
