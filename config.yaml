@@ -65,7 +65,7 @@ nginx:
   api:
     host: 0.0.0.0
     port: 8001
-    key: ""
+    key: "57b3e8ae-4aca-4776-9aa1-9ccce396dc6f"
   #---GUI
   gui:
     host: 0.0.0.0
