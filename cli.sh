@@ -108,7 +108,7 @@ menu_install()
             7)  clear && install_postgres;;
             8)  clear && install_python;;
             q)  clear && menu_main;;
-            *)  exit;;
+            *)  menu_main;;
         esac
         echo -e "\n"
     done
