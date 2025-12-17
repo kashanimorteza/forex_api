@@ -238,6 +238,8 @@ config_python()
     #----------Action
     python3.7 -m pip install --upgrade pip
     python3.7 -m pip install -r requirements.txt
+    python3.7 -m pip uninstall pytz -y
+    python3.7 -m pip install pytz==2023.3
     python3.7 -m pip list
 }
 #-----------------------------config_implementation

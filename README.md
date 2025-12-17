@@ -1,7 +1,7 @@
 <!--------------------------------------------------------------------------------- Description --->
 # Description
-Download live/history price  
-Auto-trading robots  
+Download live/history price
+Auto-trading robots
 
 
 
@@ -24,51 +24,21 @@ Auto-trading robots
 <br><br>
 
 # Install
-[Python](https://github.com/kashanimorteza/python_document/blob/main/doc/install.md)  
-[Database](https://github.com/kashanimorteza/forex_api/blob/main/database.md)
-
-
-
-<!--------------------------------------------------------------------------------- Source --->
-<br><br>
-
-# Source
+<!-------------------------- Source -->
+Source
 ```bash
 git clone git@github.com:kashanimorteza/forex_api.git
 cd forex_api
 ```
-pyenv
-```bash
-pyenv local 3.7
-python -m venv .env
-.env/bin/python -m pip install --upgrade pip
-source .env/bin/activate
-pip install -r requirements.txt
-pip list
-```
-General
-```bash
-python3.7 -m venv .env3.7
-.env3.7/bin/python -m pip install --upgrade pip
-source .env3.7/bin/activate
-pip install -r requirements.txt
-pip list
-```
-
-
-<!--------------------------------------------------------------------------------- Setup --->
-<br><br>
-
-# Setup
 <!-------------------------- Config -->
 Config
 ```bash
 vim config.yaml
 ```
-<!-------------------------- Implement databases and tables -->
-Implement databases and tables
+<!-------------------------- Implement all -->
+Implement all
 ```bash
-python implement.py
+./cli.sh all
 ```
 
 
@@ -521,3 +491,11 @@ python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,
     --------------------------------
     CHeck Spred betting account
     --------------------------------
+
+
+<!--------------------------------------------------------------------------------- Install --->
+<br><br>
+
+# Install
+[Python](https://github.com/kashanimorteza/python_document/blob/main/doc/install.md)  
+[Database](https://github.com/kashanimorteza/forex_api/blob/main/database.md)
