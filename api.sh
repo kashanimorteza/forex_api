@@ -311,12 +311,14 @@ install_python()
     echo -e "${verbose_color}sudo add-apt-repository ppa:deadsnakes/ppa -y${ENDCOLOR}"
     echo -e "${verbose_color}sudo apt update -y${ENDCOLOR}"
     echo -e "${verbose_color}sudo apt install python3.7 python3.7-venv python3.7-distutils -y${ENDCOLOR}"
+    echo -e "${verbose_color}curl -sS https://bootstrap.pypa.io/pip/3.7/get-pip.py | sudo python3.7${ENDCOLOR}"
     #----------Action
     sudo apt update -y
     sudo apt install software-properties-common -y
     sudo add-apt-repository ppa:deadsnakes/ppa -y
     sudo apt update -y
     sudo apt install python3.7 python3.7-venv python3.7-distutils -y
+    curl -sS https://bootstrap.pypa.io/pip/3.7/get-pip.py | sudo python3.7
 }
 #-----------------------------install_nginx
 install_nginx()
