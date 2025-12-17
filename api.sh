@@ -232,22 +232,13 @@ config_python()
     #----------Header
     echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
     #----------Verbose
-    echo -e "${verbose_color}pyenv local 3.7${ENDCOLOR}"
-    echo -e "${verbose_color}python -m venv .env${ENDCOLOR}"
-    echo -e "${verbose_color}.env/bin/python -m pip install --upgrade pip${ENDCOLOR}"
-    echo -e "${verbose_color}source .env/bin/activate${ENDCOLOR}"
-    echo -e "${verbose_color}pip install -r requirements.txt${ENDCOLOR}"
-    echo -e "${verbose_color}pip list${ENDCOLOR}"
+    echo -e "${verbose_color}python3.7 -m pip install --upgrade pip${ENDCOLOR}"
+    echo -e "${verbose_color}python3.7 -m pip install -r requirements.txt${ENDCOLOR}"
+    echo -e "${verbose_color}python3.7 -m pip list${ENDCOLOR}"
     #----------Action
-    pyenv local 3.7
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-    pip list
-    #python -m venv .env
-    #.env/bin/python -m pip install --upgrade pip
-    #source $path/.env/bin/activate
-    #pip install -r requirements.txt
-    #pip list
+    python3.7 -m pip install --upgrade pip
+    python3.7 -m pip install -r requirements.txt
+    python3.7 -m pip list
 }
 #-----------------------------config_implementation
 config_implementation()
@@ -255,9 +246,9 @@ config_implementation()
     #----------Header
     echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
     #----------Verbose
-    echo -e "${verbose_color}$path/.env/bin/python  $path/implement.py${ENDCOLOR}"
+    echo -e "${verbose_color}python3.7  $path/implement.py${ENDCOLOR}"
     #----------Action
-    $path/.env/bin/python  $path/implement.py
+    python3.7  $path/implement.py
 }
 
 #---------------------------------------------------------------------------------Install
@@ -320,31 +311,17 @@ install_python()
     echo -e "${verbose_color}apt install python3-pip -y${ENDCOLOR}"
     echo -e "${verbose_color}apt install python3-venv -y${ENDCOLOR}"
     #----------Verbose
-    echo -e "${verbose_color}apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev git${ENDCOLOR}"
-    echo -e "${verbose_color}curl https://pyenv.run | bash${ENDCOLOR}"
-    echo -e "${verbose_color}export PYENV_ROOT=\"\$HOME/.pyenv\"${ENDCOLOR}"
-    echo -e "${verbose_color}export PATH=\"\$PYENV_ROOT/bin:\$PATH\"${ENDCOLOR}"
-    echo -e "${verbose_color}eval \"\$(pyenv init -)\"${ENDCOLOR}"
-    echo -e "${verbose_color}eval \"\$(pyenv virtualenv-init -)\"${ENDCOLOR}"
-    echo -e "${verbose_color}source ~/.bashrc${ENDCOLOR}"
-    echo -e "${verbose_color}pyenv install 3.7${ENDCOLOR}"
-    echo -e "${verbose_color}pyenv local 3.7${ENDCOLOR}"
+    echo -e "${verbose_color}sudo apt update -y${ENDCOLOR}"
+    echo -e "${verbose_color}sudo apt install software-properties-common -y${ENDCOLOR}"
+    echo -e "${verbose_color}sudo add-apt-repository ppa:deadsnakes/ppa -y${ENDCOLOR}"
+    echo -e "${verbose_color}sudo apt update -y${ENDCOLOR}"
+    echo -e "${verbose_color}sudo apt install python3.7 python3.7-venv python3.7-distutils -y${ENDCOLOR}"
     #----------Action
-    # Install dependencies
-    sudo apt install -y make build-essential libssl-dev zlib1g-dev \
-    libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-    libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev \
-    libffi-dev liblzma-dev git
-    # Install pyenv
-    curl https://pyenv.run | bash
-    # Add pyenv to bashrc
-    echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-    echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-    echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-    echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
-    # Reload bashrc and install Python
-    source ~/.bashrc
-    pyenv install 3.7
+    sudo apt update -y
+    sudo apt install software-properties-common -y
+    sudo add-apt-repository ppa:deadsnakes/ppa -y
+    sudo apt update -y
+    sudo apt install python3.7 python3.7-venv python3.7-distutils -y
 }
 #-----------------------------install_nginx
 install_nginx()
