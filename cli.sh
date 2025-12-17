@@ -93,8 +93,9 @@ menu_install()
         echo -e  ${YELLOW}"6)  ${GREEN}Nginx"    ${ENDCOLOR}
         echo -e  ${YELLOW}"7)  ${GREEN}Postgres" ${ENDCOLOR}
         echo -e  ${YELLOW}"8)  ${GREEN}Python"   ${ENDCOLOR}
-        echo -e  ${YELLOW}${LINE2}               ${ENDCOLOR}
-        read -p "Enter your choice [0-8]: " choice
+        echo -e "${YELLOW}${LINE2}                   ${ENDCOLOR}"
+        echo -e  ${YELLOW}"q)  ${GREEN}Exit"         ${ENDCOLOR}
+        read -p "Enter your choice [1-8]: " choice
         case $choice in    
             1)  clear && install_all;;
             2)  clear && install_update;;
@@ -105,7 +106,7 @@ menu_install()
             7)  clear && install_postgres;;
             8)  clear && install_python;;
             q)  clear && menu_main;;
-            *)  menu_main;;
+            *)  exit;;
         esac
         echo -e "\n"
     done
@@ -125,8 +126,9 @@ menu_config()
         echo -e  ${YELLOW}"5)  ${GREEN}Postgres"  ${ENDCOLOR}
         echo -e  ${YELLOW}"6)  ${GREEN}Python"    ${ENDCOLOR}
         echo -e  ${YELLOW}"7)  ${GREEN}Implement" ${ENDCOLOR}
-        echo -e  ${YELLOW}${LINE2}                ${ENDCOLOR}
-        read -p "Enter your choice [0-7]: " choice
+        echo -e "${YELLOW}${LINE2}                   ${ENDCOLOR}"
+        echo -e  ${YELLOW}"q)  ${GREEN}Exit"         ${ENDCOLOR}
+        read -p "Enter your choice [1-7]: " choice
         case $choice in    
             1)  clear && config_all;;
             2)  clear && config_general;;
@@ -176,7 +178,9 @@ menu_service()
         echo -e  ${YELLOW}"22) ${GREEN}Enable"       ${ENDCOLOR}
         echo -e  ${YELLOW}"23) ${GREEN}Disable"      ${ENDCOLOR}
         echo -e  ${YELLOW}"24) ${GREEN}Monitor"      ${ENDCOLOR}
-        read -p "Enter your choice [1-45]: " choice
+        echo -e "${YELLOW}${LINE2}                   ${ENDCOLOR}"
+        echo -e  ${YELLOW}"q)  ${GREEN}Exit"         ${ENDCOLOR}
+        read -p "Enter your choice [1-24]: " choice
         case $choice in
             #--------------------------All
             1)  clear && service_create_all;;
