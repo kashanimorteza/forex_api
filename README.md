@@ -1,7 +1,7 @@
 <!--------------------------------------------------------------------------------- Description --->
 # Description
-Download live/history price  
-Auto-trading robots
+Live | History price download  
+Auto-trading
 
 
 
@@ -35,12 +35,21 @@ Config
 ```bash
 vim config.yaml
 ```
+<!-------------------------- Cli -->
+Cli
+```bash
+./cli.sh
+```
 <!-------------------------- Implement all -->
 Implement all
 ```bash
 ./cli.sh all
 ```
-
+<!-------------------------- Monitor -->
+Monitor
+```bash
+./cli.sh monitor
+```
 
 
 <!--------------------------------------------------------------------------------- Download --->
