@@ -245,8 +245,7 @@ config_python()
     . .env/bin/activate
     pip install -r requirements.txt
     pip list
-    echo $path
-    . $path/.env/bin/activate
+    source /root/forex_api/.env/bin/activate
 }
 #-----------------------------config_implementation
 config_implementation()
