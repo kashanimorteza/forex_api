@@ -233,7 +233,7 @@ install_python()
     pyenv install 3.7
     pyenv local 3.7
 }
-#-----------------------------install_nginx  : Shell
+#-----------------------------install_nginx
 install_nginx()
 {
     #----------Header
@@ -249,7 +249,7 @@ install_nginx()
     echo "" > /etc/nginx/sites-enabled/default 
     systemctl restart nginx
 }
-#-----------------------------install_postgres  : Shell
+#-----------------------------install_postgres
 install_postgres()
 {
     #----------Header
