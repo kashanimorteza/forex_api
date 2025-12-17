@@ -342,7 +342,6 @@ install_python()
     # Reload bashrc and install Python
     source ~/.bashrc
     pyenv install 3.7
-    pyenv local 3.7
 }
 #-----------------------------install_nginx
 install_nginx()
