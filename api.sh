@@ -37,7 +37,7 @@ check_jq_yq()
         if [[ "$OSTYPE" == "darwin"* ]]; then
             brew install yq || { echo "Failed to install yq"; return 1; }
         else
-            apt update && apt install yq -y || { echo "Failed to install yq"; return 1; }
+            apt update && snap install yq || { echo "Failed to install yq"; return 1; }
         fi
     fi
     
