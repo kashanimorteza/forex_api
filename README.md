@@ -35,7 +35,7 @@ Auto-trading robots
 
 # Source
 ```bash
-git clone https://github.com/kashanimorteza/forex_api.git
+git clone git@github.com:kashanimorteza/forex_api.git
 cd forex_api
 ```
 pyenv
