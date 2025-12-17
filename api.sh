@@ -102,6 +102,7 @@ config_all()
     config_network
     config_git
     config_postgres
+    config_python
     config_implementation
 }
 #-----------------------------config_general  : Shell
@@ -224,6 +225,26 @@ config_postgres()
     sudo -u postgres psql -d log -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${username};"
     sudo -u postgres psql -d log -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};"
     sudo -u postgres psql -d log -c "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};"
+}
+#-----------------------------config_python
+config_python()
+{
+    #----------Header
+    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
+    #----------Verbose
+    echo -e "${verbose_color}pyenv local 3.7${ENDCOLOR}"
+    echo -e "${verbose_color}python -m venv .env${ENDCOLOR}"
+    echo -e "${verbose_color}.env/bin/python -m pip install --upgrade pip${ENDCOLOR}"
+    echo -e "${verbose_color}source .env/bin/activate${ENDCOLOR}"
+    echo -e "${verbose_color}pip install -r requirements.txt${ENDCOLOR}"
+    echo -e "${verbose_color}pip list${ENDCOLOR}"
+    #----------Action
+    pyenv local 3.7
+    python -m venv .env
+    .env/bin/python -m pip install --upgrade pip
+    source .env/bin/activate
+    pip install -r requirements.txt
+    pip list
 }
 #-----------------------------config_implementation
 config_implementation()
