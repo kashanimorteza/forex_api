@@ -550,24 +550,26 @@ service_create_nginx_create_api()
     key=$nginx_api_key
     api_host=$webapi_host
     api_port=$webapi_port
-    echo "server {
-    listen $port;
-    server_name _;
+    echo "server 
+    {
+        listen $port;
+        server_name _;
 
-        location /$key {
-            proxy_pass http://$api_host:$api_port;
-            proxy_set_header Host \$host;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto \$scheme;
+            location /$key 
+            {
+                proxy_pass http://$api_host:$api_port;
+                proxy_set_header Host \$host;
+                proxy_set_header X-Real-IP \$remote_addr;
+                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto \$scheme;
 
-            proxy_ssl_verify off;
+                proxy_ssl_verify off;
 
-            proxy_connect_timeout 60s;
-            proxy_send_timeout 60s;
-            proxy_read_timeout 60s;
-            send_timeout 60s;
-        }
+                proxy_connect_timeout 60s;
+                proxy_send_timeout 60s;
+                proxy_read_timeout 60s;
+                send_timeout 60s;
+            }
     }" > /etc/nginx/sites-available/$name"_"api.conf
     
     ln -s /etc/nginx/sites-available/$name"_"api.conf /etc/nginx/sites-enabled/
@@ -602,14 +604,16 @@ service_create_nginx_create_gui()
     host=$nginx_gui_host
     port=$nginx_gui_port
     key=$nginx_gui_key
-    echo "server {
-    listen $port;
-    server_name _;
-        location /$key {
-            alias /var/www/$name"_"gui;
-            index index.html;
-            try_files \$uri \$uri/ =404;
-        }
+    echo "server 
+    {
+        listen $port;
+        server_name _;
+            location /$key 
+            {
+                alias /var/www/$name"_"gui;
+                index index.html;
+                try_files \$uri \$uri/ =404;
+            }
     }" > /etc/nginx/sites-available/$name"_"gui.conf
     ln -s /etc/nginx/sites-available/$name"_"gui.conf /etc/nginx/sites-enabled/
     nginx -t
