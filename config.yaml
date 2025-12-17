@@ -55,7 +55,7 @@ webapi:
   docs_url: /doc1
   redoc_url: /doc2
   key: "57b3e8ae-4aca-4776-9aa1-9ccce396dc6f"
-  host: 127.0.0.1
+  host: 0.0.0.0
   port: 8000
   workers: 2
 
