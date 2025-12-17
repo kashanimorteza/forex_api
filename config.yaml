@@ -54,7 +54,7 @@ webapi:
   openapi_url: /schema
   docs_url: /doc1
   redoc_url: /doc2
-  key: "57b3e8ae-4aca-4776-9aa1-9ccce396dc6f"
+  key: "e21d6dfd-85cf-4886-a512-8c6e432bf9c9"
   host: 127.0.0.1
   port: 8000
   workers: 2
@@ -65,12 +65,12 @@ nginx:
   api:
     host: 0.0.0.0
     port: 8001
-    key: "57b3e8ae-4aca-4776-9aa1-9ccce396dc6f"
+    key: "e21d6dfd-85cf-4886-a512-8c6e432bf9c9"
   #---GUI
   gui:
     host: 0.0.0.0
     port: 8002
-    key: "57b3e8ae-4aca-4776-9aa1-9ccce396dc6f"
+    key: "e21d6dfd-85cf-4886-a512-8c6e432bf9c9"
 
 #--------------------------------------------------------------------------------- Log
 log:
