@@ -239,12 +239,12 @@ config_python()
     echo -e "${verbose_color}pip install -r requirements.txt${ENDCOLOR}"
     echo -e "${verbose_color}pip list${ENDCOLOR}"
     #----------Action
-    pyenv local 3.7
-    python -m venv .env
+    #pyenv local 3.7
+    #python -m venv .env
     .env/bin/python -m pip install --upgrade pip
-    source "$path/.env/bin/activate"
-    pip install -r requirements.txt
-    pip list
+    . /root/forex_api/.env/bin/activate
+    #pip install -r requirements.txt
+    #pip list
 }
 #-----------------------------config_implementation
 config_implementation()
