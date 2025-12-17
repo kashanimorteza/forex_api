@@ -379,10 +379,10 @@ class Implementation:
         
         try:
             #-------------------- Action
-            tblList = self.data_sql.db.items(f"SELECT name FROM {tbl_instrument}")
-            for i in tblList.data:
+            tblList= self.data_orm.items(model=model_instrument_db).data
+            for i in tblList:
                 for t in timeframes:
-                    tblName =f"{i[0]}_{t}"
+                    tblName =f"{i.name}_{t}"
                     if t =="t1":
                         query = f"""
                             CREATE TABLE IF NOT EXISTS {tblName} (
