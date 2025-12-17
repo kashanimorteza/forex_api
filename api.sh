@@ -86,8 +86,8 @@ all()
     #----------Header
     echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
     #----------Action
-    config_all
     install_all
+    config_all
     service_create_all
 }
 
@@ -101,6 +101,8 @@ config_all()
     config_general
     config_network
     config_git
+    config_postgres
+    config_implementation
 }
 #-----------------------------config_general  : Shell
 config_general()
@@ -223,7 +225,16 @@ config_postgres()
     sudo -u postgres psql -d log -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ${username};"
     sudo -u postgres psql -d log -c "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${username};"
 }
-
+#-----------------------------config_implementation
+config_implementation()
+{
+    #----------Header
+    echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
+    #----------Verbose
+    echo -e "${verbose_color}$path/.myenv3/bin/python  $path/implement.py${ENDCOLOR}"
+    #----------Action
+    $path/.myenv3/bin/python  $path/implement.py
+}
 
 #---------------------------------------------------------------------------------Install
 #-----------------------------install_all
@@ -269,10 +280,10 @@ install_general()
     echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
     #----------Verbose
     echo -e "${verbose_color}apt install -yqq --no-install-recommends ca-certificates${ENDCOLOR}"
-    echo -e "${verbose_color}apt install curl git telnet sqlite3 jq vim hostapd dnsmasq dhcpcd5 unclutter telnet python3-tk${ENDCOLOR}"
+    echo -e "${verbose_color}apt install curl git telnet vim telnet${ENDCOLOR}"
     #----------Action
     sudo apt install -yqq --no-install-recommends ca-certificates
-    sudo apt install curl git telnet sqlite3 jq vim hostapd dnsmasq dhcpcd5 unclutter python3-tk -y
+    sudo apt install curl git telnet vim telnet -y
 }
 #-----------------------------install_python
 install_python()
