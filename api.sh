@@ -245,6 +245,7 @@ config_python()
     source .env/bin/activate
     pip install -r requirements.txt
     pip list
+    source $path/.env/bin/activate
 }
 #-----------------------------config_implementation
 config_implementation()
