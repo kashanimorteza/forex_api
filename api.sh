@@ -243,6 +243,7 @@ config_python()
     #python -m venv .env
     .env/bin/python -m pip install --upgrade pip
     . /root/forex_api/.env/bin/activate
+    source /root/forex_api/.env/bin/activate
     #pip install -r requirements.txt
     #pip list
 }
