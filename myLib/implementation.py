@@ -135,23 +135,23 @@ class Implementation:
                 for instrument in defaultSymbols:
                     name = instrument.replace('/', '')
                     name = name.replace('.', '')
-                    category = 100
-                    priority = 100
-                    if instrument == "XAU/USD" : 
-                        category = 1
-                        priority = 1 
-                    if instrument == "XAG/USD" : 
-                        category = 1
-                        priority = 2
-                    if instrument == "USOil" : 
-                        category = 1
-                        priority = 3
-                    if instrument == "UKOil" : 
-                        category = 1
-                        priority = 4
-                    if instrument == "EUR/USD" : 
-                        category = 1
-                        priority = 5
+                    category = 1
+                    priority = 1
+                    # if instrument == "XAU/USD" : 
+                    #     category = 1
+                    #     priority = 1 
+                    # if instrument == "XAG/USD" : 
+                    #     category = 1
+                    #     priority = 2
+                    # if instrument == "USOil" : 
+                    #     category = 1
+                    #     priority = 3
+                    # if instrument == "UKOil" : 
+                    #     category = 1
+                    #     priority = 4
+                    # if instrument == "EUR/USD" : 
+                    #     category = 1
+                    #     priority = 5
                     obj = model_instrument_db(name=name, instrument=instrument,  category=category,  priority=priority, description="", enable=True)
                     self.data_orm.add(model=model_instrument_db, item=obj)
             #--------------Output
@@ -244,7 +244,8 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add: 
-                self.data_orm.add(model=model, item=model(name='ST_01', description='Buy|Sell   if p>0 same   if p<0 inverse'))
+                self.data_orm.add(model=model, item=model(name='OneWay', description='Buy|Sell'))
+                self.data_orm.add(model=model, item=model(name='Floating', description='Buy&Sell   if p>0:same   if p<0:reverse'))
                 self.data_orm.add(model=model, item=model(name='ST_02', description=''))
                 self.data_orm.add(model=model, item=model(name='ST_03', description=''))
                 self.data_orm.add(model=model, item=model(name='ST_04', description=''))
@@ -293,13 +294,9 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name='TP-SL-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy','amount':1000,'tp_pips':1,'st_pips':1}", description="TP/SL"))
-                self.data_orm.add(model=model, item=model(name='TP-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy,sell','amount':1000,'tp_pips':1,'st_pips':100}", description="TP-EURUSD"))
-                self.data_orm.add(model=model, item=model(name='TP-XAUUSD', strategy_id=1, params="{'symbols':'XAU/USD','actions':'buy,sell','amount':1,'tp_pips':100,'st_pips':10000}", description="TP-XAUUSD"))
-                self.data_orm.add(model=model, item=model(name='TP-USOIL', strategy_id=1, params="{'symbols':'USOil','actions':'buy,sell','amount':1,'tp_pips':30,'st_pips':100}", description="TP-USOIL"))
-                self.data_orm.add(model=model, item=model(name='TP-XAGUSD', strategy_id=1, params="{'symbols':'XAG/USD','actions':'buy,sell','amount':1,'tp_pips':100,'st_pips':100}", description="TP-XAGUSD"))
-                self.data_orm.add(model=model, item=model(name='TP-UKOil', strategy_id=1, params="{'symbols':'UKOil','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':100}", description="TP-UKOil"))
-                self.data_orm.add(model=model, item=model(name='TP-EUR', strategy_id=1, params="{'symbols':'EUR/USD', 'EUR/GBP,EUR/CHF,EUR/JPY,EUR/AUD,EUR/CAD,EUR/NZD','actions':'buy,sell','amount':1000,'tp_pips':1,'st_pips':100}", description="TP-EURU"))
+                self.data_orm.add(model=model, item=model(name='B-XAUUSD', strategy_id=1, params="{'symbols':'XAU/USD','actions':'buy','amount':1,'tp_pips':100,'st_pips':1000}", description=""))
+                self.data_orm.add(model=model, item=model(name='S-XAUUSD', strategy_id=1, params="{'symbols':'XAU/USD','actions':'sell','amount':1,'tp_pips':100,'st_pips':1000}", description=""))
+                self.data_orm.add(model=model, item=model(name='BS-XAUUSD', strategy_id=2, params="{'symbols':'XAU/USD','actions':'buy,sell','amount':1,'tp_pips':100,'st_pips':10000}", description=""))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -344,13 +341,9 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="Test-TP-SL-EURUSD", strategy_item_id=1, account_id=1))
-                self.data_orm.add(model=model, item=model(name="Test-TP-EURUSD", strategy_item_id=2, account_id=1))
-                self.data_orm.add(model=model, item=model(name="Test-TP-XAUUSD", strategy_item_id=3, account_id=1))
-                self.data_orm.add(model=model, item=model(name="Test-TP-UKOil", strategy_item_id=4, account_id=1))
-                self.data_orm.add(model=model, item=model(name="Test-TP-XAGUSD", strategy_item_id=5, account_id=1))
-                self.data_orm.add(model=model, item=model(name="Test-TP-UKOil", strategy_item_id=6, account_id=1))
-                self.data_orm.add(model=model, item=model(name="Test-TP-EUR", strategy_item_id=7, account_id=1))
+                self.data_orm.add(model=model, item=model(name="T-B-1", strategy_item_id=1, account_id=1))
+                self.data_orm.add(model=model, item=model(name="T-S-1", strategy_item_id=2, account_id=1))
+                self.data_orm.add(model=model, item=model(name="T-BS-1", strategy_item_id=3, account_id=1))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

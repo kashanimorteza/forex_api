@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------------- Location
-# myStrategy/st_01.py
+# myStrategy/OneWay.py
 
 #--------------------------------------------------------------------------------- Description
-# st_01
+# OneWay
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
@@ -17,7 +17,7 @@ from myModel.model_live_order import model_live_order_db
 from myModel.model_live_execute import model_live_execute_db
 
 #--------------------------------------------------------------------------------- Action
-class ST_01:
+class OneWay:
     #--------------------------------------------- init
     def __init__(
             self,
@@ -156,6 +156,9 @@ class ST_01:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
+        #-------------- Variable
+        keep = False
+        result = model_output()
         
         try:
             #--------------Data
@@ -167,17 +170,10 @@ class ST_01:
             profit = order_detaile["profit"]
             trade_id = order_detaile["trade_id"]
             #--------------Check
-            if profit < 0 :
-                action = "sell" if action == "buy" else "buy"
+            if profit > 0 : keep = True
             #--------------Forex
-            result:model_output = self.forex.order_open(
-                action=action, 
-                symbol=symbol,
-                amount=amount,
-                tp_pips=tp_pips,
-                sl_pips=sl_pips,
-                execute_id=self.execute_id
-            )
+            if keep :
+                result:model_output = self.forex.order_open(action=action, symbol=symbol, amount=amount, tp_pips=tp_pips, sl_pips=sl_pips,execute_id=self.execute_id)
             #--------------Database
             if result.status:
                 cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id={self.execute_id};"

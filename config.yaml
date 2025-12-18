@@ -223,20 +223,19 @@ debug:
     order_open: {log: false, verbose: true, model: "Forex"}
     order_close: {log: false, verbose: true, model: "Forex"}
     order_close_all: {log: false, verbose: false, model: "Forex"}
-    
   Data:
     save: {log: false, verbose: true, model: "Data"}
     get_max_min: {log: false, verbose: false, model: "Data"}
-  ST_01:
-    start: {log: false, verbose: true, model: "ST_01"}
-    stop: {log: false, verbose: true, model: "ST_01"}
-    order_close: {log: false, verbose: true, model: "ST_01"}
-    price_change: {log: false, verbose: true, model: "ST_01"}
-  ST_02:
-    start: {log: false, verbose: true, model: "ST_02"}
-    stop: {log: false, verbose: true, model: "ST_02"}
-    order_close: {log: false, verbose: true, model: "ST_02"}
-    price_change: {log: false, verbose: true, model: "ST_02"}
+  OneWay:
+    start: {log: false, verbose: true, model: "OneWay"}
+    stop: {log: false, verbose: true, model: "OneWay"}
+    order_close: {log: false, verbose: true, model: "OneWay"}
+    price_change: {log: false, verbose: true, model: "OneWay"}
+  Floating:
+    start: {log: false, verbose: true, model: "Floating"}
+    stop: {log: false, verbose: true, model: "Floating"}
+    order_close: {log: false, verbose: true, model: "Floating"}
+    price_change: {log: false, verbose: true, model: "Floating"}
   ST_03:
     start: {log: false, verbose: true, model: "ST_03"}
     stop: {log: false, verbose: true, model: "ST_03"}
