@@ -161,7 +161,7 @@ class ST_01:
             symbol = order_detaile["symbol"]
             amount = order_detaile["amount"]
             tp_pips = self.params["tp_pips"]
-            sl_pips = order_detaile["sl_pips"]
+            sl_pips = self.params["st_pips"]
             profit = order_detaile["profit"]
             #--------------Check
             if profit < 0 :
