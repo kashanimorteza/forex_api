@@ -100,7 +100,10 @@ class Database_Orm:
             if filters:
                 for attr, value in filters.items() : 
                     if value !='null' : query = query.filter(getattr(model, attr) == value)
-            query = query.order_by(model.id)
+            if hasattr(model, 'date'):
+                query = query.order_by(model.date.desc())
+            else:
+                query = query.order_by(model.id.desc())
             result = query.all()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
