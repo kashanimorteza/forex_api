@@ -58,20 +58,22 @@ class ST_01:
         
         try:
             #--------------Data
-            action = self.params["action"]
-            symbol = self.params["symbol"]
+            actions = self.params["actions"].split(',')
+            symbols = self.params["symbols"].split(',')
             amount = self.params["amount"]
             tp_pips = self.params["tp_pips"]
             sl_pips = self.params["st_pips"]
             #--------------Forex
-            result:model_output = self.forex.order_open(
-                action=action, 
-                symbol=symbol,
-                amount=amount,
-                tp_pips=tp_pips,
-                sl_pips=sl_pips,
-                execute_id=self.execute_id
-            )
+            for symbol in symbols :
+                for action in actions :
+                    result:model_output = self.forex.order_open(
+                        action=action, 
+                        symbol=symbol,
+                        amount=amount,
+                        tp_pips=tp_pips,
+                        sl_pips=sl_pips,
+                        execute_id=self.execute_id
+                    )
             #--------------Database
             if result.status:
                 cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id={self.execute_id}"

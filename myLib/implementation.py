@@ -293,8 +293,8 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name='TP/SL', strategy_id=1, params="{'symbol':'EUR/USD','action':'buy','amount':10000,'tp_pips':1,'st_pips':1}", description="TP/SL"))
-                self.data_orm.add(model=model, item=model(name='TP', strategy_id=1, params="{'symbol':'EUR/USD','action':'buy','amount':10000,'tp_pips':1,'st_pips':1000}", description="TP"))
+                self.data_orm.add(model=model, item=model(name='TP/SL', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy','amount':10000,'tp_pips':1,'st_pips':1}", description="TP/SL"))
+                self.data_orm.add(model=model, item=model(name='TP', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy,sell','amount':10000,'tp_pips':1,'st_pips':1000}", description="TP"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
