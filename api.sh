@@ -136,7 +136,7 @@ install_general()
     echo -e "${header_color}${header_line}${FUNCNAME[0]}${ENDCOLOR}"
     #----------Verbose
     echo -e "${verbose_color}apt install -yqq --no-install-recommends ca-certificates${ENDCOLOR}"
-    echo -e "${verbose_color}apt install curl git telnet vim telnet${ENDCOLOR}"
+    echo -e "${verbose_color}apt install curl git telnet vim telnet uvicorn${ENDCOLOR}"
     #----------Action
     sudo apt install -yqq --no-install-recommends ca-certificates
     sudo apt install curl git telnet vim telnet -y
