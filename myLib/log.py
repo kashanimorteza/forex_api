@@ -72,7 +72,7 @@ class Log:
         #--------------------------------- execution
         try:                                                           
             if drop:                
-                res = self.db.execute(f"DROP TABLE IF EXISTS {self.tblName}")                
+                res = self.db.db.execute(f"DROP TABLE IF EXISTS {self.tblName}")                
                 self.verbose('not',f'{self.className}({methodName})    ', f'Drop Table {self.tblName} : {res}')
             if create:
                 query = f"""CREATE TABLE IF NOT EXISTS {self.tblName}
@@ -84,7 +84,7 @@ class Log:
                 data text,           
                 PRIMARY KEY (id)
                 );"""                
-                res = self.db.execute(query)                
+                res = self.db.db.execute(query)                
                 self.verbose('not',f'{self.className}({methodName})    ',f'Create Table {self.tblName} : {res}')                                
             res = True
         except Exception as e:
@@ -139,8 +139,8 @@ class Log:
         #--------------------------------- variable        
         methodName = "toDatabase"
         res = False
-        if self.db.status !=True:
-            self.db.open()
+        if self.db.db.status !=True:
+            self.db.db.open()
         #--------------------------------- execution        
         try:
             if data is not None:      
@@ -148,11 +148,11 @@ class Log:
                 data = data.replace("'","")
                 data = data.replace("^","")  
             if model=='err' and self.err_toDatabase:                     
-                    self.db.execute(f"INSERT INTO {self.tblName} (date, model, subject, data) VALUES('{dt.now():%Y-%m-%d %H:%M:%S}', '{model}', '{subject}', '{data}')")
+                    self.db.db.execute(f"INSERT INTO {self.tblName} (date, model, subject, data) VALUES('{dt.now():%Y-%m-%d %H:%M:%S}', '{model}', '{subject}', '{data}')")
             if model=='not' and self.not_toDatabase:                     
-                    self.db.execute(f"INSERT INTO {self.tblName} (date, model, subject, data) VALUES('{dt.now():%Y-%m-%d %H:%M:%S}', '{model}', '{subject}', '{data}')")
+                    self.db.db.execute(f"INSERT INTO {self.tblName} (date, model, subject, data) VALUES('{dt.now():%Y-%m-%d %H:%M:%S}', '{model}', '{subject}', '{data}')")
             if model=='rep' and self.not_toDatabase:                     
-                    self.db.execute(f"INSERT INTO {self.tblName} (date, model, subject, data) VALUES('{dt.now():%Y-%m-%d %H:%M:%S}', '{model}', '{subject}', '{data}')")
+                    self.db.db.execute(f"INSERT INTO {self.tblName} (date, model, subject, data) VALUES('{dt.now():%Y-%m-%d %H:%M:%S}', '{model}', '{subject}', '{data}')")
             res = True
         except Exception as e:
             res = False
