@@ -294,7 +294,9 @@ class Implementation:
             #-------------- Add
             if add:
                 self.data_orm.add(model=model, item=model(name='TP/SL', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy','amount':10000,'tp_pips':1,'st_pips':1}", description="TP/SL"))
-                self.data_orm.add(model=model, item=model(name='TP', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy,sell','amount':10000,'tp_pips':1,'st_pips':1000}", description="TP"))
+                self.data_orm.add(model=model, item=model(name='TP-E', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy,sell','amount':10000,'tp_pips':1,'st_pips':1000}", description="TP-E"))
+                self.data_orm.add(model=model, item=model(name='TP-X', strategy_id=1, params="{'symbols':'XAU/USD,XAG/USD','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':10000}", description="TP-X"))
+                self.data_orm.add(model=model, item=model(name='TP-O', strategy_id=1, params="{'symbols':'USOil,UKOil','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':10000}", description="TP-O"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
