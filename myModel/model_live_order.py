@@ -22,6 +22,7 @@ class model_live_order_db(BaseModel_db):
     date = Column(DateTime, default=func.now(), server_default=func.now())
     execute_id = Column(Integer, default=0)
     order_id = Column(String, default='')
+    trade_id = Column(String, default='')
     symbol = Column(String, default='')
     action = Column(String, default='')
     amount = Column(Integer, default=0)
@@ -47,6 +48,7 @@ class model_live_order_py(BaseModel_py):
     date : Optional[str] = ''
     execute_id : int = 0
     order_id : str = ''
+    trade_id : str = ''
     symbol : str = ''
     action : str = ''
     amount : int = 0

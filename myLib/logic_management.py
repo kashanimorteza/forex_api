@@ -228,7 +228,7 @@ class Logic_Management:
 
         try:
             #--------------Action
-            cmd = f"SELECT strategy.name, strategy_item.params, live_execute.id, live_execute.account_id, live_order.id, live_order.date, live_order.symbol, live_order.action, live_order.amount, live_order.bid, live_order.ask, live_order.tp, live_order.sl, live_order.profit, live_order.status, live_execute.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN live_execute ON strategy_item.id = live_execute.strategy_item_id JOIN live_order ON live_order.execute_id = live_execute.id WHERE live_order.order_id='{order_id}'"
+            cmd = f"SELECT strategy.name, strategy_item.params, live_execute.id, live_execute.account_id, live_order.id, live_order.trade_id, live_order.date, live_order.symbol, live_order.action, live_order.amount, live_order.bid, live_order.ask, live_order.tp, live_order.sl, live_order.profit, live_order.status, live_execute.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN live_execute ON strategy_item.id = live_execute.strategy_item_id JOIN live_order ON live_order.execute_id = live_execute.id WHERE live_order.order_id='{order_id}'"
             result:model_output = self.data_sql.db.items(cmd=cmd)
             #--------------Data
             if result.status and len(result.data) > 0 :
@@ -236,18 +236,19 @@ class Logic_Management:
                 detaile["params"] = result.data[0][1]
                 detaile["execute_id"] = result.data[0][2]
                 detaile["account_id"] = result.data[0][3]
-                detaile["live_order_id"] = result.data[0][4]
-                detaile["date"] = result.data[0][5]
-                detaile["symbol"] = result.data[0][6]
-                detaile["action"] = result.data[0][7]
-                detaile["amount"] = result.data[0][8]
-                detaile["bid"] = result.data[0][9]
-                detaile["ask"] = result.data[0][10]
-                detaile["tp"] = result.data[0][11]
-                detaile["sl"] = result.data[0][12]
-                detaile["profit"] = result.data[0][13]
-                detaile["status"] = result.data[0][14]
-                detaile["execute_status"] = result.data[0][15]
+                detaile["order_id"] = result.data[0][4]
+                detaile["trade_id"] = result.data[0][5]
+                detaile["date"] = result.data[0][6]
+                detaile["symbol"] = result.data[0][7]
+                detaile["action"] = result.data[0][8]
+                detaile["amount"] = result.data[0][9]
+                detaile["bid"] = result.data[0][10]
+                detaile["ask"] = result.data[0][11]
+                detaile["tp"] = result.data[0][12]
+                detaile["sl"] = result.data[0][13]
+                detaile["profit"] = result.data[0][14]
+                detaile["status"] = result.data[0][15]
+                detaile["execute_status"] = result.data[0][16]
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = detaile
@@ -266,7 +267,7 @@ class Logic_Management:
         return output
         
     #-------------------------- [order_close]
-    def order_close(self, order_id, profit) -> model_output:
+    def order_close(self, order_id, trade_id, profit) -> model_output:
         #-------------- Description
         # IN     : order_id | profit
         # OUT    : model_output
@@ -284,7 +285,7 @@ class Logic_Management:
 
         try:
             #--------------Database
-            cmd = f"UPDATE live_order SET status='close', profit={profit} WHERE order_id='{order_id}'"
+            cmd = f"UPDATE live_order SET trade_id='{trade_id}', status='close', profit={profit} WHERE order_id='{order_id}'"
             self.data_sql.db.execute(cmd=cmd)
             #--------------Strategy
             order_detaile = self.order_detaile(order_id=order_id).data
@@ -344,6 +345,8 @@ class Logic_Management:
             if action == "price_change" : strategy.price_change(order_detaile=order_detaile)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = None
+            output.message = None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

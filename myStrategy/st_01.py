@@ -165,6 +165,7 @@ class ST_01:
             tp_pips = self.params["tp_pips"]
             sl_pips = self.params["st_pips"]
             profit = order_detaile["profit"]
+            trade_id = order_detaile["trade_id"]
             #--------------Check
             if profit < 0 :
                 action = "sell" if action == "buy" else "buy"
@@ -184,7 +185,7 @@ class ST_01:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = self.execute_id
-            output.message = f"{order_detaile['action']}:{profit} | {action},{symbol},{amount},{tp_pips},{sl_pips},{result.status}"
+            output.message = f" {trade_id} | {order_detaile['action']}:{profit} | {action},{symbol},{amount},{tp_pips},{sl_pips},{result.status}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

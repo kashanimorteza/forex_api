@@ -476,6 +476,7 @@ class Forex:
         output.method_name = this_method
         #--------------Variable
         buy_sell = None
+        rate=None
         ask = None
         bid = None
         sl = None
@@ -504,11 +505,13 @@ class Forex:
             #--------------TP/SL
             if tp_pips or sl_pips:
                 if action == "buy":
-                    tp = float(f"{ask + (tp_pips * point_size):.{digits}f}")
-                    sl = float(f"{bid - (sl_pips * point_size):.{digits}f}")
+                    rate = ask
+                    tp = float(f"{ask + tp_pips * point_size:.{digits}f}")
+                    sl = float(f"{bid - sl_pips * point_size:.{digits}f}")
                 elif action == "sell":
-                    tp = float(f"{bid - (tp_pips * point_size):.{digits}f}")
-                    sl = float(f"{ask + (sl_pips * point_size):.{digits}f}")
+                    rate = bid
+                    tp = float(f"{bid - tp_pips * point_size:.{digits}f}")
+                    sl = float(f"{ask + sl_pips * point_size:.{digits}f}")
             #--------------Order
             if ask and bid :
                 if tp or sl:
@@ -529,7 +532,7 @@ class Forex:
                         order_type=order_type,
                         BUY_SELL= buy_sell,
                         SYMBOL = symbol,
-                        AMOUNT= amount
+                        AMOUNT= amount,
                     )
                 response = self.fx.send_request(request)
                 order_id = getattr(response, "order_id", None) if response else None
@@ -552,7 +555,7 @@ class Forex:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = order_id
-            output.message = f"{execute_id} | {order_id} | {symbol} | {action} | {amount} | {bid} | {ask} | {tp} | {sl}"
+            output.message = f"{execute_id} | {order_id} | {symbol} | {action} | {amount} | {rate} | {bid} | {ask} | {tp} | {sl}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
