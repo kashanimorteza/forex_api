@@ -37,10 +37,9 @@ app = FastAPI(
     title = title,
     description = description,
     version=version,
-    openapi_url=openapi_url,
-    docs_url=docs_url,
-    redoc_url=redoc_url,
-    root_path=f"/{key}"
+    openapi_url=f"/{key}{openapi_url}",
+    docs_url=f"/{key}{docs_url}",
+    redoc_url=f"/{key}{redoc_url}"
 )
 app.add_middleware(
     CORSMiddleware, 
@@ -79,12 +78,12 @@ async def shutdown_event():
         
 #--------------------------------------------------------------------------------- Route
 routes = [
-    (account, "/account", ["Account"]),
-    (instrument, "/instrument", ["Instrument"]),
-    (strategy, "/strategy", ["Strategy"]),
-    (strategy_item, "/strategy_item", ["Strategy Item"]),
-    (live_execute, "/live_execute", ["Live Execute"]),
-    (live_order, "/live_order", ["Live Order"])
+    (account, f"/{key}/account", ["Account"]),
+    (instrument, f"/{key}/instrument", ["Instrument"]),
+    (strategy, f"/{key}/strategy", ["Strategy"]),
+    (strategy_item, f"/{key}/strategy_item", ["Strategy Item"]),
+    (live_execute, f"/{key}/live_execute", ["Live Execute"]),
+    (live_order, f"/{key}/live_order", ["Live Order"])
 ]
 for router, prefix, tags in routes : app.include_router(router, prefix=prefix, tags=tags)
 
