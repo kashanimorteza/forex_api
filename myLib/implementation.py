@@ -295,8 +295,8 @@ class Implementation:
             if add:
                 self.data_orm.add(model=model, item=model(name='TP-SL-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy','amount':1000,'tp_pips':1,'st_pips':1}", description="TP/SL"))
                 self.data_orm.add(model=model, item=model(name='TP-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy,sell','amount':1000,'tp_pips':1,'st_pips':100}", description="TP-EURUSD"))
-                self.data_orm.add(model=model, item=model(name='TP-XAUUSD', strategy_id=1, params="{'symbols':'XAU/USD','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':100}", description="TP-XAUUSD"))
-                self.data_orm.add(model=model, item=model(name='TP-USOIL', strategy_id=1, params="{'symbols':'USOil','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':100}", description="TP-USOIL"))
+                self.data_orm.add(model=model, item=model(name='TP-XAUUSD', strategy_id=1, params="{'symbols':'XAU/USD','actions':'buy,sell','amount':1,'tp_pips':30,'st_pips':100}", description="TP-XAUUSD"))
+                self.data_orm.add(model=model, item=model(name='TP-USOIL', strategy_id=1, params="{'symbols':'USOil','actions':'buy,sell','amount':1,'tp_pips':30,'st_pips':100}", description="TP-USOIL"))
                 self.data_orm.add(model=model, item=model(name='TP-XAGUSD', strategy_id=1, params="{'symbols':'XAG/USD','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':100}", description="TP-XAGUSD"))
                 self.data_orm.add(model=model, item=model(name='TP-UKOil', strategy_id=1, params="{'symbols':'UKOil','actions':'buy,sell','amount':1,'tp_pips':10,'st_pips':100}", description="TP-UKOil"))
                 self.data_orm.add(model=model, item=model(name='TP-EUR', strategy_id=1, params="{'symbols':'EUR/USD', 'EUR/GBP,EUR/CHF,EUR/JPY,EUR/AUD,EUR/CAD,EUR/NZD','actions':'buy,sell','amount':1000,'tp_pips':1,'st_pips':100}", description="TP-EURU"))
