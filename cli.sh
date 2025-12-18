@@ -50,8 +50,6 @@ config_file=$path/config.yaml
 #-----------------------------Config
 name=$(yq '.general.name' "$config_file" | tr -d '"')
 
-source /root/forex_api/.env/bin/activate
-
 #---------------------------------------------------------------------------------Menu
 #--------------------menu_main
 menu_main()
