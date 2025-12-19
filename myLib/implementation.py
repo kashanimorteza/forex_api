@@ -299,13 +299,13 @@ class Implementation:
                 self.data_orm.add(model=model, item=model(name='B-XAUUSD', strategy_id=1, params="{'symbols':'XAU/USD','actions':'buy','amount':1,'tp_pips':100,'st_pips':1000}", description=""))
                 self.data_orm.add(model=model, item=model(name='S-XAUUSD', strategy_id=1, params="{'symbols':'XAU/USD','actions':'sell','amount':1,'tp_pips':100,'st_pips':10000}", description=""))
                 #EUR/USD
-                self.data_orm.add(model=model, item=model(name='B-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy','amount':1000,'tp_pips':1,'st_pips':1000}", description=""))
-                self.data_orm.add(model=model, item=model(name='S-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'sell','amount':1000,'tp_pips':1,'st_pips':1000}", description=""))
+                self.data_orm.add(model=model, item=model(name='B-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy','amount':10000,'tp_pips':1,'st_pips':1000}", description=""))
+                self.data_orm.add(model=model, item=model(name='S-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'sell','amount':10000,'tp_pips':1,'st_pips':1000}", description=""))
                 #---Strategy 2
                 #XAU/USD
                 self.data_orm.add(model=model, item=model(name='BS-XAUUSD', strategy_id=2, params="{'symbols':'XAU/USD','actions':'buy,sell','amount':1,'tp_pips':100,'st_pips':10000}", description=""))
                 #EUR/USD
-                self.data_orm.add(model=model, item=model(name='BS-EURUSD', strategy_id=2, params="{'symbols':'EUR/USD','actions':'buy,sell','amount':1000,'tp_pips':1,'st_pips':1000}", description=""))
+                self.data_orm.add(model=model, item=model(name='BS-EURUSD', strategy_id=2, params="{'symbols':'EUR/USD','actions':'buy,sell','amount':10000,'tp_pips':1,'st_pips':1000}", description=""))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
