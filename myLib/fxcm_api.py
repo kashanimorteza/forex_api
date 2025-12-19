@@ -334,7 +334,7 @@ class Fxcm_API:
                     )
                     response = self.fx.send_request(request)
                     order_id = getattr(response, "order_id", None) if response else None
-                    time.sleep(0.5)
+                    time.sleep(0.25)
                     self.order_edit(order_id, action, tp_pips, sl_pips, spread, point_size, digits)
                 else:
                     request = self.fx.create_order_request(

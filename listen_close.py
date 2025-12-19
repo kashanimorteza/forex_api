@@ -36,7 +36,8 @@ class Listen_Close:
         print("Listen_Close : Started")
         self.listener = CloseTradesListener(self)
         table_manager = self.forex_api.api.fx.table_manager
-        while table_manager.status != forexconnect.lib.fxcorepy.O2GTableManagerStatus.TABLES_LOADED : time.sleep(0.1)
+        while table_manager.status != forexconnect.lib.fxcorepy.O2GTableManagerStatus.TABLES_LOADED : 
+            time.sleep(0.1)
         self.close_table = table_manager.get_table(ForexConnect.CLOSED_TRADES)
         self.close_table.subscribe_update(fxcorepy.O2GTableUpdateType.INSERT, self.listener)
         self.is_running = True

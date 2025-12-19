@@ -66,7 +66,7 @@ async def startup_event():
     listener_thread.start()
     
     # Start Listen_Close_Execute
-    listener_close_execute = Listen_Close_Execute(items=list_close, sleep_time=0.5)
+    listener_close_execute = Listen_Close_Execute(items=list_close, sleep_time=0.25)
     listener_execute_thread = threading.Thread(target=listener_close_execute.start, daemon=True)
     listener_execute_thread.start()
 
