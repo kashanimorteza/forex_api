@@ -12,7 +12,7 @@ from myModel.model_account import model_account_py as model_py
 from myModel.model_account import model_account_db as model_db
 from myLib.data_orm import Data_Orm
 from myLib.logic_global import forex_apis
-from myLib.forex import Forex
+from myLib.fxcm_api import Forex
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]

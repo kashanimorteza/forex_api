@@ -1,12 +1,13 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/forex.py
+# myLib/fxcm_api.py
 
 #--------------------------------------------------------------------------------- Description
-# forex
+# fxcm_api
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 from datetime import timedelta
+import forexconnect
 import pandas as pd
 from myLib.model import model_output
 from myLib.logic_global import config, debug, log_instance, data_instance
@@ -320,17 +321,7 @@ class Forex:
                             print(f"Error (attempt {attempt}/3): {e}")
                             if attempt > 1: 
                                 self.api.logout()
-                                account_cfg = config.get("forex_connect", {}).get(self.api.name, {})
-                                forex_api = Forex_Api(
-                                    name=self.api.name, 
-                                    type=account_cfg.get("type"), 
-                                    username=account_cfg.get("username"), 
-                                    password=account_cfg.get("password"), 
-                                    url=account_cfg.get("url"), 
-                                    key=account_cfg.get("key")
-                                )
-                                self.api = forex_api
-                                self.fx = forex_api.fx
+                                self.api.fx = forexconnect()
                                 self.api.login()
                             if attempt >= 3: raise
                             time.sleep(1)

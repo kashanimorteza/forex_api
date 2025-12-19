@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 from myLib.logic_global import load_forex_api
 from myLib.logic_management import Logic_Management
-from myLib.forex import Forex
+from myLib.fxcm_api import Forex
 from forexconnect import ForexConnect, fxcorepy
 load_forex_api()
 from myLib.logic_global import forex_apis

@@ -12,7 +12,7 @@ from myLib.utils import sort
 from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
-from myLib.forex import Forex
+from myLib.fxcm_api import Forex
 from myModel.model_live_order import model_live_order_db
 from myModel.model_live_execute import model_live_execute_db
 
