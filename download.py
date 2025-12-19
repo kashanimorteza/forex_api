@@ -60,14 +60,17 @@ try:
             for instrument in instruments:
                 account_cfg = config.get("forex_connect", {}).get(account, {})
                 forex = Logic_Forex(account_info=account_cfg)
+                forex.api.login()
                 forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
+                forex.api.logout()
     else :
         account_cfg = config.get("forex_connect", {}).get(account, {})
         forex = Logic_Forex(account_info=account_cfg)
         forex.api.login()
         for timeframe in timeframes:
             for instrument in instruments:
-                forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)        
+                forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
+        forex.api.logout()
 except Exception as e:
     #--------------Error
     output.status = False

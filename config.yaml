@@ -223,9 +223,9 @@ debug:
     order_close: {log: false, verbose: false, model: "Logic_Forex"}
     order_close_all: {log: false, verbose: false, model: "Logic_Forex"}
   Fxcm_API:
-    login: {log: false, verbose: false, model: "Fxcm_API"}
-    logout: {log: false, verbose: false, model: "Fxcm_API"}
-    info: {log: false, verbose: false, model: "Fxcm_API"}
+    login: {log: false, verbose: true, model: "Fxcm_API"}
+    logout: {log: false, verbose: true, model: "Fxcm_API"}
+    info: {log: false, verbose: true, model: "Fxcm_API"}
     store: {log: false, verbose: true, model: "Fxcm_API"}
     history: {log: false, verbose: true, model: "Fxcm_API"}
     save: {log: false, verbose: true, model: "Fxcm_API"}
