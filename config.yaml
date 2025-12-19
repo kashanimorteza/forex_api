@@ -235,7 +235,7 @@ debug:
     trade_list: {log: false, verbose: true, model: "Fxcm_API"}
     order_open: {log: false, verbose: true, model: "Fxcm_API"}
     order_close: {log: false, verbose: true, model: "Fxcm_API"}
-    order_close_all: {log: false, verbose: false, model: "Fxcm_API"}
+    get_table: {log: false, verbose: false, model: "Fxcm_API"}
   Data:
     save: {log: false, verbose: true, model: "Data"}
     get_max_min: {log: false, verbose: false, model: "Data"}

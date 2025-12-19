@@ -601,26 +601,26 @@ class Logic_Forex:
         output.class_name = self.this_class
         output.method_name = this_method
         #-------------- Variable
-        complete_count = 0
+        count = 0
         
         try:
             #--------------data
-            items = self.orader_close_list()
+            result = self.api.get_table("closed_trades")
             #--------------Items
-            if items.status:
-                for item in items.data:
+            if result.status:
+                for item in result.data:
                     order_id = item['open_order_id']
                     gross_pl = item['gross_pl']
                     if order_id in order_ids:
-                        obj = self.data_orm.items(model=model_live_order_db, order_id=order_id).data[0]
+                        obj:model_live_order_db = self.data_orm.items(model=model_live_order_db, order_id=order_id).data[0]
                         obj.profit = gross_pl
                         obj.status = "close"
                         self.data_orm.update(model=model_live_order_db, item=obj)
-                        complete_count += 1
+                        count += 1
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = complete_count
-            output.message =f"{len(items.data)} | {len(order_ids)} | {complete_count}"
+            output.data = count
+            output.message =f"{len(result.data)} | {len(order_ids)} | {count}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
