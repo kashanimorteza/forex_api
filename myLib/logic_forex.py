@@ -55,11 +55,10 @@ class Logic_Forex:
 
         try:
             #--------------Action
-            result = self.api.login()
+            result:model_output = self.api.login()
             #--------------Output
+            output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = result
-            output.message = f"{self.api_name} | {result.message}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -92,11 +91,10 @@ class Logic_Forex:
 
         try:
             #--------------Action
-            result = self.api.logout()
+            result:model_output = self.api.logout()
             #--------------Output
+            output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = result
-            output.message= self.api_name
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -113,7 +111,7 @@ class Logic_Forex:
     #--------------------------------------------- info
     def info(self):
         #-------------- Description
-        # IN     : order_id
+        # IN     : 
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -129,11 +127,10 @@ class Logic_Forex:
 
         try:
             #--------------Action
-            result = self.info()
+            result:model_output = self.api.info()
             #--------------Output
+            output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = result
-            output.message= self.api_name
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -166,11 +163,10 @@ class Logic_Forex:
 
         try:
             #--------------Action
-            result = self.instruments()
+            result:model_output = self.api.instruments()
             #--------------Output
+            output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = result
-            output.message = {"count": len(result)}
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -400,18 +396,13 @@ class Logic_Forex:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-        #-------------- Variable
-        data_count = 0
 
         try:
             #--------------Action
-            result = self.history(instrument, timeframe, datefrom=None, dateto=None, count=None)
-            #--------------Check
-            if result.status and result.data is not None : data_count = len(result.data)
+            result:model_output = self.api.history(instrument, timeframe, datefrom=None, dateto=None, count=None)
             #--------------Output
+            output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = result.data
-            output.message =f"{instrument} | {timeframe} | {sort(data_count, 6)} | {datefrom} | {dateto}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -425,10 +416,10 @@ class Logic_Forex:
         #--------------Return
         return output
 
-    #--------------------------------------------- orader_open_list
-    def orader_open_list(self):
+    #--------------------------------------------- get_table
+    def get_table(self, table):
         #-------------- Description
-        # IN     : order_id
+        # IN     : 
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -444,43 +435,9 @@ class Logic_Forex:
         
         try:
             #--------------Action
-            output = self.orader_open_list()
+            result:model_output = self.api.get_table(table = table)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-
-    #--------------------------------------------- orader_close_list
-    def orader_close_list(self):
-        #-------------- Description
-        # IN     : order_id
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-        
-        try:
-            #--------------Action
-            output = self.orader_close_list()
-            #--------------Output
+            output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
@@ -514,24 +471,14 @@ class Logic_Forex:
         
         try:
             #--------------Action
-            output = self.order_open(symbol, action, amount, tp_pips, sl_pips, execute_id)
-            order_id, bid, ask, tp, sl = output.data
+            result:model_output = self.api.order_open(symbol, action, amount, tp_pips, sl_pips, execute_id)
             #--------------Database
-            if output.status:
-                order_id = output.data
-                obj = model_live_order_db()
-                obj.execute_id = execute_id
-                obj.order_id = order_id
-                obj.symbol = symbol
-                obj.action = action
-                obj.amount = amount
-                obj.bid = bid
-                obj.ask = ask
-                obj.tp = tp
-                obj.sl = sl
-                obj.status = 'open'
-                self.data_orm.add(model=model_live_order_db, item=obj)
+            if result.status:
+                order_id, bid, ask, tp, sl = result.data
+                cmd = f"INSERT INTO live_order (execute_id, order_id, symbol, action, amount, bid, ask, tp, sl, status) VALUES ({execute_id}, '{order_id}', '{symbol}', '{action}', {amount}, {bid}, {ask}, {tp}, {sl}, 'open')"
+                self.data_sql.db.execute(cmd=cmd)
             #--------------Output
+            output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
@@ -546,9 +493,9 @@ class Logic_Forex:
         #--------------Return
         return output
 
-    #--------------------------------------------- order_close_all
+    #--------------------------------------------- order_close
     def order_close(self, order_ids=None):
-    #-------------- Description
+        #-------------- Description
         # IN     : order_id
         # OUT    : 
         # Action :
@@ -565,12 +512,10 @@ class Logic_Forex:
 
         try:
             #--------------Action
-            result = self.order_close()
+            result:model_output = self.api.order_close(order_ids=order_ids)
             #--------------Output
-            output  =result
+            output=result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = result
-            output.message= self.api_name
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -605,17 +550,15 @@ class Logic_Forex:
         
         try:
             #--------------data
-            result = self.api.get_table("closed_trades")
+            result:model_output = self.api.get_table("closed_trades")
             #--------------Items
             if result.status:
                 for item in result.data:
                     order_id = item['open_order_id']
                     gross_pl = item['gross_pl']
                     if order_id in order_ids:
-                        obj:model_live_order_db = self.data_orm.items(model=model_live_order_db, order_id=order_id).data[0]
-                        obj.profit = gross_pl
-                        obj.status = "close"
-                        self.data_orm.update(model=model_live_order_db, item=obj)
+                        cmd = f"UPDATE live_order SET profit={gross_pl}, status='close' WHERE order_id='{order_id}'"
+                        self.data_sql.db.execute(cmd=cmd)
                         count += 1
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
