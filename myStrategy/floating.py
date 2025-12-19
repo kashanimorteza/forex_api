@@ -81,7 +81,7 @@ class Floating:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = self.execute_id
-            output.message = self.execute_id
+            output.message = f"{self.execute_id} |"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
@@ -185,7 +185,7 @@ class Floating:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = self.execute_id
-            output.message = f" {trade_id} | {order_detaile['action']}:{profit} | {action},{symbol},{amount},{tp_pips},{sl_pips},{result.status}"
+            output.message = f"{trade_id} | {order_detaile['action']}:{profit} | {action},{symbol},{amount},{tp_pips},{sl_pips},{result.status}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log
