@@ -38,7 +38,7 @@ class Floating:
         output.method_name = this_method
         #--------------Variable
         params = self.params
-        output.data = [dict]
+        output.data = []
         
         try:
             #--------------Data

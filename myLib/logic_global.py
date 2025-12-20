@@ -7,6 +7,7 @@
 #--------------------------------------------------------------------------------- Variable
 forex_apis = {}
 list_close = []
+list_instrument= {}
 
 #--------------------------------------------------------------------------------- Method
 #-------------------------- load_config
@@ -57,6 +58,16 @@ def load_forex_api():
             forex_apis[account.id] = logic_forex
             logic_forex.login()
 
+#-------------------------- load_instrument
+def load_instrument():
+    from myLib.data_orm import Data_Orm
+    from myModel.model_instrument import model_instrument_db
+    db:Data_Orm = data_instance["management_orm"]
+    result= db.items(model=model_instrument_db, enable=True)
+    if result.status : 
+        for item in result.data : 
+            list_instrument[item.instrument] = item.toDict()
+
 #--------------------------------------------------------------------------------- Action
 config:dict = load_config()
 database_management = config.get("general", {}).get("database_management", {})
@@ -66,3 +77,4 @@ debug = config.get("debug", {})
 log_instance = load_log()
 data_instance = load_data()
 log_instance.db =data_instance['log_sql']
+load_instrument()

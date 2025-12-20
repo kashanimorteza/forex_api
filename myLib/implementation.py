@@ -11,6 +11,7 @@ from myLib.utils import model_output, sort
 from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
+from myLib.logic_forex import Logic_Forex
 from myModel import *
 
 #--------------------------------------------------------------------------------- Managemnet
@@ -114,7 +115,14 @@ class Implementation:
         model = model_instrument_db
         #-------------- Data
         cfgData = config.get("instrument", {})
-        defaultSymbols = cfgData.get("defaultSymbols")
+        useDefaultSymbols = cfgData.get("useDefaultSymbols")
+        if useDefaultSymbols :
+            defaultSymbols = cfgData.get("defaultSymbols")
+        else:
+            from myLib.logic_global import load_forex_api
+            load_forex_api()
+            forex:Logic_Forex = forex_apis[2]
+            offers = forex.get_table("OFFERS").data
 
         try:
             #-------------- Drop
@@ -125,28 +133,23 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                for instrument in defaultSymbols:
-                    name = instrument.replace('/', '')
-                    name = name.replace('.', '')
-                    category = 1
-                    priority = 1
-                    # if instrument == "XAU/USD" : 
-                    #     category = 1
-                    #     priority = 1 
-                    # if instrument == "XAG/USD" : 
-                    #     category = 1
-                    #     priority = 2
-                    # if instrument == "USOil" : 
-                    #     category = 1
-                    #     priority = 3
-                    # if instrument == "UKOil" : 
-                    #     category = 1
-                    #     priority = 4
-                    # if instrument == "EUR/USD" : 
-                    #     category = 1
-                    #     priority = 5
-                    obj = model_instrument_db(name=name, instrument=instrument,  category=category,  priority=priority, description="", enable=True)
-                    self.data_orm.add(model=model_instrument_db, item=obj)
+                if useDefaultSymbols :
+                    for instrument in defaultSymbols:
+                        name = instrument.replace('/', '')
+                        name = name.replace('.', '')
+                        category = 1
+                        priority = 1
+                        obj = model_instrument_db(name=name, instrument=instrument,  category=category,  priority=priority, description="", enable=True)
+                        self.data_orm.add(model=model_instrument_db, item=obj)
+                else:
+                    for offer in offers:
+                        instrument = offer['instrument']
+                        digits = offer['digits']
+                        point_size = offer['point_size']
+                        name = instrument.replace('/', '')
+                        name = name.replace('.', '')
+                        obj = model_instrument_db(name=name, instrument=instrument, description="", enable=True, digits=digits, point_size=point_size)
+                        self.data_orm.add(model=model_instrument_db, item=obj)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -438,12 +441,12 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=1, account_id=1))
-                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=2, account_id=1))
-                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=3, account_id=1))
-                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=4, account_id=1))
-                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=5, account_id=1))
-                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=6, account_id=1))
+                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=1, account_id=1, date_from="2025-12-05 03:00:00", date_to="2025-12-05 04:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=2, account_id=1, date_from="2025-12-05 03:00:00", date_to="2025-12-05 04:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=3, account_id=1, date_from="2025-12-05 03:00:00", date_to="2025-12-05 04:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=4, account_id=1, date_from="2025-12-05 03:00:00", date_to="2025-12-05 04:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=5, account_id=1, date_from="2025-12-05 03:00:00", date_to="2025-12-05 04:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=6, account_id=1, date_from="2025-12-11 04:00:00", date_to="2025-12-12 04:00:00"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

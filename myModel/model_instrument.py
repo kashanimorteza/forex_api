@@ -5,7 +5,7 @@
 # model_instrument
 
 #--------------------------------------------------------------------------------- Import
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, Float
 from sqlalchemy.inspection import inspect
 from myLib.database_orm import BaseModel as BaseModel_db
 from pydantic import BaseModel as BaseModel_py
@@ -21,6 +21,8 @@ class model_instrument_db(BaseModel_db):
     instrument = Column(String, default='')
     category = Column(Integer, default=0)
     priority = Column(Integer, default=0)
+    point_size = Column(Float, default=0.0)
+    digits = Column(Integer, default=0)
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
     #---Display
@@ -35,5 +37,7 @@ class model_instrument_py(BaseModel_py):
     instrument : str = ''
     category : int = 0
     priority : int = 0
+    point_size : float = 0.0
+    digits : int = 0
     description : Optional[str] = ''
     enable : bool = True

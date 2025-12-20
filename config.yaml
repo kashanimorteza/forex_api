@@ -144,7 +144,7 @@ download:
 #--------------------------------------------------------------------------------- instrument
 instrument:
   table: instrument
-  useDefaultSymbols: True
+  useDefaultSymbols: False
   defaultSymbols: [
       "EUR/USD", "EUR/GBP", "EUR/CHF", "EUR/JPY", "EUR/AUD", "EUR/CAD", "EUR/NZD",
       "GBP/USD", "GBP/JPY", "GBP/CHF", "GBP/NZD", "GBP/AUD", "GBP/CAD",

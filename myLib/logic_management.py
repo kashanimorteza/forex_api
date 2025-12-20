@@ -131,9 +131,11 @@ class Logic_Management:
 
         try:
             #--------------Data
-            table = "live_execute" if mode == "live" else "test_execute"
+            table = "live_execute" if mode == "live" else "back_execute"
             #--------------Action
-            cmd = f"SELECT strategy.name, strategy_item.params, {table}.account_id, {table}.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = '{id}';"
+            cmd_live = f"SELECT strategy.name, strategy_item.params, {table}.account_id, {table}.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = '{id}';"
+            cmd_back = f"SELECT strategy.name, strategy_item.params, {table}.account_id, {table}.status, {table}.date_from, {table}.date_to FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = '{id}';"
+            cmd = cmd_live if mode == "live" else cmd_back
             result:model_output = self.data_sql.db.items(cmd=cmd)
             #--------------Data
             if result.status and len(result.data) > 0 :
@@ -141,6 +143,9 @@ class Logic_Management:
                 detaile["params"] = result.data[0][1]
                 detaile["account_id"] = result.data[0][2]
                 detaile["status"] = result.data[0][3]
+                if mode == "back":
+                    detaile["date_from"] = result.data[0][4]
+                    detaile["date_to"] = result.data[0][5]
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = detaile
@@ -159,7 +164,7 @@ class Logic_Management:
         return output
     
     #-------------------------- [order_detaile]
-    def order_detaile(self, order_id) -> model_output:
+    def order_detaile(self, order_id, mode="live") -> model_output:
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -178,10 +183,14 @@ class Logic_Management:
         detaile = {}
 
         try:
-            #--------------Action
-            cmd = f"SELECT strategy.name, strategy_item.params, live_execute.id, live_execute.account_id, live_order.id, live_order.trade_id, live_order.date, live_order.symbol, live_order.action, live_order.amount, live_order.bid, live_order.ask, live_order.tp, live_order.sl, live_order.profit, live_order.status, live_execute.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN live_execute ON strategy_item.id = live_execute.strategy_item_id JOIN live_order ON live_order.execute_id = live_execute.id WHERE live_order.order_id='{order_id}'"
-            result:model_output = self.data_sql.db.items(cmd=cmd)
             #--------------Data
+            table = "live_execute" if mode == "live" else "back_execute"
+            #--------------Action
+            cmd_live = f"SELECT strategy.name, strategy_item.params, {table}.id, {table}.account_id, live_order.id, live_order.trade_id, live_order.date, live_order.symbol, live_order.action, live_order.amount, live_order.bid, live_order.ask, live_order.tp, live_order.sl, live_order.profit, live_order.status, {table}.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id JOIN live_order ON live_order.execute_id = {table}.id WHERE live_order.order_id='{order_id}'"
+            cmd_back = f"SELECT strategy.name, strategy_item.params, {table}.id, {table}.account_id, live_order.id, live_order.trade_id, live_order.date, live_order.symbol, live_order.action, live_order.amount, live_order.bid, live_order.ask, live_order.tp, live_order.sl, live_order.profit, live_order.status, {table}.status, {table}.date_from, {table}.date_to FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id JOIN live_order ON live_order.execute_id = {table}.id WHERE live_order.order_id='{order_id}'"
+            cmd = cmd_live if mode == "live" else cmd_back
+            result:model_output = self.data_sql.db.items(cmd=cmd)
+            #--------------Detaile
             if result.status and len(result.data) > 0 :
                 detaile["strategy_name"] = result.data[0][0]
                 detaile["params"] = result.data[0][1]
@@ -200,6 +209,9 @@ class Logic_Management:
                 detaile["profit"] = result.data[0][14]
                 detaile["status"] = result.data[0][15]
                 detaile["execute_status"] = result.data[0][16]
+                if mode == "back":
+                    detaile["date_from"] = result.data[0][17]
+                    detaile["date_to"] = result.data[0][18]
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = detaile
@@ -218,7 +230,7 @@ class Logic_Management:
         return output
         
     #-------------------------- [strategy_action]
-    def strategy_action(self, mode="live", execute_id=None, action="start", order_detaile=None) -> model_output:
+    def strategy_action(self, execute_id=None, action="start", order_detaile=None) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : model_output
@@ -239,7 +251,7 @@ class Logic_Management:
         try:
             #--------------Data
             if execute_id:
-                execute_detaile = self.execute_detaile(mode=mode,id=execute_id).data
+                execute_detaile = self.execute_detaile(id=execute_id).data
                 strategy_name = execute_detaile["strategy_name"]
                 params = execute_detaile["params"]
                 params = ast.literal_eval(params)
@@ -252,7 +264,6 @@ class Logic_Management:
             #--------------strategy
             strategy = self.get_strategy_instance(strategy_name).data
             strategy.params = params
-            strategy.execute_id = execute_id
             #--------------Action
             if action == "start" : result = strategy.start()
             if action == "stop" : result = strategy.stop()
@@ -260,12 +271,11 @@ class Logic_Management:
             if action == "price_change" : result = strategy.price_change(order_detaile=order_detaile)
             #--------------Action
             if result.status:
-                if mode == "live" : forex:Logic_Forex = forex_apis[account_id]
-                table = "live_execute" if mode == "live" else "test_execute"
+                forex:Logic_Forex = forex_apis[account_id]
                 for item in result.data:
                     run = item.get("run")
                     state = item.get("state")
-
+                    #--------------order_open
                     if run == "order_open":
                         #---Data
                         buy_sell = item.get("buy_sell")
@@ -273,28 +283,24 @@ class Logic_Management:
                         amount = item.get("amount")
                         tp_pips = item.get("tp_pips")
                         sl_pips = item.get("sl_pips")
-                        #---Live
-                        if mode == "live" :
-                            order_result:model_output = forex.order_open(
-                                action=buy_sell, 
-                                symbol=symbol,
-                                amount=amount,
-                                tp_pips=tp_pips,
-                                sl_pips=sl_pips,
-                                execute_id=execute_id
-                            )
-                        #---Test
-                        if mode == "test" :
-                            pass
+                        #---Action
+                        order_result:model_output = forex.order_open(
+                            action=buy_sell, 
+                            symbol=symbol,
+                            amount=amount,
+                            tp_pips=tp_pips,
+                            sl_pips=sl_pips,
+                            execute_id=execute_id
+                        )
                         #---Database
                         if order_result.status:
-                            cmd = f"UPDATE {table} SET status='{state}' WHERE id={execute_id}"
+                            cmd = f"UPDATE live_execute SET status='{state}' WHERE id={execute_id}"
                             self.data_sql.db.execute(cmd=cmd)
-
+                    #--------------close_all_order
                     if run == "close_all_order":
                         #---Data
                         order_ids = []
-                        cmd = f"SELECT * FROM {table} WHERE execute_id={execute_id} AND status='open'"
+                        cmd = f"SELECT * FROM live_execute WHERE execute_id={execute_id} AND status='open'"
                         orders = self.data_sql.db.items(cmd=cmd)
                         #---Action
                         if orders.status:
@@ -302,9 +308,8 @@ class Logic_Management:
                             if len(order_ids)>0 : forex.order_close(order_ids=order_ids)
                         #---Database
                         if order_result.status:
-                            cmd = f"UPDATE {table} SET status='{state}' WHERE id={execute_id}"
+                            cmd = f"UPDATE live_execute SET status='{state}' WHERE id={execute_id}"
                             self.data_sql.db.execute(cmd=cmd)
-
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None

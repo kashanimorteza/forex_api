@@ -5,73 +5,31 @@
 # logic_backtest
 
 #--------------------------------------------------------------------------------- Import
-import inspect, time
-from datetime import timedelta
-from myLib.logic_global import debug, log_instance, data_instance
-from myLib.utils import model_output, sort, get_tbl_name, format_dict_block
+import inspect, time, ast
+from myLib.logic_global import debug, list_instrument, log_instance, data_instance
+from myLib.utils import model_output, sort, get_tbl_name
 from myLib.log import Log
 from myLib.data_sql import Data_SQL
-from myLib.fxcm_api import Fxcm_API
+from myLib.logic_management import Logic_Management
 from myModel import *
 
 #--------------------------------------------------------------------------------- Action
 class Logic_BackTest:
     #--------------------------------------------- init
-    def __init__(self, account_info:dict, data_sql:Data_SQL=None, management_sql:Data_SQL=None, log:Log=None):
+    def __init__(self, execute_id, data_sql:Data_SQL=None, management_sql:Data_SQL=None, log:Log=None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
-        self.account_info = account_info
-        self.api_name = None
+        self.execute_id = execute_id
+        self.strategy = None
+        self.data = None
         #--------------------Instance
         self.management_sql = management_sql if management_sql else data_instance["management_sql"]
         self.data_sql = data_sql if data_sql else data_instance["data_sql"]
         self.log = log if log else log_instance
-        #--------------------Api
-        if self.account_info.get("broker").lower() == "fxcm":
-            self.api = Fxcm_API(account_info=self.account_info)
-            self.api_name = "Fxcm_API"
-        else:
-            self.api = Fxcm_API(account_info=self.account_info)
-            self.api_name = "Fxcm_API"
+        self.logic_management = Logic_Management()
 
-    #--------------------------------------------- login
-    def login(self):
-        #-------------- Description
-        # IN     :
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-
-        try:
-            #--------------Action
-            result:model_output = self.api.login()
-            #--------------Output
-            output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-
-    #--------------------------------------------- logout
-    def logout(self):
+    #--------------------------------------------- execute
+    def start(self):
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -88,82 +46,26 @@ class Logic_BackTest:
         output.method_name = this_method
 
         try:
-            #--------------Action
-            result:model_output = self.api.logout()
+            #--------------Detaile
+            execute_detaile:model_output = self.logic_management.execute_detaile(id=self.execute_id, mode="back")
+            detaile = execute_detaile.data
+            strategy_name = detaile.get("strategy_name")
+            status = detaile.get("status")
+            date_from = detaile.get("date_from")
+            date_to = detaile.get("date_to")
+            params = ast.literal_eval(detaile.get("params"))
+            #--------------Data
+            if status !="start":
+                symbols = params.get("symbols", "").split(',')
+                self.data = self.get_data(symbols=symbols, date_from=date_from, date_to=date_to).data
+            #--------------Strategy
+            if status !="start" and len(self.data)>0:
+                self.strategy = self.logic_management.get_strategy_instance(strategy_name).data
+                self.strategy.params = params
+            #--------------Start
+            if status !="start":
+                self.strategy_start()
             #--------------Output
-            output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-
-    #--------------------------------------------- info
-    def info(self):
-        #-------------- Description
-        # IN     : 
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-
-        try:
-            #--------------Action
-            result:model_output = self.api.info()
-            #--------------Output
-            output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-
-    #--------------------------------------------- instruments
-    def instruments(self):
-        #-------------- Description
-        # IN     : order_id
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-
-        try:
-            #--------------Action
-            result:model_output = self.api.instruments()
-            #--------------Output
-            output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
@@ -178,76 +80,11 @@ class Logic_BackTest:
         #--------------Return
         return output
     
-    #--------------------------------------------- timeframe_nex_date
-    def timeframe_nex_date(self, timeframe, date):
-        #-------------- Description
-        # IN     : 
-        # OUT    : 
-        # Action :
-        #-------------- Data
-        timeframe = timeframe.lower()
-        #--------------Action
-        if timeframe == "w1" : date = (date - timedelta(days=7))
-        elif timeframe == "d1" : date = (date - timedelta(days=1))
-        elif timeframe == "h8": date = (date - timedelta(hours=8))
-        elif timeframe == "h6": date = (date - timedelta(hours=6))
-        elif timeframe == "h4": date = (date - timedelta(hours=4))
-        elif timeframe == "h3": date = (date - timedelta(hours=3))
-        elif timeframe == "h2": date = (date - timedelta(hours=4))
-        elif timeframe == "h1": date = (date - timedelta(hours=1))
-        elif timeframe == "m30": date = (date - timedelta(minutes=30))
-        elif timeframe == "m15": date = (date - timedelta(minutes=15))
-        elif timeframe == "m5": date = (date - timedelta(minutes=5))
-        elif timeframe == "m1": date = (date - timedelta(minutes=1))
-        elif timeframe == "t1": date = (date - timedelta(milliseconds=1))
-        #--------------Output
-        return date
 
-    #-------------------------- [get_max_min]
-    def get_max_min(self, instrument, timeframe, mode, filed) -> model_output:
+    #--------------------------------------------- get_data
+    def get_data(self, symbols, date_from, date_to):
         #-------------- Description
         # IN     : order_id
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-
-        try:
-            #-------------- Data
-            tblName = get_tbl_name(instrument, timeframe)
-            if mode == "max" : query = f"SELECT max({filed}) FROM {tblName}"
-            if mode == "min" : query = f"SELECT min({filed}) FROM {tblName}"
-            #--------------Action
-            result = self.data_sql.db.item(query)
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = result.data
-            output.message=f"{instrument} | {timeframe} | {mode} | {filed}"
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-
-    #-------------------------- [save]
-    def save(self, instrument, timeframe, data, bulk=False) -> model_output:
-        #-------------- Description
-        # IN     : 
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -261,181 +98,17 @@ class Logic_BackTest:
         output.class_name = self.this_class
         output.method_name = this_method
         #-------------- Variable
-        start_time = time.time()
-        iter = 0 
-        insert = 0
-
-        try:
-            #-------------- Data
-            tblName = get_tbl_name(instrument, timeframe)
-            if timeframe == "t1" : query = f'INSERT INTO {tblName} (date, bid, ask) VALUES '
-            if timeframe != "t1" : query = f'INSERT INTO {tblName} (date, bidopen, bidclose, bidhigh, bidlow, askopen, askclose, askhigh, asklow) VALUES '
-            #--------------Action
-            if timeframe == "t1":
-                if bulk :
-                    data = data.drop_duplicates(subset=["Date"], keep="first")
-                    for index, row in data.iloc[::-1].iterrows(): 
-                        iter += 1
-                        insert += 1
-                        query += f"('{row['Date']}',{row['Bid']},{row['Ask']}),"
-                    if iter > 0 : query = query[:-1]
-                    result = self.data_sql.db.execute(query)
-                    if not result.status : insert = 0
-                else:
-                    for index, row in data.iloc[::-1].iterrows():
-                        iter += 1
-                        q = query + (f"('{row['Date']}',{row['Bid']},{row['Ask']})")
-                        if self.data_sql.db.execute(q).status : insert += 1
-            else:
-                if bulk :
-                    for index, row in data.iloc[::-1].iterrows(): 
-                        iter += 1
-                        insert += 1
-                        query += f"('{row['Date']}',{row['BidOpen']},{row['BidClose']},{row['BidHigh']},{row['BidLow']},{row['AskOpen']},{row['AskClose']},{row['AskHigh']},{row['AskLow']}),"
-                    if iter > 0 : query = query[:-1]
-                    result = self.data_sql.db.execute(query)
-                    if not result.status : insert = 0
-                else:
-                    for index, row in data.iloc[::-1].iterrows(): 
-                        iter += 1
-                        q = query + (f"('{row['Date']}',{row['BidOpen']},{row['BidClose']},{row['BidHigh']},{row['BidLow']},{row['AskOpen']},{row['AskClose']},{row['AskHigh']},{row['AskLow']})")
-                        if self.data_sql.db.execute(q).status : insert += 1
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = insert
-            output.message = f"{instrument} | {timeframe} | {sort(insert, 6)} |"
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-    
-    #--------------------------------------------- run
-    def store(self, instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto):
-        #-------------- Description
-        # IN     : order_id
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-
-        try:
-            #--------------Check
-            if mode == "up":
-                d = self.get_max_min(instrument=instrument, timeframe=timeframe, mode="max", filed="Date")
-                if d.status and d.data: datefrom = self.timeframe_nex_date(date=d.data, timeframe=timeframe)
-            elif mode == "down":
-                d = self.get_max_min(instrument=instrument, timeframe=timeframe, mode="min", filed="Date")
-                if d.status and d.data : dateto = self.timeframe_nex_date(date=d.data, timeframe=timeframe)
-            #--------------Display
-            params = {"account": self.api.name,"instrument": instrument, "timeframe": timeframe, "mode": mode, "count": count, "repeat": repeat, "delay": delay, "save": save, "bulk": bulk, "datefrom": datefrom, "dateto": dateto}
-            print(format_dict_block("Store", params))
-            #--------------Action
-            while(True):
-                for r in range(repeat):
-                    start = datefrom
-                    end = dateto
-                    while(True):
-                        if (end - start).total_seconds() > 1:
-                            history:model_output = self.history(instrument, timeframe, datefrom=start, dateto=end, count=count)
-                            if history.status:
-                                if save : self.save(instrument=instrument, timeframe=timeframe, data=history.data, bulk=bulk)
-                                end = self.timeframe_nex_date(date=history.data["Date"].iloc[0] , timeframe=timeframe)
-                                if mode == "once" : break
-                            else : break
-                        else: break
-                if delay == 0: break; 
-                time.sleep(delay)
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = None
-            output.message = f"{instrument} | {timeframe} |"
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-    
-    #--------------------------------------------- history
-    def history(self, instrument, timeframe, datefrom=None, dateto=None, count=None):
-        #-------------- Description
-        # IN     : order_id
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
+        output.data = {}
 
         try:
             #--------------Action
-            result:model_output = self.api.history(instrument, timeframe, datefrom=datefrom, dateto=dateto, count=count)
+            for symbol in symbols:
+                table = get_tbl_name(symbol, "t1")
+                cmd = f"SELECT * FROM {table} WHERE date>='{date_from}' and date<='{date_to}' ORDER BY date ASC"
+                result:model_output = self.data_sql.db.items(cmd=cmd)
+                if result.status == True :
+                    output.data[symbol] = result.data
             #--------------Output
-            output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
-
-    #--------------------------------------------- get_table
-    def get_table(self, table):
-        #-------------- Description
-        # IN     : 
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-        
-        try:
-            #--------------Action
-            result:model_output = self.api.get_table(table = table)
-            #--------------Output
-            output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
@@ -450,49 +123,9 @@ class Logic_BackTest:
         #--------------Return
         return output
     
-    #--------------------------------------------- order_open
-    def order_open(self, symbol, action, amount, tp_pips, sl_pips, execute_id):
-        #-------------- Description
-        # IN     : order_id
-        # OUT    : 
-        # Action :
-        #-------------- Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #-------------- Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
-        
-        try:
-            #--------------Action
-            result:model_output = self.api.order_open(symbol, action, amount, tp_pips, sl_pips, execute_id)
-            #--------------Database
-            if result.status:
-                order_id, bid, ask, tp, sl = result.data
-                cmd = f"INSERT INTO live_order (execute_id, order_id, symbol, action, amount, bid, ask, tp, sl, status, trade_id, profit, enable) VALUES ({execute_id}, '{order_id}', '{symbol}', '{action}', {amount}, {bid}, {ask}, {tp}, {sl}, 'open', 'run...', 0.0, True)"
-                self.management_sql.db.execute(cmd=cmd)
-            #--------------Output
-            output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
-        except Exception as e:  
-            #--------------Error
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Return
-        return output
 
-    #--------------------------------------------- order_close
-    def order_close(self, order_ids=None):
+    #--------------------------------------------- strategy_start
+    def strategy_start(self):
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -509,10 +142,15 @@ class Logic_BackTest:
         output.method_name = this_method
 
         try:
+            #--------------Data
+            result:model_output = self.strategy.start()
             #--------------Action
-            result:model_output = self.api.order_close(order_ids=order_ids)
+            if result.status == True :
+                for item in result.data :
+                    bid = self.data["EUR/USD"][0][2]
+                    ask = self.data["EUR/USD"][0][3]
+                    self.action(item=item, bid=bid, ask=ask)
             #--------------Output
-            output=result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
@@ -526,13 +164,14 @@ class Logic_BackTest:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
+    
 
-    #--------------------------------------------- order_close_update
-    def order_close_update(self, order_ids=None):
+    #--------------------------------------------- action
+    def action(self, item:dict, ask, bid)-> model_output:
         #-------------- Description
-        # IN     : list of order_id
-        # OUT    : model_output
-        # Action : Get all close trades and update live_order table with profit and status='close'
+        # IN     : order_id
+        # OUT    : 
+        # Action :
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
@@ -543,25 +182,51 @@ class Logic_BackTest:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-        #-------------- Variable
-        count = 0
-        
+
         try:
-            #--------------data
-            result:model_output = self.api.get_table("CLOSED_TRADES")
-            #--------------Items
-            if result.status:
-                for item in result.data:
-                    order_id = item['open_order_id']
-                    gross_pl = item['gross_pl']
-                    if order_id in order_ids:
-                        cmd = f"UPDATE live_order SET profit={gross_pl}, status='close' WHERE order_id='{order_id}'"
-                        self.management_sql.db.execute(cmd=cmd)
-                        count += 1
+            run = item.get("run")
+            state = item.get("state")
+            #--------------order_open
+            if run == "order_open":
+                #---Data
+                buy_sell = item.get("buy_sell")
+                symbol = item.get("symbol")
+                amount = item.get("amount")
+                tp_pips = item.get("tp_pips")
+                sl_pips = item.get("sl_pips")
+                #---Action
+                if tp_pips or sl_pips:
+                    point_size = list_instrument[symbol]["point_size"]
+                    digits = list_instrument[symbol]["digits"]
+                    if buy_sell == "buy":
+                        tp = float(f"{ask + tp_pips * point_size:.{digits}f}")
+                        sl = float(f"{bid - sl_pips * point_size:.{digits}f}")
+                    elif buy_sell == "sell":
+                        tp = float(f"{bid - tp_pips * point_size:.{digits}f}")
+                        sl = float(f"{ask + sl_pips * point_size:.{digits}f}")
+                #---Database
+                cmd = f"INSERT INTO back_order (date_from, model, subject, data) VALUES('{dt.now():%Y-%m-%d %H:%M:%S}', '{model}', '{subject}', '{data}')"
+                cmd = f"UPDATE back_execute SET status='{state}' WHERE id={self.execute_id}"
+                self.data_sql.db.execute(cmd=cmd)
+
+
+            #--------------close_all_order
+            if run == "close_all_order":
+                #---Data
+                order_ids = []
+                cmd = f"SELECT * FROM back_execute WHERE execute_id={self.execute_id} AND status='open'"
+                orders = self.data_sql.db.items(cmd=cmd)
+                # #---Action
+                # if orders.status:
+                #     for order in orders.data : order_ids.append(order.order_id)
+                #     if len(order_ids)>0 : forex.order_close(order_ids=order_ids)
+                # #---Database
+                # if order_result.status:
+                #     cmd = f"UPDATE live_execute SET status='{state}' WHERE id={execute_id}"
+                #     self.data_sql.db.execute(cmd=cmd)
             #--------------Output
+            output = None
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = count
-            output.message =f"{len(result.data)} | {len(order_ids)} | {count}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
             #--------------Log

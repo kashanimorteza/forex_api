@@ -167,7 +167,7 @@ class Fxcm_API:
 
         try:
             #--------------Variable
-            offers_table = self.fx.get_table(ForexConnect.OFFERS)
+            offers_table = self.get_table("OFFERS")
             instruments = {}
             #--------------Action
             for offer in offers_table:
