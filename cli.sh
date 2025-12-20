@@ -219,7 +219,6 @@ menu_service()
 #---------------------------------------------------------------------------------api_interface
 api_interface()
 {
-    # Call any function from api.sh with all arguments passed through
     if declare -f "$1" > /dev/null 2>&1; then
         "$@"
     else
