@@ -60,7 +60,7 @@ class Fxcm_API:
             output.data = result
             output.message = f"{self.name} | {self.type} | {self.id}" 
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -98,7 +98,7 @@ class Fxcm_API:
             output.data = result
             output.message= f"{self.type} | {self.id} | {self.name} | {self.balance} | {self.equity}" 
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -136,7 +136,7 @@ class Fxcm_API:
             output.data = account
             output.message= f"{self.name} | {self.id} | Balance: {self.balance} | Equity: {self.equity}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -179,7 +179,7 @@ class Fxcm_API:
             output.data = instruments
             output.message = {"count": len(instruments)}
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -254,7 +254,7 @@ class Fxcm_API:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message =f"{instrument} | {timeframe} | {sort(data_count, 6)} | {start} | {end}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -353,7 +353,7 @@ class Fxcm_API:
             output.data = order_id, bid, ask, tp, sl
             output.message = f"{execute_id} | {order_id} | {symbol} | {action} | {amount} | {rate} | {bid} | {ask} | {tp} | {sl}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -427,7 +427,7 @@ class Fxcm_API:
             output.data = None
             output.message =None
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -497,7 +497,7 @@ class Fxcm_API:
             output.data = close_order_ids
             output.message =f"{count} | {len(order_ids)} | {len(close_order_ids)}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -547,7 +547,7 @@ class Fxcm_API:
             output.data = result
             output.message = f"{table} | {len(result)}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  

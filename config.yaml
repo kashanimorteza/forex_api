@@ -251,10 +251,10 @@ debug:
     order_close: {log: false, verbose: true, model: "OneWay"}
     price_change: {log: false, verbose: true, model: "OneWay"}
   Floating:
-    start: {log: false, verbose: true, model: "Floating"}
-    stop: {log: false, verbose: true, model: "Floating"}
-    order_close: {log: false, verbose: true, model: "Floating"}
-    price_change: {log: false, verbose: true, model: "Floating"}
+    start: {log: false, verbose: false, model: "Floating"}
+    stop: {log: false, verbose: false, model: "Floating"}
+    order_close: {log: false, verbose: false, model: "Floating"}
+    price_change: {log: false, verbose: false, model: "Floating"}
   ST_03:
     start: {log: false, verbose: true, model: "ST_03"}
     stop: {log: false, verbose: true, model: "ST_03"}

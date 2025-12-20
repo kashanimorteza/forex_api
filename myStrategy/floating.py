@@ -52,7 +52,7 @@ class Floating:
                 for action in actions :
                     output.data.append({
                         "run": "order_open",
-                        "buy_sell": action,
+                        "action": action,
                         "symbol": symbol,
                         "amount": amount,
                         "tp_pips": tp_pips,
@@ -61,7 +61,7 @@ class Floating:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -108,7 +108,7 @@ class Floating:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -154,7 +154,7 @@ class Floating:
             #--------------Action
             output.data.append({
                 "run": "order_open",
-                "buy_sell": action,
+                "action": action,
                 "symbol": symbol,
                 "amount": amount,
                 "tp_pips": tp_pips,
@@ -164,7 +164,7 @@ class Floating:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"{trade_id} | {order_detaile.get('action')}:{profit} | {action},{symbol},{amount},{tp_pips},{sl_pips},{output.status}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -221,7 +221,7 @@ class Floating:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"{trade_id} | {order_detaile.get('action')}:{profit} | {action},{symbol},{amount},{tp_pips},{sl_pips},{output.status}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  

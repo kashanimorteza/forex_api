@@ -69,8 +69,9 @@ class Logic_BackTest:
             result_next:model_output = self.next()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.message = f"{result_start.status} | {result_next.status}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -104,20 +105,21 @@ class Logic_BackTest:
             result_strategy: model_output = self.strategy.start()
             #--------------Items
             for item in result_strategy.data :
+                item["date"] = self.data[item.get("symbol")][0][1]
                 item["ask"] = self.data[item.get("symbol")][0][2]
                 item["bid"] = self.data[item.get("symbol")][0][3]
+            self.data[item.get("symbol")].pop(0)
             #--------------Action
             result_action:model_output = self.action(items=result_strategy.data)
             #--------------Database
             cmd = f"UPDATE back_execute SET status='start' WHERE id={self.execute_id}"
             result_database:model_output = self.management_sql.db.execute(cmd=cmd)
-
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None
-            output.status = f"{result_strategy.status} | {result_action.status} | {result_database.status}"
+            output.message = f"{result_strategy.status} | {result_action.status} | {result_database.status}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -146,15 +148,13 @@ class Logic_BackTest:
         result = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-        #-------------- Variable
-        fire = False
 
         try:
             #--------------Action
             for symbol in self.data:
                for row in self.data[symbol]:
                    fire = False
-                   date = row[0]
+                   id = row[0]
                    date = row[1]
                    ask = row[2]
                    bid = row[3]
@@ -170,19 +170,20 @@ class Logic_BackTest:
                             #--------------Check TP/SL
                             #---Buy
                             if order_action == "buy":
-                                if bid >= order_tp and order_tp > 0 : fire = True
-                                if bid <= order_sl and order_sl > 0 : fire = True
+                                if bid > order_tp and order_tp > 0 : fire = True
+                                if bid < order_sl and order_sl > 0 : fire = True
                             #---Sell
                             if order_action == "sell":
-                                if ask <= order_tp and order_tp > 0 :fire = True
-                                if ask >= order_sl and order_sl > 0 : fire = True
+                                if ask < order_tp and order_tp > 0 :fire = True
+                                if ask > order_sl and order_sl > 0 : fire = True
                             #---Fire
                             if fire :
-                                item = {"id":order_id, "action":order_action, "amount":order_amount, "price_open":price_open, "ask":ask, "bid":bid}
+                                item = {"id":order_id, "symbol":order_symbol, "action":order_action, "amount":order_amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
                                 self.order_close(item =item)
                                 order_detaile = self.logic_management.order_detaile(order_id=order_id, mode="back").data
                                 result_strategy:model_output = self.strategy.order_close(order_detaile=order_detaile)
                                 for item in result_strategy.data :
+                                    item["date"] = date
                                     item["ask"] = ask
                                     item["bid"] = bid
                                     result_action:model_output = self.action(items=result_strategy.data)
@@ -190,7 +191,7 @@ class Logic_BackTest:
             output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -233,7 +234,7 @@ class Logic_BackTest:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"{date_from} | {date_to} | {len(symbols)}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -276,7 +277,7 @@ class Logic_BackTest:
             output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -308,29 +309,31 @@ class Logic_BackTest:
         try:
             #-------------- Data
             symbol = item.get("symbol")
-            buy_sell = item.get("buy_sell")
+            action = item.get("action")
             amount = item.get("amount")
             tp_pips = item.get("tp_pips")
             sl_pips = item.get("sl_pips")
             ask = item.get("ask")
             bid = item.get("bid")
+            date = item.get("date")
             #-------------- TP/SL
             if tp_pips or sl_pips:
                 point_size = list_instrument[symbol]["point_size"]
                 digits = list_instrument[symbol]["digits"]
-                if buy_sell == "buy":
+                if action == "buy":
                     price_open = ask
                     tp = float(f"{ask + tp_pips * point_size:.{digits}f}")
                     sl = float(f"{bid - sl_pips * point_size:.{digits}f}")
-                elif buy_sell == "sell":
+                elif action == "sell":
                     price_open = bid
                     tp = float(f"{bid - tp_pips * point_size:.{digits}f}")
                     sl = float(f"{ask + sl_pips * point_size:.{digits}f}")
             #-------------- Action
             obj = model_back_order_db()
+            obj.date_open = date
             obj.execute_id = self.execute_id
             obj.symbol = symbol
-            obj.action = buy_sell
+            obj.action = action
             obj.amount = amount
             obj.bid = bid
             obj.ask = ask
@@ -338,16 +341,16 @@ class Logic_BackTest:
             obj.tp = tp
             obj.sl = sl
             obj.status = 'open'
-            result:model_output = self.management_orm.add(model=model_back_order_db, item=obj)
+            result_database:model_output = self.management_orm.add(model=model_back_order_db, item=obj)
             #-------------- Orders
             self.orders = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' AND status='open'").data
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.status = result.status
+            output.status = result_database.status
             output.data = None
-            output.message = f"{symbol} | {buy_sell} | {amount} | {price_open} | {tp} | {sl}"
+            output.message = f"{symbol} | {action} | {amount} | {price_open} | {tp} | {sl}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -379,32 +382,33 @@ class Logic_BackTest:
         try:
             #-------------- Data
             id = item.get("id")
+            symbol = item.get("symbol")
             action = item.get("action")
-            amount = (item.get("amount"))
-            price_open = (item.get("price_open"))
-            ask = (item.get("ask"))
-            bid = (item.get("bid"))
+            amount = item.get("amount")
+            price_open = item.get("price_open")
+            ask = item.get("ask")
+            bid = item.get("bid")
+            date= item.get("date")
             #-------------- Profit
             if action == "buy":
                 price_close = bid
-                profit = round(bid - price_open, 6)
-                profit = profit * amount
+                profit = (bid - price_open) * amount
             elif action == "sell":
                 price_close = ask
-                profit = round(price_open - ask, 6)
-                profit = profit * amount
+                profit = (price_open - ask) * amount
+            profit = f"{profit:.{2}f}"
             #-------------- Action
-            cmd = f"UPDATE back_order SET date_close=CURRENT_TIMESTAMP, price_close={price_close}, profit={profit}, status='close' WHERE id='{id}'"
-            result:model_output = self.management_sql.db.execute(cmd=cmd)
+            cmd = f"UPDATE back_order SET date_close='{date}', price_close={price_close}, profit={profit}, status='close' WHERE id='{id}'"
+            result_database:model_output = self.management_sql.db.execute(cmd=cmd)
             #-------------- Orders
             self.orders = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' AND status='open'").data
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.status = result.status
+            output.status = result_database.status
             output.data = None
-            output.message = f"{id} | {profit}"
+            output.message = f"{id} | {symbol} | {action} | {profit}"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 8)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
