@@ -4,3 +4,5 @@ from .model_strategy import model_strategy_db, model_strategy_py
 from .model_strategy_item import model_strategy_item_db, model_strategy_item_py
 from .model_live_execute import model_live_execute_db, model_live_execute_py
 from .model_live_order import model_live_order_db, model_live_order_py
+from .model_test_execute import model_test_execute_db, model_test_execute_py
+from .model_test_order import model_test_order_db, model_test_order_py
