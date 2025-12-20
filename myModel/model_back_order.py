@@ -37,6 +37,7 @@ class model_back_order_db(BaseModel_db):
     status = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
+    father_id = Column(Integer, default=0)
     #---Display
     def __repr__(self) : return f"{self.toDict()}"
     #---Json
@@ -66,3 +67,4 @@ class model_back_order_py(BaseModel_py):
     status : str = ''
     description : Optional[str] = ''
     enable : bool = True
+    father_id : int = 0

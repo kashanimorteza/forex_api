@@ -67,9 +67,11 @@ class Logic_BackTest:
             result_start:model_output = self.start()
             #--------------Next
             result_next:model_output = self.next()
+            #--------------Stop
+            result_stop:model_output = self.stop()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = f"{result_start.status} | {result_next.status}"
+            output.message = f"{result_start.status} | {result_next.status} | {result_stop.status}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
@@ -105,6 +107,7 @@ class Logic_BackTest:
             result_strategy: model_output = self.strategy.start()
             #--------------Items
             for item in result_strategy.data :
+                item["father_id"] = 0
                 item["date"] = self.data[item.get("symbol")][0][1]
                 item["ask"] = self.data[item.get("symbol")][0][2]
                 item["bid"] = self.data[item.get("symbol")][0][3]
@@ -118,6 +121,56 @@ class Logic_BackTest:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None
             output.message = f"{result_strategy.status} | {result_action.status} | {result_database.status}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #--------------------------------------------- stop
+    def stop(self):
+        #-------------- Description
+        # IN     : order_id
+        # OUT    : 
+        # Action :
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            for order in self.orders :
+                order_id = order[0]
+                order_symbol = order[6]
+                order_action = order[7]
+                order_amount = order[8]
+                price_open = order[11]
+
+                data = self.data[order_symbol][-1]
+                id = data[0]
+                date = data[1]
+                ask = data[2]
+                bid = data[3]
+                
+                item = {"id":order_id, "symbol":order_symbol, "action":order_action, "amount":order_amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
+                self.order_close(item =item)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = None
+            output.message = len(self.orders)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
@@ -183,6 +236,7 @@ class Logic_BackTest:
                                 order_detaile = self.logic_management.order_detaile(order_id=order_id, mode="back").data
                                 result_strategy:model_output = self.strategy.order_close(order_detaile=order_detaile)
                                 for item in result_strategy.data :
+                                    item["father_id"] = order_id
                                     item["date"] = date
                                     item["ask"] = ask
                                     item["bid"] = bid
@@ -308,6 +362,7 @@ class Logic_BackTest:
 
         try:
             #-------------- Data
+            father_id = item.get("father_id")
             symbol = item.get("symbol")
             action = item.get("action")
             amount = item.get("amount")
@@ -330,6 +385,7 @@ class Logic_BackTest:
                     sl = float(f"{ask + sl_pips * point_size:.{digits}f}")
             #-------------- Action
             obj = model_back_order_db()
+            obj.father_id = father_id
             obj.date_open = date
             obj.execute_id = self.execute_id
             obj.symbol = symbol
