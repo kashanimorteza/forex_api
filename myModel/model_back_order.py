@@ -5,7 +5,7 @@
 # model_back_order
 
 #--------------------------------------------------------------------------------- Import
-from sqlalchemy import Column, Integer, String, Boolean, Float, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, Float, DateTime, Sequence
 from sqlalchemy.inspection import inspect
 from sqlalchemy.sql import func
 from myLib.database_orm import BaseModel as BaseModel_db
@@ -22,8 +22,8 @@ class model_back_order_db(BaseModel_db):
     date_open = Column(DateTime, default=func.now(), server_default=func.now())
     date_close = Column(DateTime, default=func.now(), server_default=func.now())
     execute_id = Column(Integer, default=0)
-    order_id = Column(Integer, autoincrement=True)
-    trade_id = Column(Integer, autoincrement=True)
+    order_id = Column(Integer, Sequence("back_order_order_id_seq"), nullable=False)
+    trade_id = Column(Integer, Sequence("back_order_trade_id_seq"), nullable=False)
     symbol = Column(String, default='')
     action = Column(String, default='')
     amount = Column(Integer, default=0)
@@ -51,8 +51,8 @@ class model_back_order_py(BaseModel_py):
     date_open : Optional[str] = ''
     date_close : Optional[str] = ''
     execute_id : int = 0
-    order_id : str = ''
-    trade_id : str = 'run...'
+    order_id : int = 0
+    trade_id : int = 0
     symbol : str = ''
     action : str = ''
     amount : int = 0

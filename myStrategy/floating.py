@@ -52,7 +52,6 @@ class Floating:
                 for action in actions :
                     output.data.append({
                         "run": "order_open",
-                        "state": this_method,
                         "buy_sell": action,
                         "symbol": symbol,
                         "amount": amount,
@@ -155,7 +154,6 @@ class Floating:
             #--------------Action
             output.data.append({
                 "run": "order_open",
-                "state": this_method,
                 "buy_sell": action,
                 "symbol": symbol,
                 "amount": amount,
