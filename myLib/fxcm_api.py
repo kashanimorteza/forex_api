@@ -229,9 +229,9 @@ class Fxcm_API:
                             attempt += 1
                             print(f"Error (attempt {attempt}/3): {e}")
                             if attempt > 1: 
-                                self.fx.logout()
+                                self.logout()
                                 self.fx = ForexConnect()
-                                self.fx.login()
+                                self.login()
                             if attempt >= 3: raise
                             time.sleep(1)
                 #-----Check   
