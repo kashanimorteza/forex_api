@@ -1,13 +1,24 @@
 #--------------------------------------------------------------------------------- Location
 # myLib/logic_global.py
 
+
+
 #--------------------------------------------------------------------------------- Description
 # logic_global
+
+
+
+#--------------------------------------------------------------------------------- Import
+from enum import Enum
+
+
 
 #--------------------------------------------------------------------------------- Variable
 forex_apis = {}
 list_close = []
 list_instrument= {}
+
+
 
 #--------------------------------------------------------------------------------- Method
 #-------------------------- load_config
@@ -67,6 +78,21 @@ def load_instrument():
     if result.status : 
         for item in result.data : 
             list_instrument[item.instrument] = item.toDict()
+
+
+
+#--------------------------------------------------------------------------------- Enum
+#-------------------------- Strategy_Run
+class Strategy_Run(str, Enum):
+    ORDER_OPEN = "order_open"
+    ORDER_CLOSE = "order_close"
+    ORDER_CLOSE_ALL= "order_close_all"
+
+class Order_Action(str, Enum):
+    BUY = "buy"
+    SELL = "sell"
+
+
 
 #--------------------------------------------------------------------------------- Action
 config:dict = load_config()

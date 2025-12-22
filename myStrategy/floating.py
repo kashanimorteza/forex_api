@@ -1,12 +1,12 @@
 #--------------------------------------------------------------------------------- Location
-# myStrategy/st_01.py
+# myStrategy/floating.py
 
 #--------------------------------------------------------------------------------- Description
-# st_01
+# floating
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from myLib.logic_global import debug, log_instance
+from myLib.logic_global import debug, log_instance, Strategy_Run
 from myLib.utils import model_output, sort
 from myLib.log import Log
 
@@ -19,6 +19,15 @@ class Floating:
         self.params = params
         #-------------- Instance
         self.log = log if log else log_instance
+        #-------------- Params
+        self.symbols = self.params.get("symbols").split(',')
+        self.actions = self.params.get("actions").split(',')
+        self.amount = self.params.get("amount")
+        self.tp_pips = self.params.get("tp_pips")
+        self.sl_pips = self.params.get("sl_pips")
+        self.limit_trade = int(self.params.get("limit_trade"))
+        self.limit_profit = int(self.params.get("limit_profit"))
+        self.limit_loss = int(self.params.get("limit_loss"))
         
     #--------------------------------------------- start
     def start(self):
@@ -37,29 +46,26 @@ class Floating:
         output.class_name = self.this_class
         output.method_name = this_method
         #--------------Variable
-        params = self.params
-        output.data = []
+        items = []
         
         try:
-            #--------------Data
-            actions = params.get("actions").split(',')
-            symbols = params.get("symbols", "").split(',')
-            amount = params.get("amount")
-            tp_pips = params.get("tp_pips")
-            sl_pips = params.get("sl_pips")
             #--------------Action
-            for symbol in symbols :
-                for action in actions :
-                    output.data.append({
-                        "run": "order_open",
-                        "action": action,
-                        "symbol": symbol,
-                        "amount": amount,
-                        "tp_pips": tp_pips,
-                        "sl_pips": sl_pips,
-                    })
+            for symbol in self.symbols :
+                for action in self.actions :
+                    item = {
+                        "run": Strategy_Run.ORDER_OPEN, 
+                        "state": this_method, 
+                        "action": action, 
+                        "symbol": symbol, 
+                        "amount": self.amount, 
+                        "tp_pips": self.tp_pips, 
+                        "sl_pips": self.sl_pips
+                        }
+                    items.append(item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = items
+            output.message = None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
@@ -90,25 +96,23 @@ class Floating:
         output.class_name = self.this_class
         output.method_name = this_method
         #--------------Variable
-        params = self.params
-        output.data = [dict]
+        items = []
 
         try:
-            #--------------Data
-            actions = params.get("actions").split(',')
-            symbols = params.get("symbols", "").split(',')
-            amount = params.get("amount")
-            tp_pips = params.get("tp_pips")
-            sl_pips = params.get("sl_pips")
             #--------------Action
-            output.data.append({
-                "run": "close_all_order",
-                "state": this_method,
-            })
+            item = {
+                "run": Strategy_Run.ORDER_CLOSE_ALL, 
+                "state": this_method
+            }
+            items.append(item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = items
+            output.message = output.status
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            output.data = items
+            output.message = None
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -137,32 +141,33 @@ class Floating:
         output.class_name = self.this_class
         output.method_name = this_method
         #--------------Variable
-        output.data = []
+        items = []
 
         try:
             #--------------Data
             action = order_detaile.get("action")
             symbol = order_detaile.get("symbol")
             amount = order_detaile.get("amount")
-            tp_pips = self.params.get("tp_pips")
-            sl_pips = self.params.get("sl_pips")
             profit = order_detaile.get("profit")
             trade_id = order_detaile.get("trade_id")
             #--------------Rule
             if profit < 0 :
                 action = "sell" if action == "buy" else "buy"
             #--------------Action
-            output.data.append({
-                "run": "order_open",
-                "action": action,
-                "symbol": symbol,
-                "amount": amount,
-                "tp_pips": tp_pips,
-                "sl_pips": sl_pips,
-            })
+            item = {
+                "run": Strategy_Run.ORDER_OPEN,
+                "state": this_method,
+                "action": action, 
+                "symbol": symbol, 
+                "amount": amount, 
+                "tp_pips": self.tp_pips, 
+                "sl_pips": self.sl_pips
+            }
+            items.append(item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = f"{trade_id} | {order_detaile.get('action')}:{profit} | {action},{symbol},{amount},{tp_pips},{sl_pips},{output.status}"
+            output.data = items
+            output.message = f"{trade_id} | {action}:{profit} | {symbol},{amount},{self.tp_pips},{self.sl_pips}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
@@ -177,7 +182,7 @@ class Floating:
         return output
 
     #--------------------------------------------- price_change
-    def price_change(self, order_detaile):
+    def price_change(self, price_detailes, order_detailes):
         #-------------- Description
         # IN     : execute_id
         # OUT    : 
@@ -193,33 +198,16 @@ class Floating:
         output.class_name = self.this_class
         output.method_name = this_method
         #--------------Variable
-        output.data = [dict]
+        items = []
 
         try:
             #--------------Data
-            action = order_detaile.get("action")
-            symbol = order_detaile.get("symbol")
-            amount = order_detaile.get("amount")
-            tp_pips = self.params.get("tp_pips")
-            sl_pips = self.params.get("st_pips")
-            profit = order_detaile.get("profit")
-            trade_id = order_detaile.get("trade_id")
             #--------------Rule
-            if profit < 0 :
-                action = "sell" if action == "buy" else "buy"
             #--------------Action
-            output.data.append({
-                "run": "order_open",
-                "state": this_method,
-                "buy_sell": action,
-                "symbol": symbol,
-                "amount": amount,
-                "tp_pips": tp_pips,
-                "sl_pips": sl_pips,
-            })
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.message = f"{trade_id} | {order_detaile.get('action')}:{profit} | {action},{symbol},{amount},{tp_pips},{sl_pips},{output.status}"
+            output.data = items
+            output.message = None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log

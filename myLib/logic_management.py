@@ -27,7 +27,7 @@ class Logic_Management:
         self.log = log if log else log_instance
 
     #--------------------------------------------- get_strategy_instance
-    def get_strategy_instance(self, name)-> model_output:
+    def get_strategy_instance(self, name, params)-> model_output:
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -47,7 +47,7 @@ class Logic_Management:
             #--------------Action
             strategy_class = globals().get(name)
             if strategy_class and callable(strategy_class):
-                output.data = strategy_class()
+                output.data = strategy_class(params=params)
             else:
                 output.status = False
             #--------------Output

@@ -24,6 +24,7 @@ class model_back_execute_db(BaseModel_db):
     date_from = Column(DateTime, default=func.now(), server_default=func.now())
     date_to = Column(DateTime, default=func.now(), server_default=func.now())
     status = Column(String, default='')
+    count = Column(Integer, default=1)
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
     #---Display
@@ -39,5 +40,6 @@ class model_back_execute_py(BaseModel_py):
     date_to : Optional[str] = ''
     account_id : int = 0
     status : str = ''
+    count : int = 1
     description : Optional[str] = ''
     enable : bool = True

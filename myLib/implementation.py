@@ -290,18 +290,95 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                #---Strategy 1
+                #-------------- OneWay
                 #XAU/USD
-                self.data_orm.add(model=model, item=model(name='B-XAUUSD', strategy_id=1, params="{'symbols':'XAU/USD','actions':'buy','amount':1,'tp_pips':100,'sl_pips':1000}", description=""))
-                self.data_orm.add(model=model, item=model(name='S-XAUUSD', strategy_id=1, params="{'symbols':'XAU/USD','actions':'sell','amount':1,'tp_pips':100,'sl_pips':10000}", description=""))
+                item = model(
+                    name='B-XAUUSD', 
+                    strategy_id=1,
+                    symbols='XAU/USD',
+                    actions='buy',
+                    amount=1,
+                    tp_pips=100,
+                    sl_pips=10000,
+                    limit_trade=-1,
+                    limit_profit=10,
+                    limit_loss=-1000,
+                    params=""
+                )
+                self.data_orm.add(model=model, item=item)
+                item =model(
+                    name='S-XAUUSD',
+                    strategy_id=1,
+                    symbols='XAU/USD',
+                    actions='sell',
+                    amount=1,
+                    tp_pips=100,
+                    sl_pips=10000,
+                    limit_trade=-1,
+                    limit_profit=10,
+                    limit_loss=-1000,
+                    params=""
+                )
+                self.data_orm.add(model=model, item=item)
                 #EUR/USD
-                self.data_orm.add(model=model, item=model(name='B-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'buy','amount':10000,'tp_pips':1,'sl_pips':1000}", description=""))
-                self.data_orm.add(model=model, item=model(name='S-EURUSD', strategy_id=1, params="{'symbols':'EUR/USD','actions':'sell','amount':10000,'tp_pips':1,'sl_pips':1000}", description=""))
-                #---Strategy 2
+                item =model(
+                    name='B-EURUSD',
+                    strategy_id=1,
+                    symbols='EUR/USD',
+                    actions='buy',
+                    amount=10000,
+                    tp_pips=1,
+                    sl_pips=1000,
+                    limit_trade=-1,
+                    limit_profit=10,
+                    limit_loss=-1000,
+                    params=""
+                )
+                self.data_orm.add(model=model, item=item)
+                item =model(
+                    name='S-EURUSD',
+                    strategy_id=1,
+                    symbols='EUR/USD',
+                    actions='sell',
+                    amount=10000,
+                    tp_pips=1,
+                    sl_pips=1000,
+                    limit_trade=-1,
+                    limit_profit=10,
+                    limit_loss=-1000,
+                    params=""
+                )
+                self.data_orm.add(model=model, item=item)
+                #-------------- Floating
                 #XAU/USD
-                self.data_orm.add(model=model, item=model(name='BS-XAUUSD', strategy_id=2, params="{'symbols':'XAU/USD','actions':'buy,sell','amount':1,'tp_pips':100,'sl_pips':10000}", description=""))
+                item =model(
+                    name='BS-XAUUSD',
+                    strategy_id=2,
+                    symbols='XAU/USD',
+                    actions='buy,sell',
+                    amount=1,
+                    tp_pips=100, 
+                    sl_pips=10000,
+                    limit_trade=-1,
+                    limit_profit=10,
+                    limit_loss=-1000,
+                    params="")
+                self.data_orm.add(model=model, item=item)
                 #EUR/USD
-                self.data_orm.add(model=model, item=model(name='BS-EURUSD', strategy_id=2, params="{'symbols':'EUR/USD','actions':'buy,sell','amount':10000,'tp_pips':1,'sl_pips':1000}", description=""))
+                item =model(
+                    name='BS-EURUSD',
+                    strategy_id=2,
+                    symbols='EUR/USD',
+                    actions='buy,sell',
+                    amount=10000,
+                    tp_pips=1,
+                    sl_pips=1000,
+                    limit_trade=-1,
+                    limit_profit=10,
+                    limit_loss=-1000,
+                    params=""
+                )
+                self.data_orm.add(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -441,12 +518,12 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=1, account_id=1, date_from="2025-12-05 03:00:00", date_to="2025-12-05 04:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=2, account_id=1, date_from="2025-12-05 03:00:00", date_to="2025-12-05 04:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=3, account_id=1, date_from="2025-12-05 03:00:00", date_to="2025-12-05 04:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=4, account_id=1, date_from="2025-12-05 03:00:00", date_to="2025-12-05 04:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=5, account_id=1, date_from="2025-12-05 03:00:00", date_to="2025-12-05 04:00:00"))
-                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=6, account_id=1, date_from="2025-12-11 04:00:00", date_to="2025-12-12 04:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=1, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=2, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-B-1", strategy_item_id=3, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-S-1", strategy_item_id=4, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=5, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="B-BS-1", strategy_item_id=6, account_id=1, date_from="2025-12-17 00:00:00", date_to="2025-12-18 00:00:00"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
