@@ -67,9 +67,14 @@ def disable(id):
 def status(id): 
     return data_orm.status(model=model_db, id=id)
 
+#-------------------------- [order_clear]
+@route.get("/order_clear/{id}", description="order_clear", response_model=model_output)
+def order_clear(id): 
+    return logic_backtest.order_clear(execute_id=id)
+
 #-------------------------- [count]
-@route.get("/count/{id}", description="count", response_model=int)
-def count(id): 
+@route.get("/order_count/{id}", description="order_count", response_model=int)
+def order_count(id): 
     result = logic_backtest.order_count(execute_id=id)
     return result
 
