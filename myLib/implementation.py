@@ -348,7 +348,7 @@ class Implementation:
                 #-------------- Floating
                 #XAU/USD
                 item =model(
-                    name='Buy-Sell-XAUUSD',
+                    name='XAUUSD',
                     strategy_id=2,
                     symbols='XAU/USD',
                     actions='buy,sell',
@@ -362,7 +362,7 @@ class Implementation:
                 self.data_orm.add(model=model, item=item)
                 #EUR/USD
                 item =model(
-                    name='Buy-Sell-EURUSD',
+                    name='EURUSD',
                     strategy_id=2,
                     symbols='EUR/USD',
                     actions='buy,sell',
