@@ -13,14 +13,12 @@ from model.model_live_order import model_live_order_py as model_py
 from model.model_live_order import model_live_order_db as model_db
 from logic.data_orm import Data_Orm
 from logic.logic_live import Logic_Live
-from logic.logic_management import Logic_Management
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
 data_orm = Data_Orm(database=database_management)
 logic_live = Logic_Live()
-logic_management = Logic_Management()
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)
@@ -87,7 +85,7 @@ def detaile(request: Request) :
     start_time = time.time()
     filters = dict(request.query_params)
     id = int(filters.get('execute_id'))
-    output = logic_management.execute_order_detaile(id=id)
+    output = logic_live.execute_order_detaile(id=id)
     output.time = f"{(time.time() - start_time):.3f}",
     return output
 

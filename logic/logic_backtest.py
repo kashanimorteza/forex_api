@@ -5,9 +5,9 @@
 # logic_backtest
 
 #--------------------------------------------------------------------------------- Import
-import inspect, time
+import inspect, time, ast
 from logic.logic_global import debug, list_instrument, log_instance, data_instance, Strategy_Run, database_management, database_data
-from logic.logic_util import model_output, sort, get_tbl_name
+from logic.logic_util import model_output, sort, get_tbl_name, get_strategy_instance
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.data_orm import Data_Orm
@@ -62,11 +62,7 @@ class Logic_BackTest:
         output.class_name = self.this_class
         output.method_name = this_method
         #-------------- Variable
-        #---general
         data_params = []
-        #---logic_management
-        from logic.logic_management import Logic_Management
-        self.logic_management = Logic_Management(data_orm=self.management_orm, data_sql=self.management_sql)
 
         try:
             #--------------Detaile
@@ -84,7 +80,7 @@ class Logic_BackTest:
             else:
                 self.step = 1
             #--------------Strategy
-            self.strategy = self.logic_management.get_strategy_instance(strategy_name, execute_detaile).data
+            self.strategy = get_strategy_instance(strategy_name, execute_detaile).data
             #--------------Data
             for symbol in symbols : data_params.append({"symbol": symbol, "date_from":self.date_from, "date_to": self.date_to})
             self.data = self.get_data(params=data_params).data
@@ -779,3 +775,70 @@ class Logic_BackTest:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
+    
+
+    #-------------------------- [execute_detaile]
+    def execute_detaile(self, id) -> model_output:
+        #-------------- Variable
+        output = {}
+        #--------------Data
+        table = "back_execute"
+        #--------------Action
+        cmd = f"SELECT strategy.name, strategy_item.symbols, strategy_item.actions, strategy_item.amount, strategy_item.tp_pips, strategy_item.sl_pips, strategy_item.limit_trade, strategy_item.limit_profit, strategy_item.limit_loss, strategy_item.params, {table}.date_from, {table}.date_to, {table}.account_id, {table}.step, {table}.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = {id}"
+        result:model_output = self.management_sql.db.items(cmd=cmd)
+        #--------------Data
+        if result.status and len(result.data) > 0 :
+            output["strategy_name"] = result.data[0][0]
+            output["symbols"] = result.data[0][1]
+            output["actions"] = result.data[0][2]
+            output["amount"] = result.data[0][3]
+            output["tp_pips"] = result.data[0][4]
+            output["sl_pips"] = result.data[0][5]
+            output["limit_trade"] = result.data[0][6]
+            output["limit_profit"] = result.data[0][7]
+            output["limit_loss"] = result.data[0][8]
+            output["params"] = ast.literal_eval(result.data[0][9]) if result.data[0][9] else {}
+            output["date_from"] = result.data[0][10]
+            output["date_to"] = result.data[0][11]
+            output["account_id"] = result.data[0][12]
+            output["step"] = result.data[0][13]
+            output["status"] = result.data[0][14]
+        #--------------Return
+        return output
+    
+    #-------------------------- [order_detaile]
+    def order_detaile(self, order_id) -> model_output:
+        #-------------- Variable
+        output = {}
+        #--------------Data
+        table1 = "back_execute" 
+        table2 = "back_order"
+        #--------------Action
+        cmd = f"SELECT strategy.name, strategy_item.id,{table1}.status, {table1}.id, {table1}.account_id, {table2}.execute_id, {table2}.step, {table2}.father_id, {table2}.date_open, {table2}.price_open, {table2}.date_close, {table2}.price_close, {table2}.profit, {table2}.status,{table2}.symbol, {table2}.action, {table2}.amount, {table2}.tp, {table2}.sl, {table2}.trade_id, {table2}.enable FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table1} ON strategy_item.id = {table1}.strategy_item_id JOIN {table2} ON {table1}.id = {table2}.execute_id WHERE {table2}.order_id='{order_id}'"
+        result:model_output = self.management_sql.db.items(cmd=cmd)
+        #--------------Data
+        if result.status and len(result.data) > 0 :
+            output["strategy_name"] = result.data[0][0]
+            output["strategy_item_id"] = result.data[0][1]
+            output["execute_status"] = result.data[0][2]
+            output["id"] = result.data[0][3]
+            output["account_id"] = result.data[0][4]
+            output["execute_id"] = result.data[0][5]
+            output["step"] = result.data[0][6]
+            output["father_id"] = result.data[0][7]
+            output["date_open"] = result.data[0][8]
+            output["price_open"] = result.data[0][9]
+            output["date_close"] = result.data[0][10]
+            output["price_close"] = result.data[0][11]
+            output["profit"] = result.data[0][12]
+            output["status"] = result.data[0][13]
+            output["symbol"] = result.data[0][14]
+            output["action"] = result.data[0][15]
+            output["amount"] = result.data[0][16]
+            output["tp"] = result.data[0][17]
+            output["sl"] = result.data[0][18]
+            output["trade_id"] = result.data[0][19]
+            output["enable"] = result.data[0][20]
+        #--------------Return
+        return output
+    

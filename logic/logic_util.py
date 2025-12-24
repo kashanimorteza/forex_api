@@ -89,3 +89,16 @@ def format_dict_block(title, data: dict) -> str:
         lines.append(f"{key.ljust(max_key_len)} = {value}")
     lines.append("-" * 46)
     return "\n".join(lines)
+
+#--------------------------------------------- get_strategy_instance
+def get_strategy_instance(name, execute_detaile)-> model_output:
+    #-------------- Variable
+    output = model_output()
+    #-------------- Action
+    strategy_class = globals().get(name)
+    if strategy_class and callable(strategy_class):
+        output.data = strategy_class(params=execute_detaile)
+    else:
+        output.status = False
+    #--------------Return
+    return output

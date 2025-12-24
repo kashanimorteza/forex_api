@@ -8,12 +8,11 @@
 import inspect, time
 from datetime import timedelta
 from logic.logic_global import debug, log_instance, data_instance, Strategy_Run, Strategy_Action, forex_apis
-from logic.logic_util import model_output, sort, get_tbl_name, format_dict_block
+from logic.logic_util import model_output, sort, get_tbl_name, format_dict_block, get_strategy_instance
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.fxcm_api import Fxcm_API
 from model import *
-from logic.logic_management import Logic_Management
 
 #--------------------------------------------------------------------------------- Action
 class Logic_Live:
@@ -27,7 +26,6 @@ class Logic_Live:
         self.management_sql = management_sql if management_sql else data_instance["management_sql"]
         self.data_sql = data_sql if data_sql else data_instance["data_sql"]
         self.log = log if log else log_instance
-        self.logic_management = Logic_Management()
         #--------------------Api
         if account_info:
             if self.account_info.get("broker").lower() == "fxcm":
@@ -735,7 +733,7 @@ class Logic_Live:
                 step = order_detaile["step"]
                 father_id = order_detaile["father_id"]
             #--------------strategy
-            strategy = self.logic_management.get_strategy_instance(strategy_name, execute_detaile).data
+            strategy = get_strategy_instance(strategy_name, execute_detaile).data
             #--------------Action
             if action == Strategy_Action.START : 
                 result:model_output = strategy.start()
@@ -868,4 +866,67 @@ class Logic_Live:
             output["enable"] = result.data[0][20]
         #--------------Return
         return output
-    
+
+    #-------------------------- [execute_order_detaile]
+    def execute_order_detaile(self, id, mode="live") -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #-------------- Detaile
+        detaile = {}
+        all_count = close_count = open_count = all_amount = close_amount = open_amount = all_profit = close_profit = open_profit = all_buy = close_buy = open_buy = all_sell = close_sell = open_sell = 0
+
+        try:
+            #--------------Data
+            data:model_output = self.data_orm.items(model=model_live_order_db, execute_id=id)
+            #--------------Action
+            if data.status:
+                orders:list[model_live_order_db] = data.data
+                for order in orders:
+                    #---All
+                    all_count += 1
+                    all_amount += order.amount
+                    all_profit += order.profit
+                    all_buy += 1 if order.action == 'buy' else 0; all_sell += 1 if order.action == 'sell' else 0
+                    #---Close
+                    if order.status == 'close':
+                        close_count += 1
+                        close_amount += order.amount
+                        close_profit += order.profit
+                        close_buy += 1 if order.action == 'buy' else 0; close_sell += 1 if order.action == 'sell' else 0
+                    #---Open
+                    if order.status == 'open':
+                        open_count += 1
+                        open_amount += order.amount
+                        open_profit += order.profit
+                        open_buy += 1 if order.action == 'buy' else 0; open_sell += 1 if order.action == 'sell' else 0
+                detaile["all"] = {"count":all_count, "amount":all_amount/100000, "profit":round(all_profit, 2), "buy":all_buy, "sell":all_sell}
+                detaile["close"] = {"count":close_count, "amount":close_amount/100000, "profit":round(close_profit, 2), "buy":close_buy, "sell":close_sell}
+                detaile["open"] = {"count":open_count, "amount":open_amount/100000, "profit":round(open_profit, 2), "buy":open_buy, "sell":open_sell}
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = detaile
+            output.message=id
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
