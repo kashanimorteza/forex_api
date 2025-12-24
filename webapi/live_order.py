@@ -1,22 +1,25 @@
 #--------------------------------------------------------------------------------- location
-# webapi/routes/live_order.py
+# webapi/live_order.py
 
 #--------------------------------------------------------------------------------- Description
 # This is route for live_order
 
 #--------------------------------------------------------------------------------- Import
+import time
 from logic.logic_util import model_output
 from logic.logic_global import database_management
 from fastapi import APIRouter, Request
 from model.model_live_order import model_live_order_py as model_py
 from model.model_live_order import model_live_order_db as model_db
 from logic.data_orm import Data_Orm
+from logic.logic_live import Logic_Live
 from logic.logic_management import Logic_Management
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
 data_orm = Data_Orm(database=database_management)
+logic_live = Logic_Live()
 logic_management = Logic_Management()
 
 #-------------------------- [Add]
@@ -67,16 +70,25 @@ def disable(id):
 def status(id): 
     return data_orm.status(model=model_db, id=id)
 
-#-------------------------- [Dead]
-@route.get("/dead/{id}", description="dead", response_model=model_output)
-def dead(id): 
-    return data_orm.dead(model=model_db, id=id)
+#-------------------------- [order_clear]
+@route.get("/order_clear/{id}", description="order_clear", response_model=model_output)
+def order_clear(id): 
+    return logic_live.order_clear(execute_id=id)
+
+#-------------------------- [count]
+@route.get("/order_count/{id}", description="order_count", response_model=int)
+def order_count(id): 
+    result = logic_live.order_count(execute_id=id)
+    return result
 
 #-------------------------- [Detaile]
-#-------------------------- [Items]
 @route.get("/detaile", description="detaile", response_model=model_output)
 def detaile(request: Request) : 
+    start_time = time.time()
     filters = dict(request.query_params)
     id = int(filters.get('execute_id'))
-    result = logic_management.execute_order_detaile(id=id)
-    return result
+    output = logic_management.execute_order_detaile(id=id)
+    output.time = f"{(time.time() - start_time):.3f}",
+    return output
+
+

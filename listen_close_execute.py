@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import time
-from logic.logic_management import Logic_Management 
+from logic.logic_live import Logic_Live 
 
 #--------------------------------------------------------------------------------- Class
 class Listen_Close_Execute:
@@ -14,7 +14,7 @@ class Listen_Close_Execute:
     def __init__(self, items, sleep_time=1):
         self.items = items
         self.sleep_time = sleep_time
-        self.logic_management = Logic_Management()
+        self.logic = Logic_Live()
     
     #--------------------------------------------- start
     def start(self):
@@ -26,6 +26,6 @@ class Listen_Close_Execute:
                 trade_id = item.get("trade_id")
                 profit = item.get("profit")
                 price_close = item.get("price_close")
-                self.logic_management.live_order_close(order_id=order_id, trade_id=trade_id, profit=profit, date_close=date_close, price_close=price_close)
+                self.logic.order_closed(order_id=order_id, trade_id=trade_id, profit=profit, date_close=date_close, price_close=price_close)
                 self.items.remove(item)
             time.sleep(self.sleep_time )

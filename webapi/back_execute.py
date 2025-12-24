@@ -66,11 +66,6 @@ def disable(id:int):
 def status(id:int): 
     return data_orm.status(model=model_db, id=id)
 
-#-------------------------- [Dead]
-@route.get("/dead/{id}", description="dead", response_model=model_output)
-def dead(id:int): 
-    return data_orm.dead(model=model_db, id=id)
-
 #-------------------------- [start]
 @route.get("/start/{id}", description="start", response_model=model_output)
 def start(id:int):

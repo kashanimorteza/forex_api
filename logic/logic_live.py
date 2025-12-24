@@ -7,17 +7,18 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 from datetime import timedelta
-from logic.logic_global import debug, log_instance, data_instance
+from logic.logic_global import debug, log_instance, data_instance, Strategy_Run, Strategy_Action, forex_apis
 from logic.logic_util import model_output, sort, get_tbl_name, format_dict_block
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.fxcm_api import Fxcm_API
 from model import *
+from logic.logic_management import Logic_Management
 
 #--------------------------------------------------------------------------------- Action
 class Logic_Live:
     #--------------------------------------------- init
-    def __init__(self, account_info:dict, data_sql:Data_SQL=None, management_sql:Data_SQL=None, log:Logic_Log=None):
+    def __init__(self, account_info:dict=None, data_sql:Data_SQL=None, management_sql:Data_SQL=None, log:Logic_Log=None):
         #--------------------Variable
         self.this_class = self.__class__.__name__
         self.account_info = account_info
@@ -26,13 +27,15 @@ class Logic_Live:
         self.management_sql = management_sql if management_sql else data_instance["management_sql"]
         self.data_sql = data_sql if data_sql else data_instance["data_sql"]
         self.log = log if log else log_instance
+        self.logic_management = Logic_Management()
         #--------------------Api
-        if self.account_info.get("broker").lower() == "fxcm":
-            self.api = Fxcm_API(account_info=self.account_info)
-            self.api_name = "Fxcm_API"
-        else:
-            self.api = Fxcm_API(account_info=self.account_info)
-            self.api_name = "Fxcm_API"
+        if account_info:
+            if self.account_info.get("broker").lower() == "fxcm":
+                self.api = Fxcm_API(account_info=self.account_info)
+                self.api_name = "Fxcm_API"
+            else:
+                self.api = Fxcm_API(account_info=self.account_info)
+                self.api_name = "Fxcm_API"
 
     #--------------------------------------------- login
     def login(self):
@@ -493,6 +496,47 @@ class Logic_Live:
         #--------------Return
         return output
 
+    #-------------------------- [order_closed]
+    def order_closed(self, order_id, trade_id, profit, date_close, price_close) -> model_output:
+        #-------------- Description
+        # IN     : order_id | profit
+        # OUT    : model_output
+        # Action : update order on database:status,profit | get strategy and run action order_close
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Database
+            cmd = f"UPDATE live_order SET trade_id='{trade_id}', status='close', profit={profit}, date_close='{date_close}', price_close={price_close} WHERE order_id='{order_id}'"
+            self.management_sql.db.execute(cmd=cmd)
+            #--------------Strategy
+            order_detaile = self.order_detaile(order_id=order_id)
+            if order_detaile["execute_status"] != "stop" : self.strategy_action(action=Strategy_Action.ORDER_CLOSE, order_detaile=order_detaile)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = order_detaile
+            output.message = f"{order_id} | {profit}"
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
     #--------------------------------------------- order_close
     def order_close(self, order_ids=None):
         #-------------- Description
@@ -576,3 +620,252 @@ class Logic_Live:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
+    
+    #-------------------------- [order_count]
+    def order_count(self, execute_id) -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            cmd = f"SELECT max(count) FROM live_order WHERE execute_id={execute_id}"
+            max_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+            if max_count is None : max_count = 0
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = max_count
+            output.message=max_count
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return max_count
+    
+    #-------------------------- [order_clear]
+    def order_clear(self, execute_id) -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Acion
+            cmd = f"DELETE FROM live_order WHERE execute_id={execute_id}"
+            self.management_sql.db.execute(cmd=cmd)
+            cmd = f"DELETE FROM live_execute_detaile WHERE execute_id={execute_id}"
+            self.management_sql.db.execute(cmd=cmd)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = None
+            output.message=None
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #-------------------------- [strategy_action]
+    def strategy_action(
+                    self, 
+                    execute_id=None, 
+                    action:Strategy_Action=None,
+                    order_detaile=None
+                    ) -> model_output:
+        #-------------- Description
+        # IN     : 
+        # OUT    : model_output
+        # Action : run strategy action
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Data
+            if execute_id:
+                execute_detaile = self.execute_detaile(id=execute_id)
+                strategy_name = execute_detaile["strategy_name"]
+                account_id = execute_detaile["account_id"]
+            else:
+                execute_id = order_detaile["execute_id"]
+                execute_detaile = self.execute_detaile(id=execute_id)
+                strategy_name = order_detaile["strategy_name"]
+                account_id = order_detaile["account_id"]
+                step = order_detaile["step"]
+                father_id = order_detaile["father_id"]
+            #--------------strategy
+            strategy = self.logic_management.get_strategy_instance(strategy_name, execute_detaile).data
+            #--------------Action
+            if action == Strategy_Action.START : 
+                result:model_output = strategy.start()
+                cmd = f"SELECT MAX(step) FROM live_order WHERE execute_id='{execute_id}'"
+                step = self.management_sql.db.items(cmd=cmd).data[0][0]
+                step = step + 1 if step else 1
+                father_id=0
+            elif action == Strategy_Action.STOP : 
+                result:model_output = strategy.stop()
+            elif action == Strategy_Action.ORDER_CLOSE : 
+                result:model_output = strategy.order_close(order_detaile)
+            elif action == Strategy_Action.PRICE_CHANGE : 
+                result:model_output = strategy.price_change(order_detaile)
+            #--------------Action
+            if result.status:
+                forex:Logic_Live = forex_apis[account_id]
+                for item in result.data:
+                    run = item.get("run")
+                    state = item.get("state")
+                    #--------------order_open
+                    if run == Strategy_Run.ORDER_OPEN :
+                        #---Action
+                        order_result:model_output = forex.order_open(
+                            action=item.get("action"), 
+                            symbol=item.get("symbol"),
+                            amount=item.get("amount"),
+                            tp_pips=item.get("tp_pips"),
+                            sl_pips=item.get("sl_pips"),
+                            execute_id=execute_id,
+                            step=step,
+                            father_id=father_id
+                        )
+                        #---Database
+                        if order_result.status:
+                            cmd = f"UPDATE live_execute SET status='{state}' WHERE id={execute_id}"
+                            self.management_sql.db.execute(cmd=cmd)
+                    #--------------close_all_order
+                    if run == Strategy_Run.ORDER_CLOSE_ALL:
+                        #---Data
+                        order_ids = []
+                        cmd = f"SELECT order_id FROM live_order WHERE execute_id={execute_id} AND status='open'"
+                        orders = self.management_sql.db.items(cmd=cmd)
+                        #---Action
+                        if orders.status:
+                            for order in orders.data : order_ids.append(order[0])
+                            if len(order_ids)>0 :
+                                #-Database
+                                cmd = f"UPDATE live_execute SET status='{state}' WHERE id={execute_id}"
+                                self.management_sql.db.execute(cmd=cmd)
+                                #-forex 
+                                order_result:model_output = forex.order_close(order_ids=order_ids)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = None
+            output.message = None
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #-------------------------- [execute_detaile]
+    def execute_detaile(self, id) -> model_output:
+        #-------------- Variable
+        output = {}
+        #--------------Data
+        table = "live_execute"
+        #--------------Action
+        cmd = f"SELECT strategy.name, strategy_item.symbols, strategy_item.actions, strategy_item.amount, strategy_item.tp_pips, strategy_item.sl_pips, strategy_item.limit_trade, strategy_item.limit_profit, strategy_item.limit_loss, strategy_item.params, {table}.date_from, {table}.date_to, {table}.account_id, {table}.step, {table}.status FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = {id}"
+        result:model_output = self.management_sql.db.items(cmd=cmd)
+        #--------------Data
+        if result.status and len(result.data) > 0 :
+            output["strategy_name"] = result.data[0][0]
+            output["symbols"] = result.data[0][1]
+            output["actions"] = result.data[0][2]
+            output["amount"] = result.data[0][3]
+            output["tp_pips"] = result.data[0][4]
+            output["sl_pips"] = result.data[0][5]
+            output["limit_trade"] = result.data[0][6]
+            output["limit_profit"] = result.data[0][7]
+            output["limit_loss"] = result.data[0][8]
+            output["params"] = ast.literal_eval(result.data[0][9]) if result.data[0][9] else {}
+            output["date_from"] = result.data[0][10]
+            output["date_to"] = result.data[0][11]
+            output["account_id"] = result.data[0][12]
+            output["step"] = result.data[0][13]
+            output["status"] = result.data[0][14]
+        #--------------Return
+        return output
+    
+    #-------------------------- [order_detaile]
+    def order_detaile(self, order_id) -> model_output:
+        #-------------- Variable
+        output = {}
+        #--------------Data
+        table1 = "live_execute" 
+        table2 = "live_order"
+        #--------------Action
+        cmd = f"SELECT strategy.name, strategy_item.id,{table1}.status, {table1}.id, {table1}.account_id, {table2}.execute_id, {table2}.step, {table2}.father_id, {table2}.date_open, {table2}.price_open, {table2}.date_close, {table2}.price_close, {table2}.profit, {table2}.status,{table2}.symbol, {table2}.action, {table2}.amount, {table2}.tp, {table2}.sl, {table2}.trade_id, {table2}.enable FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table1} ON strategy_item.id = {table1}.strategy_item_id JOIN {table2} ON {table1}.id = {table2}.execute_id WHERE {table2}.order_id='{order_id}'"
+        result:model_output = self.management_sql.db.items(cmd=cmd)
+        #--------------Data
+        if result.status and len(result.data) > 0 :
+            output["strategy_name"] = result.data[0][0]
+            output["strategy_item_id"] = result.data[0][1]
+            output["execute_status"] = result.data[0][2]
+            output["id"] = result.data[0][3]
+            output["account_id"] = result.data[0][4]
+            output["execute_id"] = result.data[0][5]
+            output["step"] = result.data[0][6]
+            output["father_id"] = result.data[0][7]
+            output["date_open"] = result.data[0][8]
+            output["price_open"] = result.data[0][9]
+            output["date_close"] = result.data[0][10]
+            output["price_close"] = result.data[0][11]
+            output["profit"] = result.data[0][12]
+            output["status"] = result.data[0][13]
+            output["symbol"] = result.data[0][14]
+            output["action"] = result.data[0][15]
+            output["amount"] = result.data[0][16]
+            output["tp"] = result.data[0][17]
+            output["sl"] = result.data[0][18]
+            output["trade_id"] = result.data[0][19]
+            output["enable"] = result.data[0][20]
+        #--------------Return
+        return output
+    

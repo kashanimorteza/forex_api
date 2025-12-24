@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------------- location
-# webapi/routes/live_execute.py
+# webapi/live_execute.py
 
 #--------------------------------------------------------------------------------- Description
 # This is route for live_execute
@@ -12,13 +12,13 @@ from fastapi import APIRouter, Request
 from model.model_live_execute import model_live_execute_py as model_py
 from model.model_live_execute import model_live_execute_db as model_db
 from logic.data_orm import Data_Orm
-from logic.logic_management import Logic_Management
+from logic.logic_live import Logic_Live
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
 data_orm = Data_Orm(database=database_management)
-logic_management = Logic_Management()
+logic_live = Logic_Live()
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)
@@ -69,14 +69,14 @@ def status(id:int):
 @route.get("/start/{id}", description="start", response_model=model_output)
 def start(id:int):
     start_time = time.time()
-    output:model_output = logic_management.live_action(execute_id=id, action=Strategy_Action.START)
+    output:model_output = logic_live.strategy_action(execute_id=id, action=Strategy_Action.START)
     output.time = f"{(time.time() - start_time):.3f}",
     return output
 
 #-------------------------- [end]
 @route.get("/stop/{id}", description="stop", response_model=model_output)
-def end(id:int):
+def stop(id:int):
     start_time = time.time()
-    output:model_output = logic_management.live_action(execute_id=id, action=Strategy_Action.STOP)
+    output:model_output = logic_live.strategy_action(execute_id=id, action=Strategy_Action.STOP)
     output.time = f"{(time.time() - start_time):.3f}",
     return output
