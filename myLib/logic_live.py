@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------------- Location
-# myLib/logic_forex.py
+# myLib/logic_live.py
 
 #--------------------------------------------------------------------------------- Description
-# logic_forex
+# logic_live
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
@@ -15,7 +15,7 @@ from myLib.fxcm_api import Fxcm_API
 from myModel import *
 
 #--------------------------------------------------------------------------------- Action
-class Logic_Forex:
+class Logic_Live:
     #--------------------------------------------- init
     def __init__(self, account_info:dict, data_sql:Data_SQL=None, management_sql:Data_SQL=None, log:Log=None):
         #--------------------Variable

@@ -11,7 +11,7 @@ from myLib.utils import model_output, sort
 from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
-from myLib.logic_forex import Logic_Forex
+from myLib.logic_live import Logic_Live
 from myLib.logic_backtest import Logic_BackTest
 from myModel import *
 from myStrategy import *
@@ -248,7 +248,7 @@ class Logic_Management:
             if action == "price_change" : result = strategy.price_change(order_detaile=order_detaile)
             #--------------Action
             if result.status:
-                forex:Logic_Forex = forex_apis[account_id]
+                forex:Logic_Live = forex_apis[account_id]
                 for item in result.data:
                     run = item.get("run")
                     state = item.get("state")

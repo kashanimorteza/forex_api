@@ -213,18 +213,18 @@ debug:
     order_detaile: {log: false, verbose: false, model: "Logic_Management"}
     live_action: {log: false, verbose: false, model: "Logic_Management"}
     get_strategy_item_instance: {log: false, verbose: false, model: "Logic_Management"}
-  Logic_Forex:
-    login: {log: false, verbose: false, model: "Logic_Forex"}
-    logout: {log: false, verbose: false, model: "Logic_Forex"}
-    info: {log: false, verbose: false, model: "Logic_Forex"}
-    store: {log: false, verbose: true, model: "Logic_Forex"}
-    save: {log: false, verbose: true, model: "Logic_Forex"}
-    symbol: {log: false, verbose: false, model: "Logic_Forex"}
-    account_info: {log: false, verbose: false, model: "Logic_Forex"}
-    trade_list: {log: false, verbose: false, model: "Logic_Forex"}
-    order_open: {log: false, verbose: false, model: "Logic_Forex"}
-    order_close: {log: false, verbose: false, model: "Logic_Forex"}
-    order_close_all: {log: false, verbose: false, model: "Logic_Forex"}
+  Logic_Live:
+    login: {log: false, verbose: false, model: "Logic_Live"}
+    logout: {log: false, verbose: false, model: "Logic_Live"}
+    info: {log: false, verbose: false, model: "Logic_Live"}
+    store: {log: false, verbose: true, model: "Logic_Live"}
+    save: {log: false, verbose: true, model: "Logic_Live"}
+    symbol: {log: false, verbose: false, model: "Logic_Live"}
+    account_info: {log: false, verbose: false, model: "Logic_Live"}
+    trade_list: {log: false, verbose: false, model: "Logic_Live"}
+    order_open: {log: false, verbose: false, model: "Logic_Live"}
+    order_close: {log: false, verbose: false, model: "Logic_Live"}
+    order_close_all: {log: false, verbose: false, model: "Logic_Live"}
   Logic_BackTest:
     run: {log: false, verbose: true, model: "Logic_BackTest"}
     start: {log: false, verbose: true, model: "Logic_BackTest"}

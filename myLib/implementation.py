@@ -11,7 +11,7 @@ from myLib.utils import model_output, sort
 from myLib.log import Log
 from myLib.data_orm import Data_Orm
 from myLib.data_sql import Data_SQL
-from myLib.logic_forex import Logic_Forex
+from myLib.logic_live import Logic_Live
 from myModel import *
 
 #--------------------------------------------------------------------------------- Managemnet
@@ -121,7 +121,7 @@ class Implementation:
         else:
             from myLib.logic_global import load_forex_api
             load_forex_api()
-            forex:Logic_Forex = forex_apis[2]
+            forex:Logic_Live = forex_apis[2]
             offers = forex.get_table("OFFERS").data
 
         try:

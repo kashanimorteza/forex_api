@@ -50,14 +50,14 @@ def load_data():
 
 #-------------------------- load_forex_api
 def load_forex_api():
-    from myLib.logic_forex import Logic_Forex
+    from myLib.logic_live import Logic_Live
     from myModel.model_account import model_account_db
     from myLib.data_orm import Data_Orm
     data_orm = Data_Orm(database=database_management)
     forex_accounts:list[model_account_db] = data_orm.items(model=model_account_db, enable=True).data
     for account in forex_accounts:
         if account.name !="Back-Test":
-            logic_forex = Logic_Forex(account_info=account.toDict())
+            logic_forex = Logic_Live(account_info=account.toDict())
             forex_apis[account.id] = logic_forex
             logic_forex.login()
 

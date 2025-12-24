@@ -10,7 +10,7 @@ from datetime import datetime
 from myLib.utils import model_output
 from myLib.logic_global import config
 from myLib.utils import parse_cli_args, format_dict_block, to_bool
-from myLib.logic_forex import Logic_Forex
+from myLib.logic_live import Logic_Live
 
 #--------------------------------------------------------------------------------- Debug
 this_class = "Download"
@@ -59,13 +59,13 @@ try:
         for timeframe in timeframes:
             for instrument in instruments:
                 account_cfg = config.get("forex_connect", {}).get(account, {})
-                forex = Logic_Forex(account_info=account_cfg)
+                forex = Logic_Live(account_info=account_cfg)
                 forex.api.login()
                 forex.store(instrument, timeframe, mode, count, repeat, delay, save, bulk, datefrom, dateto)
                 forex.api.logout()
     else :
         account_cfg = config.get("forex_connect", {}).get(account, {})
-        forex = Logic_Forex(account_info=account_cfg)
+        forex = Logic_Live(account_info=account_cfg)
         forex.api.login()
         for timeframe in timeframes:
             for instrument in instruments:
