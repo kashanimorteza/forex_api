@@ -19,7 +19,7 @@ class model_live_order_db(BaseModel_db):
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
     execute_id = Column(Integer, default=1)
-    count = Column(Integer, default=1)
+    step = Column(Integer, default=1)
     father_id = Column(Integer, default=0)
     date_open = Column(DateTime)
     price_open = Column(Float, default=0.0)
@@ -51,7 +51,7 @@ class model_live_order_db(BaseModel_db):
 class model_live_order_py(BaseModel_py):
     id : int = 0
     execute_id : int = 1
-    count : int = 1
+    step : int = 1
     father_id : int = 0
     date_open : Optional[str] = ''
     price_open : float = 0

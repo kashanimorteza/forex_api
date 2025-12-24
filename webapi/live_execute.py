@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 import time
 from logic.logic_util import model_output
-from logic.logic_global import database_management
+from logic.logic_global import database_management, Strategy_Action
 from fastapi import APIRouter, Request
 from model.model_live_execute import model_live_execute_py as model_py
 from model.model_live_execute import model_live_execute_db as model_db
@@ -69,7 +69,7 @@ def status(id:int):
 @route.get("/start/{id}", description="start", response_model=model_output)
 def start(id:int):
     start_time = time.time()
-    output:model_output = logic_management.live_action(execute_id=id, action="start")
+    output:model_output = logic_management.live_action(execute_id=id, action=Strategy_Action.START)
     output.time = f"{(time.time() - start_time):.3f}",
     return output
 
@@ -77,6 +77,6 @@ def start(id:int):
 @route.get("/stop/{id}", description="stop", response_model=model_output)
 def end(id:int):
     start_time = time.time()
-    output:model_output = logic_management.live_action(execute_id=id, action="stop")
+    output:model_output = logic_management.live_action(execute_id=id, action=Strategy_Action.STOP)
     output.time = f"{(time.time() - start_time):.3f}",
     return output

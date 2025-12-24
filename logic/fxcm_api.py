@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 import pandas as pd
-from logic.logic_global import debug, log_instance, data_instance
+from logic.logic_global import debug, log_instance, data_instance, forexconnect_delay
 from logic.logic_util import model_output, sort
 from logic.logic_log import Logic_Log
 from forexconnect import ForexConnect, fxcorepy
@@ -289,6 +289,8 @@ class Fxcm_API:
         bid = None
         sl = None
         tp = None
+        price_open = 0
+        date_open = ''
 
         try:
             #--------------Check
@@ -313,11 +315,11 @@ class Fxcm_API:
             #--------------TP/SL
             if tp_pips or sl_pips:
                 if action == "buy":
-                    rate = ask
+                    price_open = ask
                     tp = float(f"{ask + tp_pips * point_size:.{digits}f}")
                     sl = float(f"{bid - sl_pips * point_size:.{digits}f}")
                 elif action == "sell":
-                    rate = bid
+                    price_open = bid
                     tp = float(f"{bid - tp_pips * point_size:.{digits}f}")
                     sl = float(f"{ask + sl_pips * point_size:.{digits}f}")
             #--------------Order
@@ -335,8 +337,9 @@ class Fxcm_API:
                     )
                     response = self.fx.send_request(request)
                     order_id = getattr(response, "order_id", None) if response else None
-                    time.sleep(0.25)
-                    self.order_edit(order_id, action, tp_pips, sl_pips, spread, point_size, digits)
+                    time.sleep(forexconnect_delay)
+                    order_edit:model_output = self.order_edit(order_id, action, tp_pips, sl_pips, spread, point_size, digits)
+                    price_open, date_open= order_edit.data
                 else:
                     request = self.fx.create_order_request(
                         ACCOUNT_ID=self.id,
@@ -350,8 +353,8 @@ class Fxcm_API:
                     order_id = getattr(response, "order_id", None) if response else None
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = order_id, bid, ask, tp, sl
-            output.message = f"{execute_id} | {order_id} | {symbol} | {action} | {amount} | {rate} | {bid} | {ask} | {tp} | {sl}"
+            output.data = order_id, bid, ask, tp, sl, price_open, date_open
+            output.message = f"{execute_id} | {order_id} | {symbol} | {action} | {amount} | {price_open} | {bid} | {ask} | {tp} | {sl}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
@@ -384,20 +387,21 @@ class Fxcm_API:
 
         try:
             #--------------Data
-            result = self.get_table("TRADES")
+            result:model_output = self.get_table("TRADES")
             if result.status:
                 for order in result.data:
                     if order['open_order_id'] == order_id:
-                        rate = order['open_rate']
+                        price_open = order['open_rate']
+                        date_open = order['open_time']
                         stop_order_id = order['stop_order_id']
                         limit_order_id = order['limit_order_id']
                         if action == "buy":
-                            ask = rate
+                            ask = price_open
                             bid = ask - spread
                             tp = float(f"{ask + tp_pips * point_size:.{digits}f}")
                             sl = float(f"{bid - sl_pips * point_size:.{digits}f}")
                         elif action == "sell":
-                            bid = rate
+                            bid = price_open
                             ask = bid + spread
                             tp = float(f"{bid - tp_pips * point_size:.{digits}f}")
                             sl = float(f"{ask + sl_pips * point_size:.{digits}f}")
@@ -424,7 +428,7 @@ class Fxcm_API:
                         break
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = None
+            output.data = price_open, date_open
             output.message =None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)

@@ -453,7 +453,7 @@ class Logic_Live:
         return output
     
     #--------------------------------------------- order_open
-    def order_open(self, symbol, action, amount, tp_pips, sl_pips, execute_id):
+    def order_open(self, symbol, action, amount, tp_pips, sl_pips, execute_id, step, father_id):
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -474,8 +474,8 @@ class Logic_Live:
             result:model_output = self.api.order_open(symbol, action, amount, tp_pips, sl_pips, execute_id)
             #--------------Database
             if result.status:
-                order_id, bid, ask, tp, sl = result.data
-                cmd = f"INSERT INTO live_order (execute_id, order_id, symbol, action, amount, bid, ask, tp, sl, status, trade_id, profit, enable) VALUES ({execute_id}, '{order_id}', '{symbol}', '{action}', {amount}, {bid}, {ask}, {tp}, {sl}, 'open', 'run...', 0.0, True)"
+                order_id, bid, ask, tp, sl, price_open, date_open = result.data
+                cmd = f"INSERT INTO live_order (execute_id, order_id, step, father_id, date_open, price_open, symbol, action, amount, bid, ask, tp, sl, status, trade_id, profit, enable) VALUES ({execute_id}, '{order_id}', '{step}', '{father_id}', '{date_open}', '{price_open}', '{symbol}', '{action}', {amount}, {bid}, {ask}, {tp}, {sl}, 'open', '', 0.0, True)"
                 self.management_sql.db.execute(cmd=cmd)
             #--------------Output
             output = result

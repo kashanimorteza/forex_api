@@ -72,6 +72,13 @@ def load_instrument():
             list_instrument[item.instrument] = item.toDict()
 
 #--------------------------------------------------------------------------------- Enum
+#-------------------------- Strategy_Action
+class Strategy_Action(str, Enum):
+    START = "start"
+    STOP = "stop"
+    ORDER_CLOSE = "order_close"
+    PRICE_CHANGE= "price_change"
+    
 #-------------------------- Strategy_Run
 class Strategy_Run(str, Enum):
     ORDER_OPEN = "order_open"
@@ -84,6 +91,7 @@ class Order_Action(str, Enum):
 
 #--------------------------------------------------------------------------------- Action
 config:dict = load_config()
+forexconnect_delay = config.get("forex_connect", {}).get("delay",0)
 database_management = config.get("general", {}).get("database_management", {})
 database_data = config.get("general", {}).get("database_data", {})
 database_log = config.get("general", {}).get("database_log", {})

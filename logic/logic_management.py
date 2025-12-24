@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
-from logic.logic_global import debug, log_instance, data_instance, forex_apis, Strategy_Run
+from logic.logic_global import debug, log_instance, data_instance, forex_apis, Strategy_Run, Strategy_Action
 from logic.logic_util import model_output, sort
 from logic.logic_log import Logic_Log
 from logic.data_orm import Data_Orm
@@ -32,7 +32,7 @@ class Logic_Management:
         self.log = log if log else log_instance
 
     #--------------------------------------------- get_strategy_instance
-    def get_strategy_instance(self, name, params)-> model_output:
+    def get_strategy_instance(self, name, execute_detaile)-> model_output:
         #-------------- Description
         # IN     : order_id
         # OUT    : 
@@ -52,7 +52,7 @@ class Logic_Management:
             #--------------Action
             strategy_class = globals().get(name)
             if strategy_class and callable(strategy_class):
-                output.data = strategy_class(params=params)
+                output.data = strategy_class(params=execute_detaile)
             else:
                 output.status = False
             #--------------Output
@@ -211,7 +211,12 @@ class Logic_Management:
         return output
     
     #-------------------------- [live_action]
-    def live_action(self, count=1, execute_id=None, action="start", order_detaile=None) -> model_output:
+    def live_action(
+                    self, 
+                    execute_id=None, 
+                    action:Strategy_Action=None,
+                    order_detaile=None
+                    ) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : model_output
@@ -226,26 +231,36 @@ class Logic_Management:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-        #-------------- Output
-        result = model_output()
+        #-------------- Variable
+        mode= "live"
 
         try:
             #--------------Data
             if execute_id:
-                execute_detaile = self.execute_detaile(id=execute_id, mode="live")
+                execute_detaile = self.execute_detaile(id=execute_id, mode=mode)
                 strategy_name = execute_detaile["strategy_name"]
                 account_id = execute_detaile["account_id"]
             else:
                 execute_id = order_detaile["execute_id"]
                 strategy_name = order_detaile["strategy_name"]
                 account_id = order_detaile["account_id"]
+                step = execute_detaile["step"]
+                father_id = execute_detaile["father_id"]
             #--------------strategy
             strategy = self.get_strategy_instance(strategy_name, execute_detaile).data
             #--------------Action
-            if action == "start" : result = strategy.start()
-            if action == "stop" : result = strategy.stop()
-            if action == "order_close" : result = strategy.order_close(order_detaile=order_detaile)
-            if action == "price_change" : result = strategy.price_change(order_detaile=order_detaile)
+            if action == Strategy_Action.START : 
+                result:model_output = strategy.start()
+                cmd = f"SELECT MAX(step) FROM live_order WHERE execute_id='{execute_id}'"
+                step = self.data_sql.db.items(cmd=cmd).data[0][0]
+                step = step + 1 if step else 1
+                father_id=0
+            elif action == Strategy_Action.STOP : 
+                result:model_output = strategy.stop()
+            elif action == Strategy_Action.ORDER_CLOSE : 
+                result:model_output = strategy.order_close(order_detaile=order_detaile)
+            elif action == Strategy_Action.PRICE_CHANGE : 
+                result:model_output = strategy.price_change(order_detaile=order_detaile)
             #--------------Action
             if result.status:
                 forex:Logic_Live = forex_apis[account_id]
@@ -254,20 +269,16 @@ class Logic_Management:
                     state = item.get("state")
                     #--------------order_open
                     if run == Strategy_Run.ORDER_OPEN :
-                        #---Data
-                        action = item.get("action")
-                        symbol = item.get("symbol")
-                        amount = item.get("amount")
-                        tp_pips = item.get("tp_pips")
-                        sl_pips = item.get("sl_pips")
                         #---Action
                         order_result:model_output = forex.order_open(
-                            action=action, 
-                            symbol=symbol,
-                            amount=amount,
-                            tp_pips=tp_pips,
-                            sl_pips=sl_pips,
-                            execute_id=execute_id
+                            action=item.get("action"), 
+                            symbol=item.get("symbol"),
+                            amount=item.get("amount"),
+                            tp_pips=item.get("tp_pips"),
+                            sl_pips=item.get("sl_pips"),
+                            execute_id=execute_id,
+                            step=step,
+                            father_id=father_id
                         )
                         #---Database
                         if order_result.status:
