@@ -6,13 +6,11 @@
 
 #--------------------------------------------------------------------------------- Import
 import time
-from myLib.utils import sort
 from myLib.utils import model_output
 from myLib.logic_global import database_management
 from fastapi import APIRouter, Request
 from myModel.model_live_execute import model_live_execute_py as model_py
 from myModel.model_live_execute import model_live_execute_db as model_db
-from myModel.model_live_order import model_live_order_db as model_db_orders
 from myLib.data_orm import Data_Orm
 from myLib.logic_management import Logic_Management
 
@@ -67,23 +65,18 @@ def disable(id:int):
 def status(id:int): 
     return data_orm.status(model=model_db, id=id)
 
-#-------------------------- [Dead]
-@route.get("/dead/{id}", description="dead", response_model=model_output)
-def dead(id:int): 
-    return data_orm.dead(model=model_db, id=id)
-
 #-------------------------- [start]
 @route.get("/start/{id}", description="start", response_model=model_output)
 def start(id:int):
     start_time = time.time()
-    output:model_output = logic_management.strategy_action(execute_id=id, action="start")
-    output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+    output:model_output = logic_management.live_action(execute_id=id, action="start")
+    output.time = f"{(time.time() - start_time):.3f}",
     return output
 
 #-------------------------- [end]
 @route.get("/stop/{id}", description="stop", response_model=model_output)
 def end(id:int):
     start_time = time.time()
-    output:model_output = logic_management.strategy_action(execute_id=id, action="stop")
-    output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+    output:model_output = logic_management.live_action(execute_id=id, action="stop")
+    output.time = f"{(time.time() - start_time):.3f}",
     return output

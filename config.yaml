@@ -211,7 +211,7 @@ debug:
   Logic_Management:
     order_close: {log: false, verbose: false, model: "Logic_Management"}
     order_detaile: {log: false, verbose: false, model: "Logic_Management"}
-    strategy_action: {log: false, verbose: false, model: "Logic_Management"}
+    live_action: {log: false, verbose: false, model: "Logic_Management"}
     get_strategy_item_instance: {log: false, verbose: false, model: "Logic_Management"}
   Logic_Forex:
     login: {log: false, verbose: false, model: "Logic_Forex"}

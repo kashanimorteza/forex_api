@@ -37,7 +37,7 @@ def items(request: Request) :
         data = []
         for item in output.data : 
             i = item.toDict()
-            i["amount"] = i["amount"]/ 100000 
+            #i["amount"] = i["amount"]/ 100000 
             data.append(i)
         output.data = data
     return output

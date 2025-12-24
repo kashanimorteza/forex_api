@@ -14,13 +14,13 @@ from myModel.model_back_execute import model_back_execute_py as model_py
 from myModel.model_back_execute import model_back_execute_db as model_db
 from myModel.model_back_order import model_back_order_db as model_back_order_db
 from myLib.data_orm import Data_Orm
-from myLib.logic_management import Logic_Management
+from myLib.logic_backtest import Logic_BackTest
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]
 route = APIRouter()
 data_orm = Data_Orm(database=database_management)
-logic_management = Logic_Management()
+logic_backtest = Logic_BackTest()
 
 #-------------------------- [Add]
 @route.post("/add", description="add", response_model=model_output)
@@ -75,6 +75,7 @@ def dead(id:int):
 @route.get("/start/{id}", description="start", response_model=model_output)
 def start(id:int):
     start_time = time.time()
-    output:model_output = logic_management.back_action(execute_id=id, action="start")
+    logic_backtest.execute_id = id
+    output:model_output = logic_backtest.run()
     output.time = sort(f"{(time.time() - start_time):.3f}", 3)
     return output

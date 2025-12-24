@@ -1,24 +1,16 @@
 #--------------------------------------------------------------------------------- Location
 # myLib/logic_global.py
 
-
-
 #--------------------------------------------------------------------------------- Description
 # logic_global
 
-
-
 #--------------------------------------------------------------------------------- Import
 from enum import Enum
-
-
 
 #--------------------------------------------------------------------------------- Variable
 forex_apis = {}
 list_close = []
 list_instrument= {}
-
-
 
 #--------------------------------------------------------------------------------- Method
 #-------------------------- load_config
@@ -67,7 +59,7 @@ def load_forex_api():
         if account.name !="Back-Test":
             logic_forex = Logic_Forex(account_info=account.toDict())
             forex_apis[account.id] = logic_forex
-            #logic_forex.login()
+            logic_forex.login()
 
 #-------------------------- load_instrument
 def load_instrument():
@@ -79,8 +71,6 @@ def load_instrument():
         for item in result.data : 
             list_instrument[item.instrument] = item.toDict()
 
-
-
 #--------------------------------------------------------------------------------- Enum
 #-------------------------- Strategy_Run
 class Strategy_Run(str, Enum):
@@ -91,8 +81,6 @@ class Strategy_Run(str, Enum):
 class Order_Action(str, Enum):
     BUY = "buy"
     SELL = "sell"
-
-
 
 #--------------------------------------------------------------------------------- Action
 config:dict = load_config()

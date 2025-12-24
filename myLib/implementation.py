@@ -419,12 +419,12 @@ class Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="T-B-1", strategy_item_id=1, account_id=2))
-                self.data_orm.add(model=model, item=model(name="T-S-1", strategy_item_id=2, account_id=2))
-                self.data_orm.add(model=model, item=model(name="T-B-1", strategy_item_id=3, account_id=2))
-                self.data_orm.add(model=model, item=model(name="T-S-1", strategy_item_id=4, account_id=2))
-                self.data_orm.add(model=model, item=model(name="T-BS-1", strategy_item_id=5, account_id=2))
-                self.data_orm.add(model=model, item=model(name="T-BS-1", strategy_item_id=6, account_id=2))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=2, count=10))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=2, count=10))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=2, count=10))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=2, count=10))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=2, count=10))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=2, count=10))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
