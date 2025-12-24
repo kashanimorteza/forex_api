@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------------- Location
-# code/logic/logic_implementation.py
+# logic/logic_implementation.py
 
 #--------------------------------------------------------------------------------- Description
 # Logic_Implementation
