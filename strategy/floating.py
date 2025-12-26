@@ -54,7 +54,8 @@ class Floating:
                 for action in self.actions :
                     item = {
                         "run": Strategy_Run.ORDER_OPEN, 
-                        "state": this_method, 
+                        "state": this_method,
+                        "father_id": 0, 
                         "action": action, 
                         "symbol": symbol, 
                         "amount": self.amount, 
@@ -145,6 +146,7 @@ class Floating:
 
         try:
             #--------------Data
+            id = order_detaile.get("id")
             symbol = order_detaile.get("symbol")
             action = order_detaile.get("action")
             amount = order_detaile.get("amount")
@@ -157,8 +159,9 @@ class Floating:
             item = {
                 "run": Strategy_Run.ORDER_OPEN,
                 "state": this_method,
-                "action": action, 
+                "father_id": id,
                 "symbol": symbol, 
+                "action": action, 
                 "amount": amount, 
                 "tp_pips": self.tp_pips, 
                 "sl_pips": self.sl_pips

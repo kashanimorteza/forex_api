@@ -7,11 +7,12 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
 from logic.logic_global import debug, list_instrument, log_instance, data_instance, Strategy_Run, database_management, database_data
-from logic.logic_util import model_output, sort, get_tbl_name, get_strategy_instance
+from logic.logic_util import model_output, sort, get_tbl_name
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.data_orm import Data_Orm
 from model.model_back_order import model_back_order_db
+from strategy import *
 
 #--------------------------------------------------------------------------------- Action
 class Logic_BackTest:
@@ -775,7 +776,6 @@ class Logic_BackTest:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
-    
 
     #-------------------------- [execute_detaile]
     def execute_detaile(self, id) -> model_output:
@@ -841,4 +841,16 @@ class Logic_BackTest:
             output["enable"] = result.data[0][20]
         #--------------Return
         return output
-    
+
+    #--------------------------------------------- get_strategy_instance
+    def get_strategy_instance(self, name, execute_detaile)-> model_output:
+        #-------------- Variable
+        output = model_output()
+        #-------------- Action
+        strategy_class = globals().get(name)
+        if strategy_class and callable(strategy_class):
+            output.data = strategy_class(params=execute_detaile)
+        else:
+            output.status = False
+        #--------------Return
+        return output
