@@ -75,9 +75,9 @@ def start(id:int):
     output.time = sort(f"{(time.time() - start_time):.3f}", 3)
     return output
 
-#-------------------------- [order_clear]
-@route.get("/order_clear/{id}", description="order_clear", response_model=model_output)
-def order_clear(id): 
+#-------------------------- [back_clear]
+@route.get("/back_clear/{id}", description="back_clear", response_model=model_output)
+def back_clear(id:int): 
     return logic_backtest.order_clear(execute_id=id)
 
 #-------------------------- [order_step]

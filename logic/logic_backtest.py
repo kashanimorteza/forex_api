@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
-from logic.logic_global import debug, list_instrument, log_instance, data_instance, Strategy_Run, database_management, database_data
+from logic.logic_global import debug, list_instrument, log_instance, Strategy_Run, database_management, database_data
 from logic.logic_util import model_output, sort, get_tbl_name
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
@@ -74,10 +74,12 @@ class Logic_BackTest:
             symbols = execute_detaile.get("symbols", "").split(',')
             count = execute_detaile.get("step")
             #--------------Count
-            cmd = f"SELECT MAX(step) FROM back_order WHERE execute_id='{self.execute_id}'"
-            count_history = self.management_sql.db.items(cmd=cmd).data[0][0]
+            cmd = f"SELECT MAX(step),max(date_close) FROM back_order WHERE execute_id={self.execute_id}"
+            data = self.management_sql.db.items(cmd=cmd).data[0]
+            count_history = data[0]
             if count_history:
-                self.step = count+1
+                self.step = count_history+1
+                self.date_from = data[1]
             else:
                 self.step = 1
             #--------------Strategy
@@ -406,8 +408,6 @@ class Logic_BackTest:
             obj.symbol = symbol
             obj.action = action
             obj.amount = amount
-            obj.bid = bid
-            obj.ask = ask
             obj.price_open = price_open
             obj.tp = tp
             obj.sl = sl
@@ -696,14 +696,14 @@ class Logic_BackTest:
                 data = self.management_sql.db.items(cmd=cmd).data[0]
                 date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
                 date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
-                all_step = data[2]
+                count = data[2]
                 profit = f"{data[3]:.{2}f}"
                 cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and status='open'"
-                open_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+                open_count = self.management_sql.db.items(cmd=cmd).data[0][0]
                 cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and status='close'"
-                close_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+                close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
                 cmd = f"SELECT count(id) FROM back_order  WHERE execute_id={execute_id} and status='close'"
-                close_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+                close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
                 cmd = f"SELECT min(profit), max(profit), min(loss), max(loss) FROM back_execute_detaile WHERE execute_id={execute_id}"
                 data = self.management_sql.db.items(cmd=cmd).data[0]
                 profit_min = f"{data[0]:.{2}f}"
@@ -714,10 +714,10 @@ class Logic_BackTest:
                     "step":'All',
                     "date_from":date_from,
                     "date_to":date_to,
-                    "all_step":all_step,
+                    "count":count,
                     "profit":profit,
-                    "open_step":open_step,
-                    "close_step":close_step,
+                    "open_count":open_count,
+                    "close_count":close_count,
                     "profit_min":profit_min,
                     "profit_max":profit_max,
                     "loss_min":loss_min,
@@ -730,14 +730,14 @@ class Logic_BackTest:
                     data = self.management_sql.db.items(cmd=cmd).data[0]
                     date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
                     date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
-                    all_step = data[2]
+                    count = data[2]
                     profit = f"{data[3]:.{2}f}"
                     cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and step={i} and status='open'"
-                    open_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    open_count = self.management_sql.db.items(cmd=cmd).data[0][0]
                     cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and step={i} and status='close'"
-                    close_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
                     cmd = f"SELECT count(id) FROM back_order  WHERE execute_id={execute_id} and step={i} and status='close'"
-                    close_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
                     cmd = f"SELECT min(profit), max(profit), min(loss), max(loss) FROM back_execute_detaile WHERE execute_id={execute_id} and step={i}"
                     data = self.management_sql.db.items(cmd=cmd).data[0]
                     profit_min = f"{data[0]:.{2}f}"
@@ -748,10 +748,10 @@ class Logic_BackTest:
                         "step":i,
                         "date_from":date_from,
                         "date_to":date_to,
-                        "all_step":all_step,
+                        "count":count,
                         "profit":profit,
-                        "open_step":open_step,
-                        "close_step":close_step,
+                        "open_count":open_count,
+                        "close_count":close_count,
                         "profit_min":profit_min,
                         "profit_max":profit_max,
                         "loss_min":loss_min,
