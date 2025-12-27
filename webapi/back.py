@@ -1,15 +1,18 @@
-#--------------------------------------------------------------------------------- location
-# webapi/routes/back_order.py
+#--------------------------------------------------------------------------------- Location
+# webapi/routes/back_execute.py
 
 #--------------------------------------------------------------------------------- Description
-# This is route for back_order
+# This is route for back_execute
 
 #--------------------------------------------------------------------------------- Import
+import time
+from fastapi import APIRouter, Request
+from logic.logic_util import sort
 from logic.logic_util import model_output
 from logic.logic_global import database_management
-from fastapi import APIRouter, Request
-from model.model_back_order import model_back_order_py as model_py
-from model.model_back_order import model_back_order_db as model_db
+from model.model_back_execute import model_back_execute_py as model_py
+from model.model_back_execute import model_back_execute_db as model_db
+from model.model_back_order import model_back_order_db as model_back_order_db
 from logic.data_orm import Data_Orm
 from logic.logic_backtest import Logic_BackTest
 
@@ -24,7 +27,6 @@ logic_backtest = Logic_BackTest()
 def add(item:model_py) : 
     item = item.dict()
     if 'id' in item : del item['id']
-    if 'date' in item : del item['date']
     output:model_output = data_orm.add(model=model_db, item=model_db(**item))
     return output
 
@@ -32,13 +34,10 @@ def add(item:model_py) :
 @route.get("/items", description="items", response_model=model_output)
 def items(request: Request) : 
     filters = dict(request.query_params)
-    output:model_output = data_orm.items(model=model_db, order_by={"id":"asc",}, **filters)
+    output:model_output = data_orm.items(model=model_db, **filters)
     if output.status : 
         data = []
-        for item in output.data : 
-            i = item.toDict()
-            #i["amount"] = i["amount"]/ 100000 
-            data.append(i)
+        for item in output.data : data.append(item.toDict())
         output.data = data
     return output
 
@@ -49,37 +48,59 @@ def update(item: model_py):
 
 #-------------------------- [Delete]
 @route.delete("/{id}", description="delete", response_model=model_output)
-def delete(id): 
+def delete(id:int): 
     return data_orm.delete(model=model_db, id=id)
 
 #-------------------------- [Enable]
 @route.get("/enable/{id}", description="enable", response_model=model_output)
-def enable(id): 
+def enable(id:int): 
     return data_orm.enable(model=model_db, id=id)
 
 #-------------------------- [Disable]
 @route.get("/disable/{id}", description="disable", response_model=model_output)
-def disable(id): 
+def disable(id:int): 
     return data_orm.disable(model=model_db, id=id)
 
 #-------------------------- [Status]
 @route.get("/status/{id}", description="status", response_model=model_output)
-def status(id): 
+def status(id:int): 
     return data_orm.status(model=model_db, id=id)
+
+#-------------------------- [start]
+@route.get("/start/{id}", description="start", response_model=model_output)
+def start(id:int):
+    start_time = time.time()
+    logic_backtest.execute_id = id
+    output:model_output = logic_backtest.run()
+    output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+    return output
 
 #-------------------------- [order_clear]
 @route.get("/order_clear/{id}", description="order_clear", response_model=model_output)
 def order_clear(id): 
     return logic_backtest.order_clear(execute_id=id)
 
-#-------------------------- [count]
-@route.get("/order_count/{id}", description="order_count", response_model=int)
-def order_count(id): 
-    result = logic_backtest.order_count(execute_id=id)
+#-------------------------- [order_step]
+@route.get("/order_step/{id}", description="order_step", response_model=int)
+def order_step(id:int): 
+    result = logic_backtest.order_step(execute_id=id)
     return result
 
-#-------------------------- [Detaile]
-@route.get("/detaile/{id}", description="detaile", response_model=model_output)
-def detaile(id): 
-    result = logic_backtest.order_detaile(execute_id=id)
+#-------------------------- [action_detaile]
+@route.get("/action_detaile/{id}", description="action_detaile", response_model=model_output)
+def action_detaile(id:int): 
+    result = logic_backtest.action_detaile(execute_id=id)
     return result
+
+#-------------------------- [order_items]
+@route.get("/order_items", description="order_items", response_model=model_output)
+def order_items(request: Request) : 
+    filters = dict(request.query_params)
+    output:model_output = data_orm.items(model=model_back_order_db, order_by={"id":"asc",}, **filters)
+    if output.status : 
+        data = []
+        for item in output.data : 
+            i = item.toDict()
+            data.append(i)
+        output.data = data
+    return output

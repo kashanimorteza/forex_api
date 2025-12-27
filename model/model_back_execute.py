@@ -41,10 +41,10 @@ class model_back_execute_py(BaseModel_py):
     id : int = 0
     name : str = ''
     strategy_item_id : int = 1
-    account_id : int = 1
-    date_from : Optional[str] = ''
-    date_to : Optional[str] = ''
-    status : str = ''
+    account_id : int = 0
+    date_from : datetime = datetime.strptime('2025-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
+    date_to : datetime = datetime.strptime('2030-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
     step : int = 1
+    status : str = ''
     description : Optional[str] = ''
     enable : bool = True

@@ -59,7 +59,7 @@ def load_forex_api():
         if account.name !="Back-Test":
             logic_forex = Logic_Live(account_info=account.toDict())
             forex_apis[account.id] = logic_forex
-            logic_forex.login()
+            #logic_forex.login()
 
 #-------------------------- load_instrument
 def load_instrument():

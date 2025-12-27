@@ -67,7 +67,7 @@ class Logic_BackTest:
 
         try:
             #--------------Detaile
-            execute_detaile:model_output = self.logic_management.execute_detaile(id=self.execute_id, mode="back")
+            execute_detaile:model_output = self.execute_detaile(id=self.execute_id)
             self.date_from = execute_detaile.get("date_from")
             self.date_to = execute_detaile.get("date_to")
             strategy_name = execute_detaile.get("strategy_name")
@@ -81,7 +81,7 @@ class Logic_BackTest:
             else:
                 self.step = 1
             #--------------Strategy
-            self.strategy = get_strategy_instance(strategy_name, execute_detaile).data
+            self.strategy = self.get_strategy_instance(strategy_name, execute_detaile).data
             #--------------Data
             for symbol in symbols : data_params.append({"symbol": symbol, "date_from":self.date_from, "date_to": self.date_to})
             self.data = self.get_data(params=data_params).data
@@ -108,9 +108,6 @@ class Logic_BackTest:
                 if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
                 #--------------Log
                 if log : self.log.log(log_model, output)
-            #--------------Database
-            self.management_sql.db.close()
-            self.data_sql.db.close()
         except Exception as e:  
             #--------------Error
             output.status = False
@@ -593,8 +590,8 @@ class Logic_BackTest:
         #--------------Return
         return output
     
-    #-------------------------- [order_count]
-    def order_count(self, execute_id) -> model_output:
+    #-------------------------- [order_step]
+    def order_step(self, execute_id) -> model_output:
         #-------------- Description
         # IN     : execute_id
         # OUT    : model_output
@@ -611,13 +608,13 @@ class Logic_BackTest:
         output.method_name = this_method
 
         try:
-            cmd = f"SELECT max(count) FROM back_order WHERE execute_id={execute_id}"
-            max_count = self.management_sql.db.items(cmd=cmd).data[0][0]
-            if max_count is None : max_count = 0
+            cmd = f"SELECT max(step) FROM back_order WHERE execute_id={execute_id}"
+            max_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+            if max_step is None : max_step = 0
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = max_count
-            output.message=max_count
+            output.data = max_step
+            output.message=max_step
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
             #--------------Log
@@ -629,7 +626,7 @@ class Logic_BackTest:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
-        return max_count
+        return max_step
     
     #-------------------------- [order_clear]
     def order_clear(self, execute_id) -> model_output:
@@ -671,8 +668,8 @@ class Logic_BackTest:
         #--------------Return
         return output
     
-    #-------------------------- [order_detaile]
-    def order_detaile(self, execute_id) -> model_output:
+    #-------------------------- [action_detaile]
+    def action_detaile(self, execute_id) -> model_output:
         #-------------- Description
         # IN     : execute_id
         # OUT    : model_output
@@ -691,22 +688,22 @@ class Logic_BackTest:
         detaile = []
         
         try:
-            cmd = f"SELECT max(count) FROM back_order WHERE execute_id={execute_id}"
-            max_count = self.management_sql.db.items(cmd=cmd).data[0][0]
-            if max_count:
+            cmd = f"SELECT max(step) FROM back_order WHERE execute_id={execute_id}"
+            max_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+            if max_step:
                 #--------------All
                 cmd = f"SELECT min(date_open), max(date_close), count(id), sum(profit) FROM back_order WHERE execute_id={execute_id}"
                 data = self.management_sql.db.items(cmd=cmd).data[0]
                 date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
                 date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
-                all_count = data[2]
+                all_step = data[2]
                 profit = f"{data[3]:.{2}f}"
                 cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and status='open'"
-                open_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+                open_step = self.management_sql.db.items(cmd=cmd).data[0][0]
                 cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and status='close'"
-                close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+                close_step = self.management_sql.db.items(cmd=cmd).data[0][0]
                 cmd = f"SELECT count(id) FROM back_order  WHERE execute_id={execute_id} and status='close'"
-                close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+                close_step = self.management_sql.db.items(cmd=cmd).data[0][0]
                 cmd = f"SELECT min(profit), max(profit), min(loss), max(loss) FROM back_execute_detaile WHERE execute_id={execute_id}"
                 data = self.management_sql.db.items(cmd=cmd).data[0]
                 profit_min = f"{data[0]:.{2}f}"
@@ -714,47 +711,47 @@ class Logic_BackTest:
                 loss_max = f"{data[2]:.{2}f}"
                 loss_min = f"{data[3]:.{2}f}"
                 detaile.append({
-                    "count":'All',
+                    "step":'All',
                     "date_from":date_from,
                     "date_to":date_to,
-                    "all_count":all_count,
+                    "all_step":all_step,
                     "profit":profit,
-                    "open_count":open_count,
-                    "close_count":close_count,
+                    "open_step":open_step,
+                    "close_step":close_step,
                     "profit_min":profit_min,
                     "profit_max":profit_max,
                     "loss_min":loss_min,
                     "loss_max":loss_max
                 })
                 #--------------Items
-                for i in range(max_count):
+                for i in range(max_step):
                     i += 1
-                    cmd = f"SELECT min(date_open), max(date_close), count(id), sum(profit) FROM back_order WHERE execute_id={execute_id} and count={i}"
+                    cmd = f"SELECT min(date_open), max(date_close), count(id), sum(profit) FROM back_order WHERE execute_id={execute_id} and step={i}"
                     data = self.management_sql.db.items(cmd=cmd).data[0]
                     date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
                     date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
-                    all_count = data[2]
+                    all_step = data[2]
                     profit = f"{data[3]:.{2}f}"
-                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and count={i} and status='open'"
-                    open_count = self.management_sql.db.items(cmd=cmd).data[0][0]
-                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and count={i} and status='close'"
-                    close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
-                    cmd = f"SELECT count(id) FROM back_order  WHERE execute_id={execute_id} and count={i} and status='close'"
-                    close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
-                    cmd = f"SELECT min(profit), max(profit), min(loss), max(loss) FROM back_execute_detaile WHERE execute_id={execute_id} and count={i}"
+                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and step={i} and status='open'"
+                    open_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and step={i} and status='close'"
+                    close_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    cmd = f"SELECT count(id) FROM back_order  WHERE execute_id={execute_id} and step={i} and status='close'"
+                    close_step = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    cmd = f"SELECT min(profit), max(profit), min(loss), max(loss) FROM back_execute_detaile WHERE execute_id={execute_id} and step={i}"
                     data = self.management_sql.db.items(cmd=cmd).data[0]
                     profit_min = f"{data[0]:.{2}f}"
                     profit_max = f"{data[1]:.{2}f}"
                     loss_max = f"{data[2]:.{2}f}"
                     loss_min = f"{data[3]:.{2}f}"
                     detaile.append({
-                        "count":i,
+                        "step":i,
                         "date_from":date_from,
                         "date_to":date_to,
-                        "all_count":all_count,
+                        "all_step":all_step,
                         "profit":profit,
-                        "open_count":open_count,
-                        "close_count":close_count,
+                        "open_step":open_step,
+                        "close_step":close_step,
                         "profit_min":profit_min,
                         "profit_max":profit_max,
                         "loss_min":loss_min,
