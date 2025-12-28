@@ -268,10 +268,8 @@ class Database_Orm:
             #--------------Action
             for table in BaseModel.metadata.sorted_tables:
                 table_name = table.name
-                if table_name != 'instrument':
+                if table_name == 'back_order' or table_name == 'back_execute_detaile':
                     self.session.execute(text(f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE"))
-                    
-                    # Reset sequences for columns that use Sequence()
                     for column in table.columns:
                         if column.default and hasattr(column.default, 'name'):
                             sequence_name = column.default.name
@@ -279,7 +277,7 @@ class Database_Orm:
                                 try:
                                     self.session.execute(text(f"ALTER SEQUENCE {sequence_name} RESTART WITH 1"))
                                 except:
-                                    pass  # Sequence might not exist or already handled
+                                    pass
                     
                     self.session.commit()
             #--------------Output
@@ -369,7 +367,7 @@ class Database_Orm:
             
             self.session.commit()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)            
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Truncate table : {model.__tablename__}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)

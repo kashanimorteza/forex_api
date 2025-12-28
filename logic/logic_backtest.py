@@ -11,8 +11,10 @@ from logic.logic_util import model_output, sort, get_tbl_name
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.data_orm import Data_Orm
+from model import model_back_execute_detaile
 from model.model_back_order import model_back_order_db
 from strategy import *
+from model import *
 
 #--------------------------------------------------------------------------------- Action
 class Logic_BackTest:
@@ -625,7 +627,7 @@ class Logic_BackTest:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return max_step
-    
+
     #-------------------------- [order_clear]
     def order_clear(self, execute_id) -> model_output:
         #-------------- Description
@@ -649,6 +651,43 @@ class Logic_BackTest:
             self.management_sql.db.execute(cmd=cmd)
             cmd = f"DELETE FROM back_execute_detaile WHERE execute_id={execute_id}"
             self.management_sql.db.execute(cmd=cmd)
+            #--------------Output
+            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.data = None
+            output.message=None
+            #--------------Verbose
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 12)} | {output.time}", output.message)
+            #--------------Log
+            if log : self.log.log(log_model, output)
+        except Exception as e:  
+            #--------------Error
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Return
+        return output
+    
+    #-------------------------- [order_truncate]
+    def order_truncate(self) -> model_output:
+        #-------------- Description
+        # IN     : execute_id
+        # OUT    : model_output
+        # Action : Get all order, seperate to All/Close/Open, Detaile for each order
+        #-------------- Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #-------------- Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+
+        try:
+            #--------------Acion
+            self.management_orm.truncate_all_table()
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = None

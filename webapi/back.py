@@ -80,6 +80,11 @@ def start(execute_id:int):
 def back_clear(id:int): 
     return logic_backtest.order_clear(execute_id=id)
 
+#-------------------------- [back_truncate]
+@route.get("/back_truncate", description="back_truncate", response_model=model_output)
+def back_truncate(): 
+    return logic_backtest.order_truncate()
+
 #-------------------------- [order_step]
 @route.get("/order_step/{id}", description="order_step", response_model=int)
 def order_step(id:int): 
