@@ -21,8 +21,11 @@ class model_back_execute_detaile_db(BaseModel_db):
     date = Column(DateTime)
     execute_id = Column(Integer, default=0)
     step = Column(Integer, default=0)
-    profit = Column(Float, default=0)
-    loss = Column(Float, default=0)
+    profit_close = Column(Float, default=0)
+    profit_open = Column(Float, default=0)
+    param = Column(String, default='')
+    description = Column(String, default='')
+    enable = Column(Boolean, default=True)
     #---Display
     def __repr__(self) : return f"{self.toDict()}"
     #---Json
@@ -37,5 +40,8 @@ class model_back_execute_detaile_py(BaseModel_py):
     date : Optional[str] = ''
     execute_id : int = 0
     step : int = 0
-    profit : float = 0
-    loss : float = 0
+    profit_close : float = 0
+    profit_open : float = 0
+    param : Optional[str] = ''
+    description : Optional[str] = ''
+    enable : bool = True

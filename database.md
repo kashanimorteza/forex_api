@@ -130,7 +130,7 @@ GRANT pg_read_server_files TO forex;
 <!-------------------------- simple -->
 simple
 ```bash
-sudo -u postgres pg_dump -v -O -d forex -f backup_2025-12-14.sql
+sudo -u postgres pg_dump -v -O -d forex -f backup_2025-12-28.sql
 ```
 ```bash
 sudo -u postgres pg_dump -v -O -d forex forex -t public.xauusd_t1 -f backup_xauusd_t1_2025-12-14.sql

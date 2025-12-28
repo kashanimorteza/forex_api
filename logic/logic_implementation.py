@@ -353,10 +353,10 @@ class Logic_Implementation:
                     symbols='XAU/USD',
                     actions='buy,sell',
                     amount=1,
-                    tp_pips=100, 
-                    sl_pips=10000,
+                    tp_pips=300, 
+                    sl_pips=999999,
                     limit_trade=-1,
-                    limit_profit=10,
+                    limit_profit=999999,
                     limit_loss=-1000,
                     params="")
                 self.data_orm.add(model=model, item=item)
@@ -368,7 +368,7 @@ class Logic_Implementation:
                     actions='buy,sell',
                     amount=10000,
                     tp_pips=1,
-                    sl_pips=1000,
+                    sl_pips=100,
                     limit_trade=-1,
                     limit_profit=10,
                     limit_loss=-100,

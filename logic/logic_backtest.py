@@ -72,14 +72,13 @@ class Logic_BackTest:
             self.date_to = execute_detaile.get("date_to")
             strategy_name = execute_detaile.get("strategy_name")
             symbols = execute_detaile.get("symbols", "").split(',')
-            count = execute_detaile.get("step")
+            step = execute_detaile.get("step")
             #--------------Count
             cmd = f"SELECT MAX(step),max(date_close) FROM back_order WHERE execute_id={self.execute_id}"
-            data = self.management_sql.db.items(cmd=cmd).data[0]
-            count_history = data[0]
-            if count_history:
-                self.step = count_history+1
-                self.date_from = data[1]
+            data = self.management_sql.db.items(cmd=cmd).data
+            if data[0][0]:
+                self.step = data[0][0]+1
+                self.date_from = data[0][1]
             else:
                 self.step = 1
             #--------------Strategy
@@ -88,17 +87,17 @@ class Logic_BackTest:
             for symbol in symbols : data_params.append({"symbol": symbol, "date_from":self.date_from, "date_to": self.date_to})
             self.data = self.get_data(params=data_params).data
             #--------------Action
-            for i in range(count):
+            for i in range(step):
                 #--------------Variable
-                self.account_profit = 0
-                self.account_loss = 0
+                self.account_profit_close = 0
+                self.account_profit_open = 0
                 self.list_order_open = []
                 self.list_order_close = []
                 #--------------Start
                 result_start:model_output = self.start()
                 #--------------Next
                 result_next:model_output = self.next()
-                #--------------Increase count
+                #--------------Step
                 self.step += 1
                 #--------------Database
                 cmd = f"UPDATE back_execute SET status='stop' WHERE id={self.execute_id}"
@@ -137,6 +136,7 @@ class Logic_BackTest:
         output.method_name = this_method
         #-------------- Variable
         keep = False
+        state = None
 
         try:
             #--------------Data
@@ -204,40 +204,36 @@ class Logic_BackTest:
                     date = row[1]
                     ask = row[2]
                     bid = row[3]
-                    #---Check orders
                     if len(self.list_order_open) > 0:
-                        #---Check TP/SL
-                        check_tp_sl = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
-                        for item in check_tp_sl :
-                            item = self.order_close(item = item).data
+                        #---check_tp_sl
+                        check_tp_sls = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
+                        for check_tp_sl in check_tp_sls :
+                            #---order_close
+                            order_close = self.order_close(item=check_tp_sl).data
+                            #---check_limit
+                            check_limit_status, check_limit_param  = self.check_limit(symbol, ask, bid, date)
+                            if not check_limit_status:
+                                order_open_accept = False
+                                if check_limit_param == 'loss':
+                                    result_strategy:model_output = self.strategy.stop()
+                                    for item in result_strategy.data :
+                                        item["father_id"] = order_close.get("id")
+                                        item["date"] = date
+                                        item["ask"] = ask
+                                        item["bid"] = bid
+                                        self.action(items=result_strategy.data)
+                            #---keep
                             if order_open_accept:
-                                order_id = item.get("id")
-                                result_strategy:model_output = self.strategy.order_close(order_detaile=item)
+                                result_strategy:model_output = self.strategy.order_close(order_detaile=check_tp_sl)
                                 for item in result_strategy.data :
-                                    item["father_id"] = order_id
-                                    item["date"] = date
-                                    item["ask"] = ask
-                                    item["bid"] = bid
-                                    self.action(items=result_strategy.data)
-                        #---Check limit
-                        check_limit_status, check_limit_param  = self.check_limit(ask, bid, date)
-                        if not check_limit_status:
-                            if check_limit_param == 'trade':
-                                order_open_accept = False
-                            if check_limit_param == 'profit':
-                                order_open_accept = False
-                            if check_limit_param == 'loss':
-                                result_strategy:model_output = self.strategy.stop()
-                                for item in result_strategy.data :
-                                    item["father_id"] = -1
+                                    item["father_id"] = order_close.get("id")
                                     item["date"] = date
                                     item["ask"] = ask
                                     item["bid"] = bid
                                     self.action(items=result_strategy.data)
                     else:
-                        break
-            if len(self.data[symbol])>1: 
-                self.data[symbol] = self.data[symbol][self.data[symbol].index(row) + 1:]
+                         break
+                if len(self.data[symbol])>1 : self.data[symbol] = self.data[symbol][self.data[symbol].index(row) + 1:]
             #--------------Output
             output = result
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -253,7 +249,7 @@ class Logic_BackTest:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Return
         return output
-
+    
     #--------------------------------------------- action
     def action(self, items:dict)-> model_output:
         #-------------- Variable
@@ -300,18 +296,19 @@ class Logic_BackTest:
         return output
 
     #--------------------------------------------- check_limit
-    def check_limit(self, ask, bid, date)-> model_output:
+    def check_limit(self, symbol, ask, bid, date)-> model_output:
         #--------------Variable
         result = True
         param = None
         profit_close = 0
         profit_open = 0
         trade_count = 0
-        #--------------Calculate
+        #--------------check close order
         for item in self.list_order_close : 
             trade_count += 1
             profit_close = profit_close + item[8]
             profit_close = float(f"{profit_close:.{2}f}")
+        #--------------check open order
         for item in self.list_order_open : 
             trade_count += 1
             profit_open = profit_open + self.profit_calculate(item, ask, bid)
@@ -325,21 +322,19 @@ class Logic_BackTest:
             result = False
             param='profit'
         #--------------Loss
-        if profit_close < 0 :
-            profit_open = profit_open + profit_close
-            if self.strategy.limit_loss !=-1 and profit_open <= self.strategy.limit_loss:
-                result = False
-                param='loss'
-        else:
-            if self.strategy.limit_loss !=-1 and profit_open <= self.strategy.limit_loss:
-                result = False
-                param='loss'
+        if self.strategy.limit_loss !=-1 and (profit_open + profit_close) <= self.strategy.limit_loss:
+            result = False
+            param='loss'
         #--------------Log
-        if (self.account_profit != profit_close or self.account_loss != profit_open):
-            if (abs(profit_close-self.account_profit)>1 or abs(profit_open-self.account_loss)>1) :
-                self.account_profit = profit_close
-                self.account_loss = profit_open
-                cmd = f"INSERT INTO back_execute_detaile (date,execute_id,step,profit,loss) VALUES('{date}', {self.execute_id}, {self.step}, {profit_close}, {profit_open})"
+        if not result: 
+            p = f"{param} | {date}"
+            cmd = f"INSERT INTO back_execute_detaile (date, execute_id, step, profit_close, profit_open, param) VALUES('{date}', {self.execute_id}, {self.step}, {profit_close}, {profit_open}, '{p}')"
+            self.management_sql.db.execute(cmd=cmd)
+        if (self.account_profit_close != profit_close or self.account_profit_open != profit_open):
+            if (abs(profit_close-self.account_profit_close)>1 or abs(profit_open-self.account_profit_open)>1) :
+                self.account_profit_close = profit_close
+                self.account_profit_open = profit_open
+                cmd = f"INSERT INTO back_execute_detaile (date, execute_id, step, profit_close, profit_open) VALUES('{date}', {self.execute_id}, {self.step}, {profit_close}, {profit_open})"
                 self.management_sql.db.execute(cmd=cmd)
         #--------------Return
         output = result, param
@@ -348,15 +343,18 @@ class Logic_BackTest:
     #--------------------------------------------- profit_calculate
     def profit_calculate(self, item, ask, bid)-> model_output:
         #--------------Data
+        profit = 0
         action = item[11]
         amount = item[12]
         price_open = item[5]
-        profit = 0
         #--------------Action
-        profit = (bid - price_open) * amount if action == "buy" else (price_open - ask) * amount if action == "sell" else 0
-        profit = f"{profit:.{2}f}"
+        if action == "buy":
+            profit = (bid - price_open) * amount
+        else :
+            profit = (price_open - ask) * amount 
+        profit = float(f"{profit:.{2}f}")
         #--------------Return
-        output = float(profit)
+        output = profit
         return output
     
     #--------------------------------------------- order_open
@@ -469,7 +467,7 @@ class Logic_BackTest:
                 price_close = ask
                 profit = (price_open - ask) * amount
             profit = float(f"{profit:.{2}f}")
-            self.account_profit = self.account_profit + profit
+            self.account_profit_close = self.account_profit_close + profit
             item["profit"] = profit
             #-------------- Action
             cmd = f"UPDATE back_order SET date_close='{date}', price_close={price_close}, profit={profit}, status='close' WHERE id='{id}'"
@@ -696,66 +694,109 @@ class Logic_BackTest:
                 data = self.management_sql.db.items(cmd=cmd).data[0]
                 date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
                 date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
-                count = data[2]
-                profit = f"{data[3]:.{2}f}"
+                trade_all = data[2]
+                profit_all = data[3]
+                #--------------Profit
+                cmd = f"SELECT sum(profit) FROM back_order WHERE execute_id={execute_id} and profit>0"
+                profit_positive = self.management_sql.db.items(cmd=cmd).data[0][0]
+                if not profit_positive : profit_positive = 0
+                cmd = f"SELECT sum(profit) FROM back_order WHERE execute_id={execute_id} and profit<0"
+                profit_negative = self.management_sql.db.items(cmd=cmd).data[0][0]
+                if not profit_negative : profit_negative = 0
+                #--------------Trade: open/close
                 cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and status='open'"
-                open_count = self.management_sql.db.items(cmd=cmd).data[0][0]
+                trade_open = self.management_sql.db.items(cmd=cmd).data[0][0]
                 cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and status='close'"
-                close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
-                cmd = f"SELECT count(id) FROM back_order  WHERE execute_id={execute_id} and status='close'"
-                close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
-                cmd = f"SELECT min(profit), max(profit), min(loss), max(loss) FROM back_execute_detaile WHERE execute_id={execute_id}"
+                trade_close = self.management_sql.db.items(cmd=cmd).data[0][0]
+                #--------------Trade: sell/buy
+                cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and action='buy'"
+                trade_buy = self.management_sql.db.items(cmd=cmd).data[0][0]
+                cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and action='sell'"
+                trade_sell = self.management_sql.db.items(cmd=cmd).data[0][0]
+                #--------------Detaile
+                cmd = f"SELECT min(profit_close), max(profit_close), max(profit_open), min(profit_open) FROM back_execute_detaile WHERE execute_id={execute_id}"
                 data = self.management_sql.db.items(cmd=cmd).data[0]
-                profit_min = f"{data[0]:.{2}f}"
-                profit_max = f"{data[1]:.{2}f}"
-                loss_max = f"{data[2]:.{2}f}"
-                loss_min = f"{data[3]:.{2}f}"
+                profit_close_min = data[0]
+                profit_close_max = data[1]
+                profit_open_min = data[2]
+                profit_open_max=data[3]
+                #--------------Param
+                param = f""
+                #--------------Add
                 detaile.append({
                     "step":'All',
                     "date_from":date_from,
                     "date_to":date_to,
-                    "count":count,
-                    "profit":profit,
-                    "open_count":open_count,
-                    "close_count":close_count,
-                    "profit_min":profit_min,
-                    "profit_max":profit_max,
-                    "loss_min":loss_min,
-                    "loss_max":loss_max
+                    "trade_all":f"{trade_all}",
+                    "trade_open":f"{trade_open}",
+                    "trade_close":f"{trade_close}",
+                    "trade_buy":f"{trade_buy}",
+                    "trade_sell":f"{trade_sell}",
+                    "profit_all":f"{profit_all:.{2}f}",
+                    "profit_positive":f"{profit_positive:.{2}f}",
+                    "profit_negative":f"{profit_negative:.{2}f}",
+                    "profit_close_min":f"{profit_close_min:.{2}f}",
+                    "profit_close_max":f"{profit_close_max:.{2}f}",
+                    "profit_open_min":f"{profit_open_min:.{2}f}",
+                    "profit_open_max":f"{profit_open_max:.{2}f}",
+                    "param":param
                 })
                 #--------------Items
                 for i in range(max_step):
                     i += 1
+                    #--------------All
                     cmd = f"SELECT min(date_open), max(date_close), count(id), sum(profit) FROM back_order WHERE execute_id={execute_id} and step={i}"
                     data = self.management_sql.db.items(cmd=cmd).data[0]
                     date_from = data[0].strftime('%Y-%m-%d %H:%M:%S')
                     date_to = data[1].strftime('%Y-%m-%d %H:%M:%S')
-                    count = data[2]
-                    profit = f"{data[3]:.{2}f}"
-                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and step={i} and status='open'"
-                    open_count = self.management_sql.db.items(cmd=cmd).data[0][0]
-                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and step={i} and status='close'"
-                    close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
-                    cmd = f"SELECT count(id) FROM back_order  WHERE execute_id={execute_id} and step={i} and status='close'"
-                    close_count = self.management_sql.db.items(cmd=cmd).data[0][0]
-                    cmd = f"SELECT min(profit), max(profit), min(loss), max(loss) FROM back_execute_detaile WHERE execute_id={execute_id} and step={i}"
+                    trade_all = data[2]
+                    profit_all = data[3]
+                    #--------------Profit
+                    cmd = f"SELECT sum(profit) FROM back_order WHERE execute_id={execute_id} and profit>0 and step={i}"
+                    profit_positive = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    if not profit_positive : profit_positive = 0
+                    cmd = f"SELECT sum(profit) FROM back_order WHERE execute_id={execute_id} and profit<0 and step={i}"
+                    profit_negative = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    if not profit_negative : profit_negative = 0
+                    #--------------Trade: open/close
+                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and status='open' and step={i}"
+                    trade_open = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and status='close' and step={i}"
+                    trade_close = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    #--------------Trade: sell/buy
+                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and action='buy' and step={i}"
+                    trade_buy = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and action='sell' and step={i}"
+                    trade_sell = self.management_sql.db.items(cmd=cmd).data[0][0]
+                    #--------------Detaile
+                    cmd = f"SELECT min(profit_close), max(profit_close), max(profit_open), min(profit_open) FROM back_execute_detaile WHERE execute_id={execute_id} and step={i}"
                     data = self.management_sql.db.items(cmd=cmd).data[0]
-                    profit_min = f"{data[0]:.{2}f}"
-                    profit_max = f"{data[1]:.{2}f}"
-                    loss_max = f"{data[2]:.{2}f}"
-                    loss_min = f"{data[3]:.{2}f}"
+                    profit_close_min = data[0]
+                    profit_close_max = data[1]
+                    profit_open_min = data[2]
+                    profit_open_max=data[3]
+                    #--------------Param
+                    cmd = f"SELECT param FROM back_execute_detaile WHERE execute_id={execute_id} and step={i} and param !=''"
+                    param = self.management_sql.db.items(cmd=cmd).data
+                    param = param[0] if len(param)> 0 else ""
+                    #--------------Add
                     detaile.append({
-                        "step":i,
+                        "step":f'{i}',
                         "date_from":date_from,
                         "date_to":date_to,
-                        "count":count,
-                        "profit":profit,
-                        "open_count":open_count,
-                        "close_count":close_count,
-                        "profit_min":profit_min,
-                        "profit_max":profit_max,
-                        "loss_min":loss_min,
-                        "loss_max":loss_max
+                        "trade_all":f"{trade_all}",
+                        "trade_open":f"{trade_open}",
+                        "trade_close":f"{trade_close}",
+                        "trade_buy":f"{trade_buy}",
+                        "trade_sell":f"{trade_sell}",
+                        "profit_all":f"{profit_all:.{2}f}",
+                        "profit_positive":f"{profit_positive:.{2}f}",
+                        "profit_negative":f"{profit_negative:.{2}f}",
+                        "profit_close_min":f"{profit_close_min:.{2}f}",
+                        "profit_close_max":f"{profit_close_max:.{2}f}",
+                        "profit_open_min":f"{profit_open_min:.{2}f}",
+                        "profit_open_max":f"{profit_open_max:.{2}f}",
+                        "param":param
                     })
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)

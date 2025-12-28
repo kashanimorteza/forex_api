@@ -67,10 +67,10 @@ def status(id:int):
     return data_orm.status(model=model_db, id=id)
 
 #-------------------------- [start]
-@route.get("/start/{id}", description="start", response_model=model_output)
-def start(id:int):
+@route.get("/start/{execute_id}", description="start", response_model=model_output)
+def start(execute_id:int):
     start_time = time.time()
-    logic_backtest.execute_id = id
+    logic_backtest.execute_id = execute_id
     output:model_output = logic_backtest.run()
     output.time = sort(f"{(time.time() - start_time):.3f}", 3)
     return output
@@ -87,9 +87,9 @@ def order_step(id:int):
     return result
 
 #-------------------------- [action_detaile]
-@route.get("/action_detaile/{id}", description="action_detaile", response_model=model_output)
-def action_detaile(id:int): 
-    result = logic_backtest.action_detaile(execute_id=id)
+@route.get("/action_detaile/{execute_id}", description="action_detaile", response_model=model_output)
+def action_detaile(execute_id:int): 
+    result = logic_backtest.action_detaile(execute_id=execute_id)
     return result
 
 #-------------------------- [order_items]
