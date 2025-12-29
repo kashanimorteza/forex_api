@@ -268,7 +268,7 @@ class Database_Orm:
             #--------------Action
             for table in BaseModel.metadata.sorted_tables:
                 table_name = table.name
-                if table_name == 'back_order' or table_name == 'back_execute_detaile':
+                if table_name != 'instrument':
                     self.session.execute(text(f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE"))
                     for column in table.columns:
                         if column.default and hasattr(column.default, 'name'):

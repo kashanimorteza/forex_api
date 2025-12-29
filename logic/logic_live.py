@@ -5,6 +5,7 @@
 # logic_live
 
 #--------------------------------------------------------------------------------- Import
+import ast
 import inspect, time
 from datetime import timedelta
 from logic.logic_global import debug, log_instance, data_instance, Strategy_Run, Strategy_Action, forex_apis
@@ -476,7 +477,7 @@ class Logic_Live:
             #--------------Database
             if result.status:
                 order_id, bid, ask, tp, sl, price_open, date_open = result.data
-                cmd = f"INSERT INTO live_order (execute_id, order_id, step, father_id, date_open, price_open, symbol, action, amount, tp, sl, status, trade_id, profit, enable) VALUES ({execute_id}, '{order_id}', '{step}', '{father_id}', '{date_open}', '{price_open}', '{symbol}', '{action}', {amount}, {tp}, {sl}, 'open', '', 0.0, True)"
+                cmd = f"INSERT INTO live_order (execute_id, order_id, step, father_id, date_open, price_open, symbol, action, amount, tp, sl, status, trade_id, profit, enable) VALUES ({execute_id}, '{order_id}', {step}, {father_id}, '{date_open}', {price_open}, '{symbol}', '{action}', {amount}, {tp}, {sl}, 'open', '', 0.0, True)"
                 self.management_sql.db.execute(cmd=cmd)
             #--------------Output
             output = result
@@ -698,12 +699,7 @@ class Logic_Live:
         return output
     
     #-------------------------- [strategy_action]
-    def strategy_action(
-                    self, 
-                    execute_id=None, 
-                    action:Strategy_Action=None,
-                    order_detaile=None
-                    ) -> model_output:
+    def strategy_action(self, execute_id=None, action:Strategy_Action=None, order_detaile=None) -> model_output:
         #-------------- Description
         # IN     : 
         # OUT    : model_output
@@ -835,19 +831,22 @@ class Logic_Live:
     def order_detaile(self, order_id) -> model_output:
         #-------------- Variable
         output = {}
+        #--------------Data
+        table1 = "live_execute" 
+        table2 = "live_order"
         #--------------Action
-        cmd = f"SELECT strategy.name, strategy_item.id, live_execute.status, live_execute.account_id, live_order.id, live_order.execute_id, live_order.father_id, live_order.step, live_order.date_open, live_order.price_open, live_order.date_close, live_order.price_close, live_order.profit, live_order.status,live_order.symbol, live_order.action, live_order.amount, live_order.tp, live_order.sl, live_order.trade_id, live_order.enable FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN live_execute ON strategy_item.id = live_execute.strategy_item_id JOIN live_order ON live_execute.id = live_order.execute_id WHERE live_order.order_id='{order_id}'"
+        cmd = f"SELECT strategy.name, strategy_item.id,{table1}.status, {table1}.id, {table1}.account_id, {table2}.execute_id, {table2}.step, {table2}.father_id, {table2}.date_open, {table2}.price_open, {table2}.date_close, {table2}.price_close, {table2}.profit, {table2}.status,{table2}.symbol, {table2}.action, {table2}.amount, {table2}.tp, {table2}.sl, {table2}.trade_id, {table2}.enable FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table1} ON strategy_item.id = {table1}.strategy_item_id JOIN {table2} ON {table1}.id = {table2}.execute_id WHERE {table2}.order_id='{order_id}'"
         result:model_output = self.management_sql.db.items(cmd=cmd)
         #--------------Data
         if result.status and len(result.data) > 0 :
             output["strategy_name"] = result.data[0][0]
             output["strategy_item_id"] = result.data[0][1]
             output["execute_status"] = result.data[0][2]
-            output["account_id"] = result.data[0][3]
-            output["id"] = result.data[0][4]
+            output["id"] = result.data[0][3]
+            output["account_id"] = result.data[0][4]
             output["execute_id"] = result.data[0][5]
-            output["father_id"] = result.data[0][6]
-            output["step"] = result.data[0][7]
+            output["step"] = result.data[0][6]
+            output["father_id"] = result.data[0][7]
             output["date_open"] = result.data[0][8]
             output["price_open"] = result.data[0][9]
             output["date_close"] = result.data[0][10]

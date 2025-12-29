@@ -122,8 +122,8 @@ forex_connect:
   acc-trade:
     broker    : 'fxcm'
     type      : 'Demo'
-    username  : '52030299'
-    password  : '2idfycj'
+    username  : '52047997'
+    password  : 'pdk2cnf'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'
     key       : ''
 

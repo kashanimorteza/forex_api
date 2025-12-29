@@ -195,7 +195,7 @@ class Logic_Implementation:
             #-------------- Add
             if add:
                 self.data_orm.add(model=model, item=model(name='Back-Test', broker='Back-Test', type='', currency='', server='', username='', password='', description="", enable=True))
-                self.data_orm.add(model=model, item=model(name='Trade-Test', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52035533', password='iaee0at', description="", enable=True))
+                self.data_orm.add(model=model, item=model(name='Trade-Test', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52047997', password='pdk2cnf', description="", enable=True))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -354,9 +354,9 @@ class Logic_Implementation:
                     actions='buy,sell',
                     amount=1,
                     tp_pips=300, 
-                    sl_pips=999999,
+                    sl_pips=100000,
                     limit_trade=-1,
-                    limit_profit=999999,
+                    limit_profit=1000,
                     limit_loss=-1000,
                     params="")
                 self.data_orm.add(model=model, item=item)
