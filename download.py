@@ -11,6 +11,7 @@ from logic.logic_util import model_output
 from logic.logic_global import config
 from logic.logic_util import parse_cli_args, format_dict_block, to_bool
 from logic.logic_live import Logic_Live
+from logic.fxcm_api import Fxcm_API
 
 #--------------------------------------------------------------------------------- Debug
 this_class = "Download"
@@ -65,7 +66,9 @@ try:
                 forex.api.logout()
     else :
         account_cfg = config.get("forex_connect", {}).get(account, {})
-        forex = Logic_Live(account_info=account_cfg)
+        fxcm_api = Fxcm_API(account_info=account_cfg)
+        forex = Logic_Live()
+        forex.api = fxcm_api
         forex.api.login()
         for timeframe in timeframes:
             for instrument in instruments:
