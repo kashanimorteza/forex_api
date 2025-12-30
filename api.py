@@ -91,4 +91,4 @@ for router, prefix, tags in routes : app.include_router(router, prefix=prefix, t
 
 #--------------------------------------------------------------------------------- Run
 if __name__ == "__main__" : 
-    uvicorn.run(app, host=host, port=port, log_level="info")
+    uvicorn.run(app, host=host, port=port, log_level="critical")

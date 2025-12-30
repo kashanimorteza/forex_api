@@ -97,7 +97,7 @@ log:
 #--------------------------------------------------------------------------------- FXCM
 forex_connect:
   default: acc-history1
-  delay: 2
+  delay: 0.5
   acc-history1:
     broker    : 'fxcm'
     type      : 'Demo'
