@@ -419,12 +419,12 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=2, step=10, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=2, step=10, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=2, step=10, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=2, step=10, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=2, step=10, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=2, step=10, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2030-01-01 23:59:59"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -511,42 +511,44 @@ class Logic_Implementation:
         #-------------- Variable
         tbl_instrument = config["instrument"]["table"]
         timeframes =config["timeframe"]
+        defaultSymbols = config["instrument"]["defaultSymbols"]
         
         try:
             #-------------------- Action
             tblList= self.data_orm.items(model=model_instrument_db).data
             for i in tblList:
                 for t in timeframes:
-                    tblName =f"{i.name}_{t}"
-                    if t =="t1":
-                        query = f"""
-                            CREATE TABLE IF NOT EXISTS {tblName} (
-                                id SERIAL UNIQUE NOT NULL,
-                                date TIMESTAMP UNIQUE NOT NULL PRIMARY KEY,
-                                bid real,
-                                ask real                            
-                            )"""
-                    else:                  
-                        query = f"""
-                            CREATE TABLE IF NOT EXISTS {tblName} (
-                                id SERIAL UNIQUE NOT NULL,
-                                date TIMESTAMP UNIQUE NOT NULL PRIMARY KEY,
-                                bidopen real,
-                                bidclose real,
-                                bidhigh real,
-                                bidlow real,
-                                askopen real,
-                                askclose real,
-                                askhigh real,
-                                asklow real,
-                                tickqty smallint
-                            )"""
-                    if drop:
-                        output.data["drop"] = self.data_sql.db.execute(f"DROP TABLE IF EXISTS {tblName}")
-                        self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)}", f"Drop table {tblName} : {output.status}")
-                    if create:
-                        output.data["create"] = self.data_sql.db.execute(query)
-                        self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)}", f"Create table {tblName} : {output.status}")
+                    if i.name in defaultSymbols:
+                        tblName =f"{i.name}_{t}"
+                        if t =="t1":
+                            query = f"""
+                                CREATE TABLE IF NOT EXISTS {tblName} (
+                                    id SERIAL UNIQUE NOT NULL,
+                                    date TIMESTAMP UNIQUE NOT NULL PRIMARY KEY,
+                                    bid real,
+                                    ask real                            
+                                )"""
+                        else:                  
+                            query = f"""
+                                CREATE TABLE IF NOT EXISTS {tblName} (
+                                    id SERIAL UNIQUE NOT NULL,
+                                    date TIMESTAMP UNIQUE NOT NULL PRIMARY KEY,
+                                    bidopen real,
+                                    bidclose real,
+                                    bidhigh real,
+                                    bidlow real,
+                                    askopen real,
+                                    askclose real,
+                                    askhigh real,
+                                    asklow real,
+                                    tickqty smallint
+                                )"""
+                        if drop:
+                            output.data["drop"] = self.data_sql.db.execute(f"DROP TABLE IF EXISTS {tblName}")
+                            self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)}", f"Drop table {tblName} : {output.status}")
+                        if create:
+                            output.data["create"] = self.data_sql.db.execute(query)
+                            self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)}", f"Create table {tblName} : {output.status}")
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = True
