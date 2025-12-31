@@ -211,6 +211,18 @@ class Logic_Back:
                     ask = float(row[2])
                     bid = float(row[3])
                     price_data[symbol]={'date': date, 'ask': ask, 'bid': bid}
+                  #------check_limit
+                    check_limit_status, check_limit_param  = self.check_limit(symbol, ask, bid, date)
+                    if not check_limit_status:
+                        order_open_accept = False
+                        if check_limit_param == 'loss':
+                            result_strategy:model_output = self.strategy.stop()
+                            for item in result_strategy.data :
+                                item["father_id"] = order_close.get("id")
+                                item["date"] = date
+                                item["ask"] = ask
+                                item["bid"] = bid
+                                self.action(items=result_strategy.data)
                     #------check_tp_sl
                     check_tp_sls = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
                     for check_tp_sl in check_tp_sls :
@@ -244,6 +256,18 @@ class Logic_Back:
                             item["father_id"] = -1
                             item["date"] = date
                             self.action(items=result_strategy_price_change.data)
+                    #------check_limit
+                    check_limit_status, check_limit_param  = self.check_limit(symbol, ask, bid, date)
+                    if not check_limit_status:
+                        order_open_accept = False
+                        if check_limit_param == 'loss':
+                            result_strategy:model_output = self.strategy.stop()
+                            for item in result_strategy.data :
+                                item["father_id"] = order_close.get("id")
+                                item["date"] = date
+                                item["ask"] = ask
+                                item["bid"] = bid
+                                self.action(items=result_strategy.data)
                 if len(self.data[symbol])>1 : 
                     self.data[symbol] = self.data[symbol][self.data[symbol].index(row) + 1:]
             #--------------Output
