@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
-from logic.logic_global import debug, list_instrument, log_instance, Strategy_Run, database_management, database_data
+from logic.logic_global import Strategy_Action, debug, list_instrument, log_instance, Strategy_Run, database_management, database_data
 from logic.logic_util import model_output, sort, get_tbl_name
 from logic.logic_log import Logic_Log
 from logic.data_sql import Data_SQL
@@ -33,6 +33,7 @@ class Logic_Back:
         self.account_profit_open = 0
         self.list_order_open = []
         self.list_order_close = []
+        self.list_order_pending:list[dict] = []
         self.step = 1 
         #--------------------Instance
         #---management_orm
@@ -98,6 +99,7 @@ class Logic_Back:
                 self.account_profit_open = 0
                 self.list_order_open = []
                 self.list_order_close = []
+                self.list_order_pending:list[dict] = []
                 #---Start
                 result_start:model_output = self.start()
                 #---Next
@@ -140,9 +142,6 @@ class Logic_Back:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-        #-------------- Variable
-        keep = False
-        state = None
         #-------------- Action
         try:
             #------Data
@@ -151,7 +150,6 @@ class Logic_Back:
             if result_strategy.status :
                 for item in result_strategy.data :
                     symbol = item.get("symbol")
-                    state = item.get("state")
                     if len(self.data[symbol])>0:
                         item["father_id"] = 0
                         item["date"] = self.data[symbol][0][1]
@@ -163,7 +161,7 @@ class Logic_Back:
             #------Action
             result_action:model_output = self.action(items=result_strategy.data)
             #------Database
-            cmd = f"UPDATE back_execute SET status='{state}' WHERE id={self.execute_id}"
+            cmd = f"UPDATE back_execute SET status='{Strategy_Action.START}' WHERE id={self.execute_id}"
             result_database:model_output = self.management_sql.db.execute(cmd=cmd)
             #------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -211,14 +209,28 @@ class Logic_Back:
                     ask = float(row[2])
                     bid = float(row[3])
                     price_data[symbol]={'date': date, 'ask': ask, 'bid': bid}
-                  #------check_limit
+                    #------pending_order
+                    for order in self.list_order_pending:
+                        order_action = order["action"]
+                        order_ask = order["ask"]
+                        order_bid = order["bid"]
+                        if order_action=="buy":
+                            if ask>= order_ask:
+                                order["date"]=date
+                                self.order_open(order)
+                                self.list_order_pending.remove(order)
+                        if order_action =="sell":
+                            if bid<= order_bid:
+                                order["date"]=date
+                                self.order_open(order)
+                                self.list_order_pending.remove(order)
+                    #------check_limit
                     check_limit_status, check_limit_param  = self.check_limit(symbol, ask, bid, date)
                     if not check_limit_status:
                         order_open_accept = False
                         if check_limit_param == 'loss':
                             result_strategy:model_output = self.strategy.stop()
                             for item in result_strategy.data :
-                                item["father_id"] = order_close.get("id")
                                 item["date"] = date
                                 item["ask"] = ask
                                 item["bid"] = bid
@@ -234,7 +246,6 @@ class Logic_Back:
                         if check_limit_param == 'loss':
                             result_strategy:model_output = self.strategy.stop()
                             for item in result_strategy.data :
-                                item["father_id"] = order_close.get("id")
                                 item["date"] = date
                                 item["ask"] = ask
                                 item["bid"] = bid
@@ -263,7 +274,6 @@ class Logic_Back:
                         if check_limit_param == 'loss':
                             result_strategy:model_output = self.strategy.stop()
                             for item in result_strategy.data :
-                                item["father_id"] = order_close.get("id")
                                 item["date"] = date
                                 item["ask"] = ask
                                 item["bid"] = bid
@@ -423,17 +433,7 @@ class Logic_Back:
             bid = item.get("bid")
             date = item.get("date")
             #-------------- TP/SL
-            if tp_pips or sl_pips:
-                point_size = list_instrument[symbol]["point_size"]
-                digits = list_instrument[symbol]["digits"]
-                if action == "buy":
-                    price_open = ask
-                    tp = float(f"{ask + tp_pips * point_size:.{digits}f}")
-                    sl = float(f"{bid - sl_pips * point_size:.{digits}f}")
-                elif action == "sell":
-                    price_open = bid
-                    tp = float(f"{bid - tp_pips * point_size:.{digits}f}")
-                    sl = float(f"{ask + sl_pips * point_size:.{digits}f}")
+            price_open, tp, sl = self.cal_tp_sl(symbol, action, ask, bid, tp_pips, sl_pips)
             #-------------- Action
             obj = model_back_order_db()
             obj.father_id = father_id
@@ -455,7 +455,7 @@ class Logic_Back:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.status = result_database.status
             output.data = None
-            output.message = f"{symbol} | {action} | {amount} | {price_open} | {tp} | {sl}"
+            output.message = f"{date} | {symbol} | {action} | {amount} | {price_open} | {tp} | {sl}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
@@ -485,54 +485,13 @@ class Logic_Back:
         output = model_output()
         output.class_name = self.this_class
         output.method_name = this_method
-
+        #-------------- Action
         try:
-            #-------------- Data
-            father_id = item.get("father_id")
-            symbol = item.get("symbol")
-            action = item.get("action")
-            amount = item.get("amount")
-            tp_pips = item.get("tp_pips")
-            sl_pips = item.get("sl_pips")
-            ask = item.get("ask")
-            bid = item.get("bid")
-            date = item.get("date")
-            #-------------- TP/SL
-            if tp_pips or sl_pips:
-                point_size = list_instrument[symbol]["point_size"]
-                digits = list_instrument[symbol]["digits"]
-                tp_pips = tp_pips / (10 ** digits)
-                sl_pips = sl_pips / (10 ** digits)
-                if action == "buy":
-                    price_open = ask
-                    tp = float(f"{ask + tp_pips:.{digits}f}")
-                    sl = float(f"{bid - sl_pips:.{digits}f}")
-                elif action == "sell":
-                    price_open = bid
-                    tp = float(f"{bid - tp_pips:.{digits}f}")
-                    sl = float(f"{ask + sl_pips:.{digits}f}")
-            #-------------- Action
-            obj = model_back_order_db()
-            obj.father_id = father_id
-            obj.date_open = date
-            obj.execute_id = self.execute_id
-            obj.step = self.step
-            obj.symbol = symbol
-            obj.action = action
-            obj.amount = amount
-            obj.price_open = price_open
-            obj.tp = tp
-            obj.sl = sl
-            obj.status = 'open'
-            result_database:model_output = self.management_orm.add(model=model_back_order_db, item=obj)
-            #-------------- Orders
-            self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='open'").data
-            self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
+            self.list_order_pending.append(item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.status = result_database.status
             output.data = item
-            output.message = f"{date} | {symbol} | {action} | {amount} | {price_open} | {tp} | {sl}"
+            output.message = f"{item['date']} | {item['symbol']} | {item['action']} | {item['amount']} | {item['ask']} | {item['bid']}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
@@ -1044,3 +1003,19 @@ class Logic_Back:
             output.status = False
         #--------------Return
         return output
+    
+    #--------------------------------------------- cal_tp_sl
+    def cal_tp_sl(self, symbol, action, ask, bid, tp_pips, sl_pips)-> model_output:
+
+        digits = list_instrument[symbol]["digits"]
+        spred = abs(ask-bid)
+        if action == "buy":
+            price_open = ask
+            tp = float(f"{bid + spred + (tp_pips / (10 ** digits)):.{digits}f}")
+            sl = float(f"{bid + spred - (sl_pips / (10 ** digits)):.{digits}f}")
+        elif action == "sell":
+            price_open = bid
+            tp = float(f"{ask - spred - (tp_pips / (10 ** digits)):.{digits}f}")
+            sl = float(f"{ask - spred + (sl_pips / (10 ** digits)):.{digits}f}")
+
+        return price_open, tp, sl

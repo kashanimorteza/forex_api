@@ -61,23 +61,22 @@ class Dowjones:
         output.method_name = this_method
         #--------------Variable
         items = []
-        
+        #--------------Action
         try:
-            #--------------Action
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = items
-            output.message = None
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
+            pass
         except Exception as e:  
-            #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Output
+        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.data = items
+        output.message = None
+        #--------------Verbose
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        #--------------Log
+        if log : self.log.log(log_model, output)
         #--------------Return
         return output
 
@@ -99,39 +98,31 @@ class Dowjones:
         output.method_name = this_method
         #--------------Variable
         items = []
-
+        #--------------Action
         try:
-            #--------------Action
-            item = {
-                "run": Strategy_Run.ORDER_CLOSE_ALL, 
-                "state": this_method
-            }
-            items.append(item)
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = items
-            output.message = output.status
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
-            output.data = items
-            output.message = None
-            #--------------Log
-            if log : self.log.log(log_model, output)
+            items.append({"run": Strategy_Run.ORDER_CLOSE_ALL})
         except Exception as e:  
-            #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Output
+        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.data = items
+        output.message = output.status
+        #--------------Verbose
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        #--------------Log
+        if log : self.log.log(log_model, output)
         #--------------Return
         return output
     
     #--------------------------------------------- order_close
     def order_close(self, order_detaile):
         #-------------- Description
-        # IN     : execute_id
+        # IN     : 
         # OUT    : 
-        # Action :
+        # Action : Just buy|sell order
         #-------------- Debug
         this_method = inspect.currentframe().f_code.co_name
         verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
@@ -144,28 +135,27 @@ class Dowjones:
         output.method_name = this_method
         #--------------Variable
         items = []
-
+        #--------------Action
         try:
-            #--------------Action
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = items
-            output.message = None
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
+            pass
         except Exception as e:  
-            #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Output
+        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.data = items
+        output.message = None
+        #--------------Verbose
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        #--------------Log
+        if log : self.log.log(log_model, output)
         #--------------Return
         return output
 
     #--------------------------------------------- price_change
-    def price_change(self, price_data, order_close, order_open):
+    def price_change(self, price_data, order_close, order_open, order_pending):
         #-------------- Description
         # IN     : 
         # OUT    : 
@@ -184,16 +174,16 @@ class Dowjones:
         items = []
         #--------------Action
         try:
+            #---------Date
+            digits = list_instrument.get(symbol, {}).get("digits")
+            date = price_data[symbol].get("date")
+            ask = float(price_data[symbol].get("ask"))
+            bid = float(price_data[symbol].get("bid"))
+
             for symbol in self.symbols:
-                #---------Date
-                date = price_data[symbol].get("date")
                 if (self.set_order is None) or (self.set_order is False) or ( date.date()> self.date.date()):
                     #---------Time
-                    if self.time_start <= date.time() <= self.time_end:
-                        #---Data
-                        ask = float(price_data[symbol].get("ask"))
-                        bid = float(price_data[symbol].get("bid"))
-                        digits = list_instrument.get(symbol, {}).get("digits")
+                    if self.time_start <= date.time() <= self.time_end:                        
                         #---Set_Price
                         if not self.set_price:
                             self.set_order = False
@@ -220,19 +210,18 @@ class Dowjones:
                                     "sl_pips": self.sl_pips
                                 }
                                 items.append(item)
-            #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-            output.data = items
-            output.message = None
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
         except Exception as e:  
-            #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Output
+        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.data = items
+        output.message = None
+        #--------------Verbose
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        #--------------Log
+        if log : self.log.log(log_model, output)
         #--------------Return
         return output
