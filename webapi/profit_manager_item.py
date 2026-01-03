@@ -5,11 +5,11 @@
 # This is route for profit_manager_item
 
 #--------------------------------------------------------------------------------- Import
-from logic.logic_util import model_output
-from logic.logic_global import database_management
+from logic.util import model_output
+from logic.startup import database_management
 from fastapi import APIRouter, Request
-from model.model_profit_manager_item import model_profit_manager_item_py as model_py
-from model.model_profit_manager_item import model_profit_manager_item_db as model_db
+from model.profit_manager_item import model_profit_manager_item_py as model_py
+from model.profit_manager_item import model_profit_manager_item_db as model_db
 from logic.data_orm import Data_Orm
 
 #--------------------------------------------------------------------------------- Action

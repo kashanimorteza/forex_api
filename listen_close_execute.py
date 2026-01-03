@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import time
-from logic.logic_live import Logic_Live 
+from logic.live import Logic_Live 
 
 #--------------------------------------------------------------------------------- Class
 class Listen_Close_Execute:

@@ -5,13 +5,13 @@
 # This is route for account
 
 #--------------------------------------------------------------------------------- Import
-from logic.logic_util import model_output
-from logic.logic_global import database_management
+from logic.util import model_output
+from logic.startup import database_management
 from fastapi import APIRouter, Request
-from model.model_account import model_account_py as model_py
-from model.model_account import model_account_db as model_db
+from model.account import model_account_py as model_py
+from model.account import model_account_db as model_db
 from logic.data_orm import Data_Orm
-from logic.logic_global import forex_apis
+from logic.startup import forex_apis
 
 #--------------------------------------------------------------------------------- Action
 #-------------------------- [Variable]

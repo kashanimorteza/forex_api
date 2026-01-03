@@ -7,9 +7,9 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 import pandas as pd
-from logic.logic_global import debug, log_instance, data_instance, forexconnect_delay
-from logic.logic_util import model_output, sort
-from logic.logic_log import Logic_Log
+from logic.startup import debug, log_instance, data_instance, forexconnect_delay
+from logic.util import model_output, sort
+from logic.log import Logic_Log
 from forexconnect import ForexConnect, fxcorepy
 
 #--------------------------------------------------------------------------------- Action

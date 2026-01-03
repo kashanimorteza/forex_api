@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, re
 from datetime import datetime as dt
-from logic.logic_util import sort
+from logic.util import sort
 
 #--------------------------------------------------------------------------------- Action
 class Logic_Log:

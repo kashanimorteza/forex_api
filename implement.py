@@ -5,8 +5,8 @@
 # Implement
 
 #--------------------------------------------------------------------------------- Import
-from logic.logic_global import log_instance, data_instance, database_management
-from logic.logic_implementation import Logic_Implementation
+from logic.startup import log_instance, data_instance, database_management
+from logic.implementation import Logic_Implementation
 from logic.data_orm import Data_Orm
 from model import *
 

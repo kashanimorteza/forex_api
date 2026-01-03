@@ -5,9 +5,9 @@
 # data_sql
 
 #--------------------------------------------------------------------------------- Import
-from logic.logic_global import config, debug, log_instance
-from logic.logic_util import sort, get_tbl_name
-from logic.logic_log import Logic_Log
+from logic.startup import config, debug, log_instance
+from logic.util import sort, get_tbl_name
+from logic.log import Logic_Log
 from logic.database_sql import Database_SQL
 
 #--------------------------------------------------------------------------------- Action

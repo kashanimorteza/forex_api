@@ -13,13 +13,13 @@ logging.getLogger("root").setLevel(logging.CRITICAL)
 #--------------------------------------------- Other
 import uvicorn
 import threading
-from logic.logic_global import config, load_forex_api, list_close
+from logic.startup import config, load_forex_api, list_close
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from webapi import *
 from listen_close import Listen_Close
 from listen_close_execute import Listen_Close_Execute
-from logic.logic_live import Logic_Live
+from logic.live import Logic_Live
 
 #--------------------------------------------------------------------------------- Variable
 title = config.get("webapi", {}).get("title", {})
@@ -60,7 +60,7 @@ logic_live = Logic_Live(account_id=2)
 @app.on_event("startup")
 async def startup_event():
     global listener_close, listener_close_execute, listener_thread, listener_execute_thread
-    from logic.logic_global import forex_apis
+    from logic.startup import forex_apis
     
     # Start Listen_Close
     listener_close = Listen_Close(forex=logic_live, items=list_close)

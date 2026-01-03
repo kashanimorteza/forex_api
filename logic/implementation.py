@@ -6,12 +6,12 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from logic.logic_global import config, debug, log_instance, data_instance, forex_apis
-from logic.logic_util import model_output, sort
-from logic.logic_log import Logic_Log
+from logic.startup import config, debug, log_instance, data_instance, forex_apis
+from logic.util import model_output, sort
+from logic.log import Logic_Log
 from logic.data_orm import Data_Orm
 from logic.data_sql import Data_SQL
-from logic.logic_live import Logic_Live
+from logic.live import Logic_Live
 from model import *
 
 #--------------------------------------------------------------------------------- Managemnet
@@ -119,7 +119,7 @@ class Logic_Implementation:
         if useDefaultSymbols :
             defaultSymbols = cfgData.get("defaultSymbols")
         else:
-            from logic.logic_global import load_forex_api
+            from logic.startup import load_forex_api
             load_forex_api()
             forex:Logic_Live = forex_apis[2]
             offers = forex.get_table("OFFERS").data

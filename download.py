@@ -7,10 +7,10 @@
 #--------------------------------------------------------------------------------- Import
 import sys
 from datetime import datetime
-from logic.logic_util import model_output
-from logic.logic_global import config
-from logic.logic_util import parse_cli_args, format_dict_block, to_bool
-from logic.logic_live import Logic_Live
+from logic.util import model_output
+from logic.startup import config
+from logic.util import parse_cli_args, format_dict_block, to_bool
+from logic.live import Logic_Live
 from logic.fxcm_api import Fxcm_API
 
 #--------------------------------------------------------------------------------- Debug

@@ -7,9 +7,9 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 import psycopg2
-from logic.logic_global import debug, log_instance
-from logic.logic_util import model_output, sort
-from logic.logic_log import Logic_Log
+from logic.startup import debug, log_instance
+from logic.util import model_output, sort
+from logic.log import Logic_Log
 
 #--------------------------------------------------------------------------------- Action
 class Database_SQL:
