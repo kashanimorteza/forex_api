@@ -17,7 +17,7 @@ class model_profit_manager_item_db(BaseModel_db):
     __tablename__ = 'profit_manager_item'
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
-    profit_id = Column(Integer, default=1)
+    profit_manager_id = Column(Integer, default=1)
     name = Column(String, default='')
     value = Column(Integer, default=1)
     tp_value = Column(Integer, default=0)
@@ -32,7 +32,7 @@ class model_profit_manager_item_db(BaseModel_db):
 #--------------------------------------------------------------------------------- Python
 class model_profit_manager_item_py(BaseModel_py):
     id : int = 0
-    profit_id : int = 1
+    profit_manager_id : int = 1
     name : str = ''
     value : int = 1
     tp_value : int = 0

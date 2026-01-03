@@ -4,6 +4,8 @@ from .strategy import route as strategy
 from .strategy_item import route as strategy_item
 from .live import route as livee
 from .back import route as back
+from .profit_manager import route as profit_manager
+from .profit_manager_item import route as profit_manager_item
 
 __all__ = [
     "account",
@@ -11,5 +13,7 @@ __all__ = [
     "strategy",
     "strategy_item",
     "livee",
-    "back"
+    "back",
+    "profit_manager",
+    "profit_manager_item"
 ]

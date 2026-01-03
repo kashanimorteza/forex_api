@@ -86,6 +86,8 @@ routes = [
     (strategy_item, f"/{key}/strategy_item", ["Strategy Item"]),
     (livee, f"/{key}/live", ["Live"]),
     (back, f"/{key}/back", ["Back"]),
+    (profit_manager, f"/{key}/profit_manager", ["Profit Manager"]),
+    (profit_manager_item, f"/{key}/profit_manager_item", ["Profit Manager Item"]),
 ]
 for router, prefix, tags in routes : app.include_router(router, prefix=prefix, tags=tags)
 

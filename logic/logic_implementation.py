@@ -500,14 +500,17 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
-                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=8, account_id=1, step=1, profit_manager_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=1, account_id=1, step=1, profit_manager_id=5, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=2, account_id=1, step=1, profit_manager_id=5, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=3, account_id=1, step=1, profit_manager_id=5, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=4, account_id=1, step=1, profit_manager_id=5, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=5, account_id=1, step=1, profit_manager_id=5, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, step=1, profit_manager_id=5, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, step=1, profit_manager_id=5, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="2025-12", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="2025-11", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-11-01 00:00:00", date_to="2025-12-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-01-01 00:00:00", date_to="2026-01-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2024", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2024-01-01 00:00:00", date_to="2025-01-01 00:00:00"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -552,7 +555,11 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(name="PM-1-10", description="Profit Manager 1 with 10%"))
+                self.data_orm.add(model=model, item=model(name="PM-1", description="1 to 1"))
+                self.data_orm.add(model=model, item=model(name="PM-2", description="1 to 2"))
+                self.data_orm.add(model=model, item=model(name="PM-3", description="1 to 3"))
+                self.data_orm.add(model=model, item=model(name="PM-5", description="1 to 5"))
+                self.data_orm.add(model=model, item=model(name="PM-10", description="1 to 10"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -597,16 +604,32 @@ class Logic_Implementation:
             if truncate : self.data_orm.truncate(model=model)
             #-------------- Add
             if add:
-                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-1", value=100, tp_value=200, sl_value=-100))
-                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-2", value=200, tp_value=300, sl_value=-200))
-                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-3", value=300, tp_value=400, sl_value=-300))
-                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-4", value=400, tp_value=500, sl_value=-400))
-                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-5", value=500, tp_value=600, sl_value=-500))
-                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-6", value=600, tp_value=700, sl_value=-600))
-                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-7", value=700, tp_value=800, sl_value=-700))
-                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-8", value=800, tp_value=900, sl_value=-800))
-                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-9", value=900, tp_value=1000, sl_value=-900))
-                self.data_orm.add(model=model, item=model(profit_id=1, name="tp-10", value=1000, tp_value=1100, sl_value=-1000))
+                #---1
+                self.data_orm.add(model=model, item=model(profit_manager_id=1, name="st-1", value=100, tp_value=200, sl_value=-100))
+                #---2
+                self.data_orm.add(model=model, item=model(profit_manager_id=2, name="st-1", value=100, tp_value=200, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=2, name="st-2", value=200, tp_value=300, sl_value=-200))
+                #---3
+                self.data_orm.add(model=model, item=model(profit_manager_id=3, name="st-1", value=100, tp_value=200, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=3, name="st-2", value=200, tp_value=300, sl_value=-200))
+                self.data_orm.add(model=model, item=model(profit_manager_id=3, name="st-3", value=300, tp_value=400, sl_value=-300))
+                #---5
+                self.data_orm.add(model=model, item=model(profit_manager_id=4, name="st-1", value=100, tp_value=200, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=4, name="st-2", value=200, tp_value=300, sl_value=-200))
+                self.data_orm.add(model=model, item=model(profit_manager_id=4, name="st-3", value=300, tp_value=400, sl_value=-300))
+                self.data_orm.add(model=model, item=model(profit_manager_id=4, name="st-4", value=400, tp_value=500, sl_value=-400))
+                self.data_orm.add(model=model, item=model(profit_manager_id=4, name="st-5", value=500, tp_value=600, sl_value=-500))
+                #---10
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-1", value=100, tp_value=200, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-2", value=200, tp_value=300, sl_value=-200))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-3", value=300, tp_value=400, sl_value=-300))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-4", value=400, tp_value=500, sl_value=-400))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-5", value=500, tp_value=600, sl_value=-500))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-6", value=600, tp_value=700, sl_value=-600))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-7", value=700, tp_value=800, sl_value=-700))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-8", value=800, tp_value=900, sl_value=-800))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-9", value=900, tp_value=1000, sl_value=-900))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-10", value=1000, tp_value=1100, sl_value=-1000))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

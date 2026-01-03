@@ -32,7 +32,7 @@ class model_back_order_db(BaseModel_db):
     amount = Column(Integer, default=0)
     tp = Column(Float, default=0.0)
     sl = Column(Float, default=0.0)
-    spread = Column(Integer, default=0)
+    spread = Column(Float, default=0)
     profit_manager = Column(Integer, default=0)
     ask = Column(Float, default=0.0)
     bid = Column(Float, default=0.0)
@@ -66,7 +66,7 @@ class model_back_order_py(BaseModel_py):
     amount : int = 0
     tp : float = 0
     sl : float = 0
-    spread : int = 0
+    spread : float = 0
     profit_manager : int = 0
     ask : float = 0
     bid : float = 0

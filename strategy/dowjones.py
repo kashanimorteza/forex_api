@@ -15,7 +15,7 @@ from datetime import datetime
 class Dowjones:
     #--------------------------------------------- init
     def __init__(self, params:dict=None, log:Logic_Log=None):
-        #-------------- Variable
+        #-------------- Debug
         self.this_class = self.__class__.__name__
         #-------------- Instance
         self.log = log if log else log_instance
@@ -175,11 +175,14 @@ class Dowjones:
         items = []
         #--------------Action
         try:
-            for symbol in self.symbols:
-                digits = list_instrument.get(symbol, {}).get("digits")
-                date = price_data[symbol].get("date")
-                ask = float(price_data[symbol].get("ask"))
-                bid = float(price_data[symbol].get("bid"))
+            for item in price_data:
+                #---------Data
+                symbol = item
+                digits = price_data[symbol]["digits"]
+                date = price_data[symbol]["date"]
+                ask = price_data[symbol]["ask"]
+                bid = price_data[symbol]["bid"]
+                #---------Everyday
                 if (self.set_order is None) or (self.set_order is False) or ( date.date()> self.date.date()):
                     #---------Time
                     if self.time_start <= date.time() <= self.time_end:
@@ -199,16 +202,15 @@ class Dowjones:
                                 action = self.up if ask > self.ask else self.down
                                 item = {
                                     "run": Strategy_Run.ORDER_PENDING,
-                                    "state": this_method,
                                     "date": date,
-                                    "pending_limit": self.pending_limit, 
                                     "symbol": symbol, 
                                     "action": action, 
                                     "amount": self.amount, 
                                     "ask": self.ask+(self.order_pip / (10 ** digits)),
                                     "bid": self.bid-(self.order_pip / (10 ** digits)), 
                                     "tp_pips": self.tp_pips, 
-                                    "sl_pips": self.sl_pips
+                                    "sl_pips": self.sl_pips,
+                                    "pending_limit": self.pending_limit, 
                                 }
                                 items.append(item)
         except Exception as e:  
