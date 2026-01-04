@@ -403,7 +403,7 @@ class Logic_Implementation:
                     limit_trade=-1,
                     limit_profit=1000,
                     limit_loss=-1000,
-                    params="{'time_start':'14:30:00', 'time_end':'14:30:15', 'change_pip': 1000, 'order_pip': 500, 'down': 'buy', 'up': 'sell', 'pending_limit': 120}")
+                    params="{'time_start':'09:30:00', 'time_end':'09:30:15', 'change_pip': 1000, 'order_pip': 500, 'down': 'buy', 'up': 'sell', 'pending_limit': 120}")
                 self.data_orm.add(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -629,16 +629,16 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(profit_manager_id=4, name="st-4", value=400, tp_value=500, sl_value=-400))
                 self.data_orm.add(model=model, item=model(profit_manager_id=4, name="st-5", value=500, tp_value=600, sl_value=-500))
                 #---10
-                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-1", value=100, tp_value=200, sl_value=-100))
-                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-2", value=200, tp_value=300, sl_value=-200))
-                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-3", value=300, tp_value=400, sl_value=-300))
-                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-4", value=400, tp_value=500, sl_value=-400))
-                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-5", value=500, tp_value=600, sl_value=-500))
-                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-6", value=600, tp_value=700, sl_value=-600))
-                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-7", value=700, tp_value=800, sl_value=-700))
-                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-8", value=800, tp_value=900, sl_value=-800))
-                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-9", value=900, tp_value=1000, sl_value=-900))
-                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-10", value=1000, tp_value=1100, sl_value=-1000))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-1", value=100, tp_value=100, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-2", value=200, tp_value=100, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-3", value=300, tp_value=100, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-4", value=400, tp_value=100, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-5", value=500, tp_value=100, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-6", value=600, tp_value=100, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-7", value=700, tp_value=100, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-8", value=800, tp_value=100, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-9", value=900, tp_value=100, sl_value=-100))
+                self.data_orm.add(model=model, item=model(profit_manager_id=5, name="st-10", value=1000, tp_value=100, sl_value=-100))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

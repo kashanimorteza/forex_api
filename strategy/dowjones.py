@@ -6,10 +6,11 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
+from datetime import datetime, timezone
+import pytz
 from logic.startup import debug, log_instance, Strategy_Run, list_instrument
 from logic.util import model_output, sort
 from logic.log import Logic_Log
-from datetime import datetime
 
 #--------------------------------------------------------------------------------- Action
 class Dowjones:
@@ -184,8 +185,9 @@ class Dowjones:
                 bid = price_data[symbol]["bid"]
                 #---------Everyday
                 if (self.set_order is None) or (self.set_order is False) or ( date.date()> self.date.date()):
+                    ny_date = self.time_change_utc_newyork(date)
                     #---------Time
-                    if self.time_start <= date.time() <= self.time_end:
+                    if self.time_start <= ny_date.time() <= self.time_end:
                         #---Set_Price
                         if not self.set_price or date.date()> self.date.date():
                             self.set_order = False
@@ -226,5 +228,15 @@ class Dowjones:
         if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
         #--------------Log
         if log : self.log.log(log_model, output)
+        #--------------Return
+        return output
+    
+    #--------------------------------------------- time_change_utc_newyork
+    def time_change_utc_newyork(self, date):
+        #--------------Action
+        utc = pytz.utc
+        ny = pytz.timezone("America/New_York")
+        utc_dt = utc.localize(date)
+        output = utc_dt.astimezone(ny)
         #--------------Return
         return output
