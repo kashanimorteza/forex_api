@@ -33,7 +33,7 @@ class model_back_order_db(BaseModel_db):
     tp = Column(Float, default=0.0)
     sl = Column(Float, default=0.0)
     spread = Column(Float, default=0)
-    profit_manager = Column(Integer, default=0)
+    profit_manager = Column(String, default='')
     ask = Column(Float, default=0.0)
     bid = Column(Float, default=0.0)
     order_id = Column(Integer, Sequence("back_order_order_id_seq"), nullable=False)
@@ -67,7 +67,7 @@ class model_back_order_py(BaseModel_py):
     tp : float = 0
     sl : float = 0
     spread : float = 0
-    profit_manager : int = 0
+    profit_manager : Optional[str] = ''
     ask : float = 0
     bid : float = 0
     order_id : int = 0

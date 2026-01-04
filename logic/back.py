@@ -253,19 +253,15 @@ class Logic_Back:
                     ask = float(row[2])
                     bid = float(row[3])
                     self.price_data[symbol]={'digits': self.digits, 'date': date, 'ask': ask, 'bid': bid}
-                    #------check_profit_manager
-                    if len(self.list_order_open)>0 : 
-                        self.check_profit_manager(self.price_data)
                     #------check_pending_order
                     if len(self.list_order_pending)>0 :
                         self.check_pending_order(self.price_data)
-                    #------check_limit
-                    self.check_limit(symbol, ask, bid, date)
+                    #------profit_manager
+                    if len(self.list_order_open)>0 : 
+                        self.profit_manager(self.price_data)
                     #------check_tp_sl
                     if len(self.list_order_open)>0 : 
                         check_tp_sls = self.check_tp_sl(symbol=symbol, ask=ask, bid=bid, date=date)
-                        for check_tp_sl in check_tp_sls :
-                            self.order_close(item=check_tp_sl).data
                     #------check_limit
                     self.check_limit(symbol, ask, bid, date)
                     #------order_close
@@ -289,9 +285,7 @@ class Logic_Back:
                         for item in result_strategy_price_change.data :
                             item["father_id"] = -1
                             item["state"] = Strategy_Action.PRICE_CHANGE
-                            self.action(items=result_strategy_price_change.data)
-                    #------check_limit
-                    self.check_limit(symbol, ask, bid, date)
+                        self.action(items=result_strategy_price_change.data)
                 if len(self.data[symbol])>1 : 
                     self.data[symbol] = self.data[symbol][self.data[symbol].index(row) + 1:]
         except Exception as e:  
@@ -309,10 +303,10 @@ class Logic_Back:
         #--------------Return
         return output
 
-    #--------------------------------------------- check_profit_manager
-    def check_profit_manager(self, items:dict)-> model_output:
+    #--------------------------------------------- profit_manager
+    def profit_manager(self, price_data:dict)-> model_output:
         #-------------- Description
-        # IN     : order_id
+        # IN     : price_data[symbol]={'digits', 'date', 'ask', 'bid'}
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -330,61 +324,64 @@ class Logic_Back:
         execute = False
         #-------------- Action
         try:
-            for item in items:
+            for item in price_data:
                 #------Data
                 symbol = item
-                digits = items[symbol]['digits']
-                date = items[symbol]['date']
-                ask = items[symbol]['ask']
-                bid = items[symbol]['bid']
+                digits = price_data[symbol]['digits']
+                date = price_data[symbol]['date']
+                ask = price_data[symbol]['ask']
+                bid = price_data[symbol]['bid']
                 #------Check
                 for order_open in self.list_order_open:
-                    if symbol == order_open[10] :
+                    order_symbol = order_open[10]
+                    if symbol == order_symbol :
                         #---Order
-                        order_id = order_open[1]
+                        order_id = order_open[0]
                         order_price_open = order_open[5]
                         order_action = order_open[11]
                         order_price_tp = order_open[13]
                         order_price_sl = order_open[14]
+                        order_pm = order_open[16]
                         #---Trend
                         trend = self.cal_trend(digits, order_price_open, order_action, ask, bid)
                         #---PM
                         if trend>0:
                             for pm in self.profit_manager_items:
-                                value = pm[3]
-                                tp_value = pm[4]
-                                sl_value = pm[5]
-                                percent = self.cal_percent_of_value(self.tp_pips, trend)
-                                if percent >= value:
-                                    if tp_value and abs(tp_value)>0:
-                                        pips = self.cal_value_of_percent(digits, self.tp_pips, abs(tp_value))
-                                        tp = self.cal_price_pip("+", digits, order_price_open, pips) if tp_value>0 else self.cal_price_pip("-", digits, order_price_open, pips)
-                                        if order_price_tp != tp:
-                                            cmd = f"UPDATE back_order SET tp={tp}, profit_manager=profit_manager+1 WHERE id={order_id}"
-                                            self.management_sql.db.execute(cmd=cmd)
-                                            cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{date}', {order_id}, {ask}, {bid}, 'TP', {tp})"
-                                            self.management_sql.db.execute(cmd=cmd)
-                                            output.data.append(f"{date} | {symbol} | TP | {order_price_open} | {tp}")
-                                            output.message = f"{date} | {symbol} | TP | {order_price_open} | {tp}"
-                                            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-                                            self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
-                                            execute = True
-                                    if sl_value and abs(sl_value)>0:
-                                        pips = self.cal_value_of_percent(digits, self.sl_pips, abs(sl_value))
-                                        sl = self.cal_price_pip("+", digits, order_price_open, pips) if sl_value>0 else self.cal_price_pip("-", digits, order_price_open, pips)
-                                        if order_price_sl != sl:
-                                            cmd = f"UPDATE back_order SET sl={sl}, profit_manager=profit_manager+1 WHERE id={order_id}"
-                                            self.management_sql.db.execute(cmd=cmd)
-                                            cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{date}', {order_id}, {ask}, {bid}, 'SL', {sl})"
-                                            self.management_sql.db.execute(cmd=cmd)
-                                            output.data.append(f"{date} | {symbol} | SL | {order_price_open} | {sl}")
-                                            output.message = f"{date} | {symbol} | SL | {order_price_open} | {sl}"
-                                            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-                                            self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
-                                            execute = True
-                                    self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id={self.execute_id} and step={self.step} AND status='open'").data
-                                    if execute:
-                                        break
+                                if pm[2] !=order_pm:
+                                    value = pm[3]
+                                    tp_value = pm[4]
+                                    sl_value = pm[5]
+                                    percent = self.cal_percent_of_value(self.tp_pips, trend)
+                                    if percent >= value:
+                                        if tp_value and abs(tp_value)>0:
+                                            pips = self.cal_value_of_percent(digits, self.tp_pips, abs(tp_value))
+                                            tp = self.cal_price_pip("+", digits, order_price_open, pips) if tp_value>0 else self.cal_price_pip("-", digits, order_price_open, pips)
+                                            if order_price_tp != tp:
+                                                cmd = f"UPDATE back_order SET tp={tp}, profit_manager={pm[2]} WHERE id={order_id}"
+                                                self.management_sql.db.execute(cmd=cmd)
+                                                cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{date}', {order_id}, {ask}, {bid}, 'TP', {tp})"
+                                                self.management_sql.db.execute(cmd=cmd)
+                                                output.data.append(f"{date} | {symbol} | TP | {order_price_open} | {tp}")
+                                                output.message = f"{date} | {symbol} | TP | {order_price_open} | {tp}"
+                                                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                                                self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+                                                execute = True
+                                        if sl_value and abs(sl_value)>0:
+                                            pips = self.cal_value_of_percent(digits, self.sl_pips, abs(sl_value))
+                                            sl = self.cal_price_pip("+", digits, order_price_open, pips) if sl_value>0 else self.cal_price_pip("-", digits, order_price_open, pips)
+                                            if order_price_sl != sl:
+                                                cmd = f"UPDATE back_order SET sl={sl}, profit_manager={pm[2]} WHERE id={order_id}"
+                                                self.management_sql.db.execute(cmd=cmd)
+                                                cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{date}', {order_id}, {ask}, {bid}, 'SL', {sl})"
+                                                self.management_sql.db.execute(cmd=cmd)
+                                                output.data.append(f"{date} | {symbol} | SL | {order_price_open} | {sl}")
+                                                output.message = f"{date} | {symbol} | SL | {order_price_open} | {sl}"
+                                                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                                                self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+                                                execute = True
+                                        self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id={self.execute_id} and step={self.step} AND status='open'").data
+                                        if execute:
+                                            break
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
@@ -529,7 +526,7 @@ class Logic_Back:
         output = model_output()
         #--------------Action
         for item in items :
-            run = item.get("run")
+            run = item["run"]
             if run == Strategy_Run.ORDER_OPEN : output:model_output =self.order_open(item=item)
             if run == Strategy_Run.ORDER_PENDING : output:model_output =self.order_pending(item=item)
             if run == Strategy_Run.ORDER_CLOSE : output:model_output = self.order_close(item=item)
@@ -566,6 +563,7 @@ class Logic_Back:
                 if fire :
                     item = {"id":id, "symbol":order_symbol, "action":action, "amount":amount, "price_open":price_open, "ask":ask, "bid":bid, "date":date}
                     output.append(item)
+                    self.order_close(item=item).data
         #--------------Return
         return output
 
@@ -686,7 +684,7 @@ class Logic_Back:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.status = result_database.status
             output.data = None
-            output.message = f"{date} | {symbol} | {action} | {amount} | {price_open} | {tp} | {sl}"
+            output.message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({price_open}) | tpt({tp}) | sls({sl})"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
@@ -722,7 +720,7 @@ class Logic_Back:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = item
-            output.message = f"{item['date']} | {item['symbol']} | {item['action']} | {item['amount']} | {item['ask']} | {item['bid']}"
+            output.message = f"{item['date']} | {item['symbol']} | {sort(item['action'], 4)} | amt({item['amount']}) | ask({item['ask']}) | bid({item['bid']})"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log
@@ -783,7 +781,7 @@ class Logic_Back:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.status = result_database.status
             output.data = item
-            output.message = f"{date} | {symbol} | {action} | {profit}"
+            output.message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({price_close}) | prf({profit})"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
             #--------------Log

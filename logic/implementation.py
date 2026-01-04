@@ -509,8 +509,17 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, step=1, profit_manager_id=5, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
                 self.data_orm.add(model=model, item=model(name="2025-12", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
                 self.data_orm.add(model=model, item=model(name="2025-11", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-11-01 00:00:00", date_to="2025-12-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-01-01 00:00:00", date_to="2026-01-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2024", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2024-01-01 00:00:00", date_to="2025-01-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-10", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-10-01 00:00:00", date_to="2025-11-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-09", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-09-01 00:00:00", date_to="2025-10-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-08", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-08-01 00:00:00", date_to="2025-09-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-07", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-07-01 00:00:00", date_to="2025-08-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-06", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-06-01 00:00:00", date_to="2025-07-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-05", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-05-01 00:00:00", date_to="2025-06-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-04", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-04-01 00:00:00", date_to="2025-05-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-03", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-03-01 00:00:00", date_to="2025-04-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-02", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-02-01 00:00:00", date_to="2025-03-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2025-01", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, date_from="2025-01-01 00:00:00", date_to="2025-02-01 00:00:00"))
+                
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
