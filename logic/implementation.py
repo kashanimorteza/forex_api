@@ -398,12 +398,12 @@ class Logic_Implementation:
                     symbols='US30',
                     actions='buy,sell',
                     amount=1,
-                    tp_pips=4000, 
-                    sl_pips=2000,
+                    tp_pips=40, 
+                    sl_pips=20,
                     limit_trade=-1,
                     limit_profit=1000,
                     limit_loss=-1000,
-                    params="{'time_start':'09:30:00', 'time_end':'09:30:15', 'change_pip': 1000, 'order_pip': 500, 'down': 'buy', 'up': 'sell', 'pending_limit': 120}")
+                    params="{'time_start':'09:30:00', 'time_end':'09:30:15', 'change_pip': 10, 'order_pip': 5, 'down': 'buy', 'up': 'sell', 'pending_limit': 120}")
                 self.data_orm.add(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)

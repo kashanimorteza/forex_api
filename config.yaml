@@ -231,7 +231,7 @@ debug:
     run: {log: false, verbose: true, model: "Logic_Back"}
     start: {log: false, verbose: true, model: "Logic_Back"}
     order_open: {log: false, verbose: true, model: "Logic_Back"}
-    order_pending: {log: false, verbose: true, model: "Logic_Back"}
+    order_pending: {log: false, verbose: false, model: "Logic_Back"}
     order_close: {log: false, verbose: true, model: "Logic_Back"}
     profit_manager: {log: false, verbose: false, model: "Logic_Back"}
   Fxcm_API:
@@ -260,11 +260,11 @@ debug:
     stop: {log: false, verbose: false, model: "Floating"}
     order_close: {log: false, verbose: false, model: "Floating"}
     price_change: {log: false, verbose: false, model: "Floating"}
-  ST_03:
-    start: {log: false, verbose: true, model: "ST_03"}
-    stop: {log: false, verbose: true, model: "ST_03"}
-    order_close: {log: false, verbose: true, model: "ST_03"}
-    price_change: {log: false, verbose: true, model: "ST_03"}
+  Dowjones:
+    start: {log: false, verbose: false, model: "Dowjones"}
+    stop: {log: false, verbose: false, model: "Dowjones"}
+    order_close: {log: false, verbose: false, model: "Dowjones"}
+    price_change: {log: false, verbose: false, model: "Dowjones"}
   ST_04:
     start: {log: false, verbose: true, model: "ST_04"}
     stop: {log: false, verbose: true, model: "ST_04"}

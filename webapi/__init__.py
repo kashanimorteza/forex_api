@@ -6,6 +6,7 @@ from .live import route as livee
 from .back import route as back
 from .profit_manager import route as profit_manager
 from .profit_manager_item import route as profit_manager_item
+from .money_management import route as money_management
 
 __all__ = [
     "account",
@@ -15,5 +16,6 @@ __all__ = [
     "livee",
     "back",
     "profit_manager",
-    "profit_manager_item"
+    "profit_manager_item",
+    "money_management",
 ]

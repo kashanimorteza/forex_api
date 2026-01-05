@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time, ast
 from logic.startup import Strategy_Action, Strategy_Run, debug, list_instrument, log_instance, database_management, database_data
-from logic.util import model_output, sort, get_tbl_name
+from logic.util import model_output, sort, get_tbl_name, time_change_utc_newyork, cal_price_pips, cal_size, cal_tp_sl, cal_movement, cal_percent_of_value, cal_value_of_percent
 from logic.log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.data_orm import Data_Orm
@@ -72,6 +72,7 @@ class Logic_Back:
             symbols = ed["symbols"].split(',')
             step = ed["step"]
             profit_manager_id = ed["profit_manager_id"]
+            money_management_id = ed["money_management_id"]
             self.date_from = ed["date_from"]
             self.date_to = ed["date_to"]
             self.tp_pips = ed["tp_pips"]
@@ -93,9 +94,17 @@ class Logic_Back:
             #------profit_manager
             cmd = f"SELECT * FROM profit_manager_item WHERE profit_manager_id={profit_manager_id} ORDER BY value DESC"
             self.profit_manager_items = self.management_sql.db.items(cmd=cmd).data 
+            #------money_management
+            cmd = f"SELECT balance, risk, limit_profit, limit_loss, limit_trade FROM money_management WHERE id={money_management_id}"
+            self.money_management = self.management_sql.db.items(cmd=cmd).data[0]
             #------Do
             for i in range(step):
                 #---Rest
+                self.strategy.balance = self.money_management[0]
+                self.strategy.risk = self.money_management[1]
+                self.strategy.limit_profit = self.money_management[2]
+                self.strategy.limit_loss = self.money_management[3]
+                self.strategy.limit_trade = self.money_management[4]
                 self.account_profit_close = 0
                 self.account_profit_open = 0
                 self.list_order_open = []
@@ -122,7 +131,7 @@ class Logic_Back:
         output.data = None
         output.message = f"{self.execute_id} | {strategy_name} | {symbols} | {step} | {result_start.status} | {result_next.status} | {result_database.status} | {result_stop.status}"
         #------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #------Log
         if log : self.log.log(log_model, output)
         #--------------Return
@@ -175,7 +184,7 @@ class Logic_Back:
         output.data = None
         output.message = f"{self.execute_id} | {result_strategy.status} | {result_action.status} | {result_database.status}"
         #------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #------Log
         if log : self.log.log(log_model, output)
         #--------------Return
@@ -216,7 +225,7 @@ class Logic_Back:
         output.data = None
         output.message = f"{self.execute_id} | {result_strategy.status} | {result_action.status} | {result_database.status}"
         #------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #------Log
         if log : self.log.log(log_model, output)
         #--------------Return
@@ -247,12 +256,13 @@ class Logic_Back:
         try:
             for symbol in self.data:
                 self.digits = list_instrument[symbol]["digits"]
+                self.point_size = list_instrument[symbol]["point_size"]
                 for row in self.data[symbol]:
                     #------price_data
                     date = row[1]
                     ask = float(row[2])
                     bid = float(row[3])
-                    self.price_data[symbol]={'digits': self.digits, 'date': date, 'ask': ask, 'bid': bid}
+                    self.price_data[symbol]={'digits': self.digits, 'point_size': self.point_size, 'date': date, 'ask': ask, 'bid': bid}
                     #------check_pending_order
                     if len(self.list_order_pending)>0 :
                         self.check_pending_order(self.price_data)
@@ -297,7 +307,7 @@ class Logic_Back:
         output = result
         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
         #--------------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #--------------Log
         if log : self.log.log(log_model, output)
         #--------------Return
@@ -306,7 +316,7 @@ class Logic_Back:
     #--------------------------------------------- profit_manager
     def profit_manager(self, price_data:dict)-> model_output:
         #-------------- Description
-        # IN     : price_data[symbol]={'digits', 'date', 'ask', 'bid'}
+        # IN     : 
         # OUT    : 
         # Action :
         #-------------- Debug
@@ -328,6 +338,7 @@ class Logic_Back:
                 #------Data
                 symbol = item
                 digits = price_data[symbol]['digits']
+                point_size = price_data[symbol]['point_size']
                 date = price_data[symbol]['date']
                 ask = price_data[symbol]['ask']
                 bid = price_data[symbol]['bid']
@@ -343,55 +354,55 @@ class Logic_Back:
                         order_price_sl = order_open[14]
                         order_pm = order_open[16]
                         #---Trend
-                        trend = self.cal_trend(digits, order_price_open, order_action, ask, bid)
+                        movement = cal_movement(order_action, order_price_open, ask, bid, digits, point_size)
                         #---PM
-                        if trend>0:
+                        if movement>0:
                             for pm in self.profit_manager_items:
                                 if pm[2] == order_pm : break
                                 value = pm[3]
                                 tp_value = pm[4]
                                 sl_value = pm[5]
-                                percent = self.cal_percent_of_value(self.tp_pips, trend)
+                                percent = cal_percent_of_value(self.tp_pips, movement)
                                 if percent >= value:
                                     if tp_value and abs(tp_value)>0:
-                                        pips = self.cal_value_of_percent(digits, self.tp_pips, abs(tp_value))
+                                        pips = cal_value_of_percent(self.tp_pips, abs(tp_value), digits, point_size)
                                         if tp_value>0:
                                             if order_action == "buy":
-                                                tp = self.cal_price_pip("+", digits, order_price_tp, pips)
+                                                tp = cal_price_pips(order_price_tp, pips, digits, point_size)
                                             else:
-                                                tp = self.cal_price_pip("-", digits, order_price_tp, pips)
+                                                tp = cal_price_pips(order_price_tp, -pips, digits, point_size)
                                         else:
                                             if order_action == "buy":
-                                                tp = self.cal_price_pip("-", digits, order_price_tp, pips)
+                                                tp = cal_price_pips(order_price_tp, -pips, digits, point_size)
                                             else:
-                                                tp = self.cal_price_pip("+", digits, order_price_tp, pips)
+                                                tp = cal_price_pips(order_price_tp, +pips, digits, point_size)
                                         cmd = f"UPDATE back_order SET tp={tp}, profit_manager='{pm[2]}' WHERE id={order_id}"
                                         self.management_sql.db.execute(cmd=cmd)
                                         cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{date}', {order_id}, {ask}, {bid}, 'TP', {tp})"
                                         self.management_sql.db.execute(cmd=cmd)
-                                        output.message = f"{date} | {symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | TP | old({order_price_tp}) | {pips} | new({tp})"
+                                        message = f"{date} | {symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | TP | old({order_price_tp}) | {pips} | new({tp})"
                                         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-                                        self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+                                        self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
                                         execute = True
                                     if sl_value and abs(sl_value)>0:
-                                        pips = self.cal_value_of_percent(digits, self.sl_pips, abs(sl_value))
+                                        pips = cal_value_of_percent(self.sl_pips, abs(sl_value), digits, point_size)
                                         if sl_value>0:
                                             if order_action == "buy":
-                                                sl = self.cal_price_pip("-", digits, order_price_sl, pips)
+                                                sl = cal_price_pips(order_price_sl, -pips, digits, point_size)
                                             else:
-                                                sl = self.cal_price_pip("+", digits, order_price_sl, pips)
+                                                sl = cal_price_pips(order_price_sl, pips, digits, point_size)
                                         else:
                                             if order_action == "buy":
-                                                sl = self.cal_price_pip("+", digits, order_price_sl, pips)
+                                                sl = cal_price_pips(order_price_sl, pips, digits, point_size)
                                             else:
-                                                sl = self.cal_price_pip("-", digits, order_price_sl, pips)
+                                                sl = cal_price_pips(order_price_sl, -pips, digits, point_size)
                                         cmd = f"UPDATE back_order SET sl={sl}, profit_manager='{pm[2]}' WHERE id={order_id}"
                                         self.management_sql.db.execute(cmd=cmd)
                                         cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{date}', {order_id}, {ask}, {bid}, 'SL', {sl})"
                                         self.management_sql.db.execute(cmd=cmd)
-                                        output.message = f"{date} | {symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | SL | old({order_price_sl}) | {pips} | new({sl})"
+                                        message = f"{date} | {symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | SL | old({order_price_sl}) | {pips} | new({sl})"
                                         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-                                        self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+                                        self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
                                         execute = True
                                     if execute:
                                         self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id={self.execute_id} and step={self.step} AND status='open'").data
@@ -405,7 +416,7 @@ class Logic_Back:
         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
         output.message =  f"{date} | {len(output.data)}"
         #--------------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #--------------Log
         if log : self.log.log(log_model, output)
         #--------------Return
@@ -441,23 +452,29 @@ class Logic_Back:
                 for order in self.list_order_pending:
                     order_date = order["date"]
                     order_action = order["action"]
-                    order_ask = order["ask"]
-                    order_bid = order["bid"]
+                    order_price = order["price"]
+                    order_amount = order["amount"]
                     pending_limit = order["pending_limit"]
                     if (date - order_date).seconds <= pending_limit:
                         if order_action=="buy":
-                            if ask>= order_ask:
+                            if ask>= order_price:
                                 order["date"]=date
                                 order["ask"]=ask
                                 order["bid"]=bid
+                                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                                message = f"{date} | {symbol} | {sort(order_action, 4)} | amt({order_amount}) | prc({order_price}) | prc({ask}) | Active"
+                                self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
                                 output.data.append(order)
                                 self.order_open(order)
                                 self.list_order_pending.remove(order)
                         if order_action =="sell":
-                            if bid<= order_bid:
+                            if bid<= order_price:
                                 order["date"]=date
                                 order["ask"]=ask
                                 order["bid"]=bid
+                                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                                message = f"{date} | {symbol} | {sort(order_action, 4)} | amt({order_amount}) | prc({order_price}) | prc({bid}) | Active"
+                                self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
                                 output.data.append(order)
                                 self.order_open(order)
                                 self.list_order_pending.remove(order)
@@ -472,7 +489,7 @@ class Logic_Back:
         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
         output.message = f"{date} | {len(output.data)}"
         #--------------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #--------------Log
         if log : self.log.log(log_model, output)
         #--------------Return
@@ -580,41 +597,6 @@ class Logic_Back:
                     self.order_close(item=item).data
         #--------------Return
         return output
-
-    #--------------------------------------------- cal_price_pip
-    def cal_price_pip(self, type, digit , price, pip)-> int:
-        #--------------Action
-        if type=="+":
-            output = price + (pip / (10 ** digit))
-        else:
-            output = price - (pip / (10 ** digit))
-        output = float(f"{output:.{digit}f}")
-        #--------------Return
-        return output
-     
-    #--------------------------------------------- cal_percent_of_value
-    def cal_percent_of_value(self, value_1, value_2)-> int:
-        #--------------Action
-        output = (value_2 / value_1) * 100
-        #--------------Return
-        return output
-    
-    #--------------------------------------------- cal_value_of_percent
-    def cal_value_of_percent(self, digits, value_1, value_2)-> int:
-        #--------------Action
-        output = (value_1 * value_2) / 100
-        output = float(f"{output:.{digits}f}")
-        #--------------Return
-        return output
-    
-    #--------------------------------------------- cal_trend
-    def cal_trend(self, digits, price_open, action,  ask, bid)-> model_output:
-        #--------------Action
-        if action == "buy" : output = (bid - price_open) * (10 ** digits)
-        if action == "sell" : output = (price_open - ask) * (10 ** digits)
-        output = int(output)
-        #--------------Return
-        return output
     
     #--------------------------------------------- cal_profit
     def cal_profit(self, price_open, action, amount,  ask, bid)-> model_output:
@@ -625,22 +607,6 @@ class Logic_Back:
         #--------------Return
         output = profit
         return output
-
-    #--------------------------------------------- cal_tp_sl
-    def cal_tp_sl(self, symbol, action, ask, bid, tp_pips, sl_pips)-> model_output:
-
-        digits = list_instrument[symbol]["digits"]
-        spred = abs(ask-bid)
-        if action == "buy":
-            price_open = ask
-            tp = float(f"{bid + spred + (tp_pips / (10 ** digits)):.{digits}f}")
-            sl = float(f"{bid + spred - (sl_pips / (10 ** digits)):.{digits}f}")
-        elif action == "sell":
-            price_open = bid
-            tp = float(f"{ask - spred - (tp_pips / (10 ** digits)):.{digits}f}")
-            sl = float(f"{ask - spred + (sl_pips / (10 ** digits)):.{digits}f}")
-
-        return price_open, tp, sl
     
     #--------------------------------------------- order_open
     def order_open(self, item:dict)-> model_output:
@@ -670,9 +636,10 @@ class Logic_Back:
             ask = item.get("ask")
             bid = item.get("bid")
             date = item.get("date")
-            spread = float(f"{abs(ask - bid):.{self.digits}f}")
+            digits = item.get("digits")
+            point_size = item.get("point_size")
             #-------------- TP/SL
-            price_open, tp, sl = self.cal_tp_sl(symbol, action, ask, bid, tp_pips, sl_pips)
+            price_open, tp, sl, spread = cal_tp_sl(action, ask, bid, tp_pips, sl_pips, digits, point_size)
             #-------------- Action
             obj = model_back_order_db()
             obj.father_id = father_id
@@ -700,7 +667,7 @@ class Logic_Back:
             output.data = None
             output.message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({price_open}) | tpt({tp}) | sls({sl})"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -734,17 +701,23 @@ class Logic_Back:
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.data = item
-            output.message = f"{item['date']} | {item['symbol']} | {sort(item['action'], 4)} | amt({item['amount']}) | ask({item['ask']}) | bid({item['bid']})"
-            #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
-            #--------------Log
-            if log : self.log.log(log_model, output)
+            if item['action']=="buy":
+                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                message = f"{item['date']} | {item['symbol']} | {sort(item['action'], 4)} | amt({item['amount']}) | prc({item['price']}) | tp({item['tp_pips']}) | sp({item['sl_pips']}) | pl({item['pending_limit']}) | Placed"
+                self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
+            else:
+                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                message = f"{item['date']} | {item['symbol']} | {sort(item['action'], 4)} | amt({item['amount']}) | prc({item['price']}) | tp({item['tp_pips']}) | sp({item['sl_pips']}) | pl({item['pending_limit']}) | Placed"
+                self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
         except Exception as e:  
-            #--------------Error
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Verbose
+        if verbose and output.message  : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
+        #--------------Log
+        if log : self.log.log(log_model, output)
         #--------------Return
         return output
     
@@ -797,7 +770,7 @@ class Logic_Back:
             output.data = item
             output.message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({price_close}) | prf({profit})"
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -851,7 +824,7 @@ class Logic_Back:
         output.data = None
         output.message = len(self.list_order_open)
         #--------------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #--------------Log
         if log : self.log.log(log_model, output)
         #--------------Return
@@ -891,7 +864,7 @@ class Logic_Back:
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = None
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -929,7 +902,7 @@ class Logic_Back:
             output.data = max_step
             output.message=max_step
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -969,7 +942,7 @@ class Logic_Back:
             output.data = None
             output.message=None
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -1006,7 +979,7 @@ class Logic_Back:
             output.data = None
             output.message=None
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -1155,7 +1128,7 @@ class Logic_Back:
             output.data = detaile
             output.message=execute_id
             #--------------Verbose
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
             if log : self.log.log(log_model, output)
         except Exception as e:  
@@ -1174,7 +1147,7 @@ class Logic_Back:
         #--------------Data
         table = "back_execute"
         #--------------Action
-        cmd = f"SELECT strategy.name, strategy_item.symbols, strategy_item.actions, strategy_item.amount, strategy_item.tp_pips, strategy_item.sl_pips, strategy_item.limit_trade, strategy_item.limit_profit, strategy_item.limit_loss, strategy_item.params, {table}.date_from, {table}.date_to, {table}.account_id, {table}.step, {table}.status, {table}.profit_manager_id FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = {id}"
+        cmd = f"SELECT strategy.name, strategy_item.symbols, strategy_item.actions, strategy_item.amount, strategy_item.tp_pips, strategy_item.sl_pips, strategy_item.limit_trade, strategy_item.limit_profit, strategy_item.limit_loss, strategy_item.params, {table}.date_from, {table}.date_to, {table}.account_id, {table}.step, {table}.status, {table}.profit_manager_id, {table}.money_management_id FROM strategy JOIN strategy_item ON strategy.id = strategy_item.strategy_id JOIN {table} ON strategy_item.id = {table}.strategy_item_id WHERE {table}.id = {id}"
         result:model_output = self.management_sql.db.items(cmd=cmd)
         #--------------Data
         if result.status and len(result.data) > 0 :
@@ -1195,6 +1168,7 @@ class Logic_Back:
             output["step"] = data[13]
             output["status"] = data[14]
             output["profit_manager_id"] = data[15]
+            output["money_management_id"] = data[16]
         #--------------Return
         return output
     

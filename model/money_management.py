@@ -18,11 +18,11 @@ class model_money_management_db(BaseModel_db):
     #---Items
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, default='')
-    balance = Column(Float, default=1000)
+    balance = Column(Integer, default=1000)
     risk = Column(Integer, default=1000)
     limit_trade = Column(Integer, default=-1)
-    limit_profit = Column(Float, default=-1)
-    limit_loss = Column(Float, default=-1)
+    limit_profit = Column(Integer, default=-1)
+    limit_loss = Column(Integer, default=-1)
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
     #---Display
@@ -34,10 +34,10 @@ class model_money_management_db(BaseModel_db):
 class model_money_management_py(BaseModel_py):
     id : int = 0
     name : str = ''
-    balance : float = 1000
+    balance : int = 1000
     risk : int = 1
     limit_trade : int = -1
-    limit_profit : float = -1
-    limit_loss : float = -1
+    limit_profit : int = -1
+    limit_loss : int = -1
     description : Optional[str] = ''
     enable : bool = True

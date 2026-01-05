@@ -6,10 +6,9 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from datetime import datetime, timezone
-import pytz
+from datetime import datetime
 from logic.startup import debug, log_instance, Strategy_Run, list_instrument
-from logic.util import model_output, sort
+from logic.util import model_output, sort, time_change_utc_newyork, cal_price_pips, cal_size
 from logic.log import Logic_Log
 
 #--------------------------------------------------------------------------------- Action
@@ -26,9 +25,6 @@ class Dowjones:
         self.amount = params.get("amount")
         self.tp_pips = params.get("tp_pips")
         self.sl_pips = params.get("sl_pips")
-        self.limit_trade = int(params.get("limit_trade"))
-        self.limit_profit = int(params.get("limit_profit"))
-        self.limit_loss = int(params.get("limit_loss"))
         self.params = params.get("params")
         self.time_start = datetime.strptime(self.params.get("time_start"), "%H:%M:%S").time()
         self.time_end = datetime.strptime(self.params.get("time_end"), "%H:%M:%S").time()
@@ -37,6 +33,11 @@ class Dowjones:
         self.down = self.params.get("down")
         self.up = self.params.get("up")
         self.pending_limit = self.params.get("pending_limit")
+        self.balance = None
+        self.risk = None
+        self.limit_profit = None
+        self.limit_loss = None
+        self.limit_trade = None
         #-------------- Variable
         self.set_order = None
         self.set_price = None
@@ -76,7 +77,7 @@ class Dowjones:
         output.data = items
         output.message = None
         #--------------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #--------------Log
         if log : self.log.log(log_model, output)
         #--------------Return
@@ -113,7 +114,7 @@ class Dowjones:
         output.data = items
         output.message = output.status
         #--------------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #--------------Log
         if log : self.log.log(log_model, output)
         #--------------Return
@@ -150,7 +151,7 @@ class Dowjones:
         output.data = items
         output.message = None
         #--------------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #--------------Log
         if log : self.log.log(log_model, output)
         #--------------Return
@@ -180,12 +181,13 @@ class Dowjones:
                 #---------Data
                 symbol = item
                 digits = price_data[symbol]["digits"]
+                point_size = price_data[symbol]["point_size"]
                 date = price_data[symbol]["date"]
                 ask = price_data[symbol]["ask"]
                 bid = price_data[symbol]["bid"]
                 #---------Everyday
                 if (self.set_order is None) or (self.set_order is False) or ( date.date()> self.date.date()):
-                    ny_date = self.time_change_utc_newyork(date)
+                    ny_date = time_change_utc_newyork(date)
                     #---------Time
                     if self.time_start <= ny_date.time() <= self.time_end:
                         #---Set_Price
@@ -197,24 +199,36 @@ class Dowjones:
                             self.date = date
                         #---Check_Price
                         if self.set_price: 
-                            disagreement = abs((ask - self.ask) * (10 ** digits))
-                            if disagreement >= self.change_pip:
+                            movement = abs(ask - self.ask)
+                            if movement >= self.change_pip:
                                 self.set_order = True
                                 self.set_price = False
                                 action = self.up if ask > self.ask else self.down
+                                if action == "buy":
+                                    price = cal_price_pips(self.ask, -self.order_pip , digits, point_size)
+                                else:
+                                    price = cal_price_pips(self.bid, self.order_pip , digits, point_size) 
+                                amount = cal_size(balance=self.balance, price=price, pips=self.sl_pips, risk=self.risk, digits=digits, point_size=point_size)
                                 item = {
                                     "run": Strategy_Run.ORDER_PENDING,
                                     "date": date,
                                     "symbol": symbol, 
                                     "action": action, 
-                                    "amount": self.amount, 
-                                    "ask": self.ask-(self.order_pip / (10 ** digits)),
-                                    "bid": self.bid+(self.order_pip / (10 ** digits)), 
+                                    "amount": amount, 
+                                    "price": price,
                                     "tp_pips": self.tp_pips, 
                                     "sl_pips": self.sl_pips,
                                     "pending_limit": self.pending_limit, 
+                                    "digits": digits, 
+                                    "point_size": point_size
                                 }
                                 items.append(item)
+                                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                                if action=="buy":
+                                    message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({self.ask}) | cpi({self.change_pip}) | prc({ask}) | opi({self.order_pip}) | prc({price})"
+                                else:
+                                    message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({self.bid}) | cpi({self.change_pip}) | prc({bid}) | opi({self.order_pip}) | prc({price})"
+                                self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
@@ -223,20 +237,9 @@ class Dowjones:
         #--------------Output
         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
         output.data = items
-        output.message = None
         #--------------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 15)} | {output.time}", output.message)
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #--------------Log
         if log : self.log.log(log_model, output)
-        #--------------Return
-        return output
-    
-    #--------------------------------------------- time_change_utc_newyork
-    def time_change_utc_newyork(self, date):
-        #--------------Action
-        utc = pytz.utc
-        ny = pytz.timezone("America/New_York")
-        utc_dt = utc.localize(date)
-        output = utc_dt.astimezone(ny)
         #--------------Return
         return output
