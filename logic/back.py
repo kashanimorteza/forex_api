@@ -79,14 +79,10 @@ class Logic_Back:
             self.sl_pips = ed["sl_pips"]
             #------Strategy
             self.strategy = self.get_strategy_instance(strategy_name, ed).data
-            #------Step and Date
+            #------Step
             cmd = f"SELECT MAX(step),max(date_close) FROM back_order WHERE execute_id={self.execute_id}"
             data = self.management_sql.db.items(cmd=cmd).data
-            if data[0][0]:
-                self.step = data[0][0]+1
-                self.date_from = data[0][1]
-            else:
-                self.step = 1
+            self.step = (data[0][0] + 1) if data[0][0] else 1
             #------Data
             data_params = []
             for symbol in symbols : data_params.append({"symbol": symbol, "date_from":self.date_from, "date_to": self.date_to})
@@ -95,16 +91,22 @@ class Logic_Back:
             cmd = f"SELECT * FROM profit_manager_item WHERE profit_manager_id={profit_manager_id} ORDER BY value DESC"
             self.profit_manager_items = self.management_sql.db.items(cmd=cmd).data 
             #------money_management
-            cmd = f"SELECT balance, risk, limit_profit, limit_loss, limit_trade FROM money_management WHERE id={money_management_id}"
+            cmd = f"SELECT balance, risk, limit_profit, limit_loss, limit_trade, limit_stop FROM money_management WHERE id={money_management_id}"
             self.money_management = self.management_sql.db.items(cmd=cmd).data[0]
             #------Do
             for i in range(step):
+                #---Run
+                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                output.message = f"exi({self.execute_id}) | stg({strategy_name}) | sym({symbols}) | stp({step})"
+                if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
                 #---Rest
                 self.strategy.balance = self.money_management[0]
                 self.strategy.risk = self.money_management[1]
-                self.strategy.limit_profit = self.money_management[2]
-                self.strategy.limit_loss = self.money_management[3]
-                self.strategy.limit_trade = self.money_management[4]
+                self.balance = self.money_management[0]
+                self.limit_profit = self.money_management[2]
+                self.limit_loss = self.money_management[3]
+                self.limit_trade = self.money_management[4]
+                self.limit_stop = self.money_management[5]
                 self.account_balance = self.money_management[0]
                 self.account_profit_close = 0
                 self.account_profit_open = 0
@@ -183,7 +185,7 @@ class Logic_Back:
         #------Output
         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
         output.data = None
-        output.message = f"{self.execute_id} | {result_strategy.status} | {result_action.status} | {result_database.status}"
+        output.message = f"exi({self.execute_id}) | stg({result_strategy.status}) | act({result_action.status}) | dbs({result_database.status})"
         #------Verbose
         if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #------Log
@@ -224,7 +226,7 @@ class Logic_Back:
         #------Output
         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
         output.data = None
-        output.message = f"{self.execute_id} | {result_strategy.status} | {result_action.status} | {result_database.status}"
+        output.message = f"exi({self.execute_id}) | stg({result_strategy.status}) | act({result_action.status}) | dbs({result_database.status})"
         #------Verbose
         if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #------Log
@@ -505,6 +507,7 @@ class Logic_Back:
         profit_open = 0
         trade_count = 0
         loss = 0
+        param = ""
         #--------------check close order
         for item in self.list_order_close : 
             trade_count += 1
@@ -519,18 +522,30 @@ class Logic_Back:
             profit_open = profit_open + cal_profit(action, amount, price_open, ask, bid, digits, point_size)[0]
             profit_open = float(f"{profit_open:.{2}f}")
         #--------------Trade
-        if self.strategy.limit_trade !=-1 and trade_count >= self.strategy.limit_trade : 
+        if self.limit_trade !=-1 and trade_count >= self.limit_trade : 
             result = False
             param = 'trade'
             self.order_open_accept = False
+        #--------------Stop
+        if self.limit_stop !=-1 and profit_close >= self.limit_stop:
+            result = False
+            param='stop'
+            self.order_open_accept = False
         #--------------Profit
-        if self.strategy.limit_profit !=-1 and profit_close >= self.strategy.limit_profit:
+        profit = profit_open + profit_close
+        if self.limit_profit !=-1 and profit>0 and profit >= self.limit_profit:
             result = False
             param='profit'
             self.order_open_accept = False
+            result_strategy:model_output = self.strategy.stop()
+            for item in result_strategy.data :
+                item["date"] = date
+                item["ask"] = ask
+                item["bid"] = bid
+                self.action(items=result_strategy.data)
         #--------------Loss
         loss = profit_open + profit_close
-        if self.strategy.limit_loss !=-1 and loss<0 and loss <= self.strategy.limit_loss:
+        if self.limit_loss !=-1 and loss<0 and loss <= self.limit_loss:
             result = False
             param='loss'
             self.order_open_accept = False
@@ -541,32 +556,16 @@ class Logic_Back:
                 item["bid"] = bid
                 self.action(items=result_strategy.data)
         #--------------Log
-        if not result: 
-            p = f"{param} | {date}"
-            cmd = f"INSERT INTO back_execute_detaile (date, execute_id, step, profit_close, profit_open, param) VALUES('{date}', {self.execute_id}, {self.step}, {profit_close}, {profit_open}, '{p}')"
-            self.management_sql.db.execute(cmd=cmd)
+        if not result: p = f"{param} | {date}"
         if (self.account_profit_close != profit_close or self.account_profit_open != profit_open):
             if (abs(profit_close-self.account_profit_close)>1 or abs(profit_open-self.account_profit_open)>1) :
                 self.account_profit_close = profit_close
                 self.account_profit_open = profit_open
-                cmd = f"INSERT INTO back_execute_detaile (date, execute_id, step, profit_close, profit_open) VALUES('{date}', {self.execute_id}, {self.step}, {profit_close}, {profit_open})"
+                profit = profit_open + profit_close
+                cmd = f"INSERT INTO back_execute_detaile (date, execute_id, step, profit_close, profit_open, profit, param) VALUES('{date}', {self.execute_id}, {self.step}, {profit_close}, {profit_open},{profit}, '{param}')"
                 self.management_sql.db.execute(cmd=cmd)
         #--------------Return
         output = result, param
-        return output
-    
-    #--------------------------------------------- action
-    def action(self, items:dict)-> model_output:
-        #-------------- Variable
-        output = model_output()
-        #--------------Action
-        for item in items :
-            run = item["run"]
-            if run == Strategy_Run.ORDER_OPEN : output:model_output =self.order_open(item=item)
-            if run == Strategy_Run.ORDER_PENDING : output:model_output =self.order_pending(item=item)
-            if run == Strategy_Run.ORDER_CLOSE : output:model_output = self.order_close(item=item)
-            if run == Strategy_Run.ORDER_CLOSE_ALL : output:model_output = self.order_close_all(item=item)
-        #--------------Return
         return output
     
     #--------------------------------------------- check_tp_sl
@@ -608,7 +607,21 @@ class Logic_Back:
             self.list_order_close = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{self.execute_id}' and step='{self.step}' AND status='close'").data
         #--------------Return
         return output
-    
+
+    #--------------------------------------------- action
+    def action(self, items:dict)-> model_output:
+        #-------------- Variable
+        output = model_output()
+        #--------------Action
+        for item in items :
+            run = item["run"]
+            if run == Strategy_Run.ORDER_OPEN : output:model_output =self.order_open(item=item)
+            if run == Strategy_Run.ORDER_PENDING : output:model_output =self.order_pending(item=item)
+            if run == Strategy_Run.ORDER_CLOSE : output:model_output = self.order_close(item=item)
+            if run == Strategy_Run.ORDER_CLOSE_ALL : output:model_output = self.order_close_all(item=item)
+        #--------------Return
+        return output
+     
     #--------------------------------------------- order_open
     def order_open(self, item:dict)-> model_output:
         #-------------- Description
@@ -1035,12 +1048,14 @@ class Logic_Back:
                 cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and action='sell'"
                 trade_sell = self.management_sql.db.items(cmd=cmd).data[0][0]
                 #--------------Detaile
-                cmd = f"SELECT min(profit_close), max(profit_close), max(profit_open), min(profit_open) FROM back_execute_detaile WHERE execute_id={execute_id}"
+                cmd = f"SELECT min(profit_close), max(profit_close), max(profit_open), min(profit_open), min(profit), max(profit) FROM back_execute_detaile WHERE execute_id={execute_id}"
                 data = self.management_sql.db.items(cmd=cmd).data[0]
                 profit_close_min = data[0]
                 profit_close_max = data[1]
                 profit_open_min = data[2]
                 profit_open_max=data[3]
+                profit_min = data[4]
+                profit_max=data[5]
                 #--------------Param
                 param = f""
                 #--------------Add
@@ -1060,6 +1075,8 @@ class Logic_Back:
                     "profit_close_max":f"{profit_close_max:.{2}f}",
                     "profit_open_min":f"{profit_open_min:.{2}f}",
                     "profit_open_max":f"{profit_open_max:.{2}f}",
+                    "profit_min":f"{profit_min:.{2}f}",
+                    "profit_max":f"{profit_max:.{2}f}",
                     "param":param
                 })
                 #--------------Items
@@ -1090,12 +1107,14 @@ class Logic_Back:
                     cmd = f"SELECT count(id) FROM back_order WHERE execute_id={execute_id} and action='sell' and step={i}"
                     trade_sell = self.management_sql.db.items(cmd=cmd).data[0][0]
                     #--------------Detaile
-                    cmd = f"SELECT min(profit_close), max(profit_close), max(profit_open), min(profit_open) FROM back_execute_detaile WHERE execute_id={execute_id} and step={i}"
+                    cmd = f"SELECT min(profit_close), max(profit_close), max(profit_open), min(profit_open), min(profit), max(profit) FROM back_execute_detaile WHERE execute_id={execute_id} and step={i}"
                     data = self.management_sql.db.items(cmd=cmd).data[0]
                     profit_close_min = data[0]
                     profit_close_max = data[1]
                     profit_open_min = data[2]
                     profit_open_max=data[3]
+                    profit_min = data[4]
+                    profit_max=data[5]
                     #--------------Param
                     cmd = f"SELECT param FROM back_execute_detaile WHERE execute_id={execute_id} and step={i} and param !=''"
                     param = self.management_sql.db.items(cmd=cmd).data
@@ -1117,6 +1136,8 @@ class Logic_Back:
                         "profit_close_max":f"{profit_close_max:.{2}f}",
                         "profit_open_min":f"{profit_open_min:.{2}f}",
                         "profit_open_max":f"{profit_open_max:.{2}f}",
+                        "profit_min":f"{profit_min:.{2}f}",
+                        "profit_max":f"{profit_max:.{2}f}",
                         "param":param
                     })
             #--------------Output

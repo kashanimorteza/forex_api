@@ -23,6 +23,7 @@ class model_back_execute_detaile_db(BaseModel_db):
     step = Column(Integer, default=0)
     profit_close = Column(Float, default=0)
     profit_open = Column(Float, default=0)
+    profit = Column(Float, default=0)
     param = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
@@ -42,6 +43,7 @@ class model_back_execute_detaile_py(BaseModel_py):
     step : int = 0
     profit_close : float = 0
     profit_open : float = 0
+    profit : float = 0
     param : Optional[str] = ''
     description : Optional[str] = ''
     enable : bool = True

@@ -21,6 +21,7 @@ class model_money_management_db(BaseModel_db):
     balance = Column(Integer, default=1000)
     risk = Column(Integer, default=1000)
     limit_trade = Column(Integer, default=-1)
+    limit_stop = Column(Integer, default=-1)
     limit_profit = Column(Integer, default=-1)
     limit_loss = Column(Integer, default=-1)
     description = Column(String, default='')
@@ -37,6 +38,7 @@ class model_money_management_py(BaseModel_py):
     balance : int = 1000
     risk : int = 1
     limit_trade : int = -1
+    limit_stop : int = -1
     limit_profit : int = -1
     limit_loss : int = -1
     description : Optional[str] = ''

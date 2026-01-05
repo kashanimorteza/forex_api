@@ -59,7 +59,7 @@ def load_forex_api():
     #---Action
     forex_accounts:list[model_account_db] = db.items(model=model_account_db, enable=True).data
     for account in forex_accounts:
-        if account.name !="Back-Test" and account.broker.lower() == "fxcm":
+        if account.name !="back" and account.broker.lower() == "fxcm":
             fxcm_api = Fxcm_API(account_info=account.toDict())
             forex_apis[account.id] = fxcm_api
             #fxcm_api.login()

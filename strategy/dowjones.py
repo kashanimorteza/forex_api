@@ -35,9 +35,6 @@ class Dowjones:
         self.pending_limit = self.params.get("pending_limit")
         self.balance = None
         self.risk = None
-        self.limit_profit = None
-        self.limit_loss = None
-        self.limit_trade = None
         #-------------- Variable
         self.set_order = None
         self.set_price = None

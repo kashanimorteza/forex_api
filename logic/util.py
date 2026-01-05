@@ -122,11 +122,11 @@ def cal_tp_sl(action, ask, bid, tp_pips, sl_pips, digits, point_size)-> model_ou
     spred =float(f"{abs(ask-bid):.{digits}f}")
     if action == "buy":
         price_open = ask
-        tp = cal_price_pips(bid, tp_pips, digits, point_size)
+        tp = cal_price_pips(bid, (tp_pips + spred), digits, point_size)
         sl = cal_price_pips(bid, -(sl_pips - spred), digits, point_size)
     elif action == "sell":
         price_open = bid
-        tp = cal_price_pips(ask, -tp_pips, digits, point_size)
+        tp = cal_price_pips(ask, -(tp_pips + spred), digits, point_size)
         sl = cal_price_pips(ask, (sl_pips - spred), digits, point_size)
     return price_open, tp, sl, spred
 
