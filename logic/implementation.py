@@ -297,9 +297,6 @@ class Logic_Implementation:
                     amount=1,
                     tp_pips=100,
                     sl_pips=10000,
-                    limit_trade=-1,
-                    limit_profit=10,
-                    limit_loss=-1000,
                     params=""
                 )
                 self.data_orm.add(model=model, item=item)
@@ -311,9 +308,6 @@ class Logic_Implementation:
                     amount=1,
                     tp_pips=100,
                     sl_pips=10000,
-                    limit_trade=-1,
-                    limit_profit=10,
-                    limit_loss=-1000,
                     params=""
                 )
                 self.data_orm.add(model=model, item=item)
@@ -326,9 +320,6 @@ class Logic_Implementation:
                     amount=10000,
                     tp_pips=1,
                     sl_pips=1000,
-                    limit_trade=-1,
-                    limit_profit=10,
-                    limit_loss=-1000,
                     params=""
                 )
                 self.data_orm.add(model=model, item=item)
@@ -340,9 +331,6 @@ class Logic_Implementation:
                     amount=10000,
                     tp_pips=1,
                     sl_pips=1000,
-                    limit_trade=-1,
-                    limit_profit=10,
-                    limit_loss=-1000,
                     params=""
                 )
                 self.data_orm.add(model=model, item=item)
@@ -356,9 +344,6 @@ class Logic_Implementation:
                     amount=1,
                     tp_pips=300, 
                     sl_pips=100000,
-                    limit_trade=-1,
-                    limit_profit=1000,
-                    limit_loss=-1000,
                     params="")
                 self.data_orm.add(model=model, item=item)
                 #EUR/USD
@@ -370,9 +355,6 @@ class Logic_Implementation:
                     amount=10000,
                     tp_pips=1,
                     sl_pips=100,
-                    limit_trade=-1,
-                    limit_profit=10,
-                    limit_loss=-100,
                     params=""
                 )
                 self.data_orm.add(model=model, item=item)
@@ -386,9 +368,6 @@ class Logic_Implementation:
                     amount=1,
                     tp_pips=400, 
                     sl_pips=200,
-                    limit_trade=-1,
-                    limit_profit=1000,
-                    limit_loss=-1000,
                     params="{'time_start':'16:30:00', 'time_end':'16:32:00', 'change_pip': 10, 'order_pip': 5, 'down': 'buy', 'up': 'sell'}")
                 self.data_orm.add(model=model, item=item)
                 #US30
@@ -400,9 +379,6 @@ class Logic_Implementation:
                     amount=1,
                     tp_pips=40, 
                     sl_pips=20,
-                    limit_trade=-1,
-                    limit_profit=1000,
-                    limit_loss=-1000,
                     params="{'time_start':'09:30:00', 'time_end':'09:30:15', 'change_pip': 10, 'order_pip': 5, 'down': 'buy', 'up': 'sell', 'pending_limit': 120}")
                 self.data_orm.add(model=model, item=item)
             #--------------Output
@@ -508,7 +484,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=1, step=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, step=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
                 self.data_orm.add(model=model, item=model(name="2025", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, money_management_id=4, date_from="2025-01-01 00:00:00", date_to="2026-01-01 00:00:00"))
-                self.data_orm.add(model=model, item=model(name="2025-12", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, money_management_id=4, date_from="2025-12-01 00:00:00", date_to="2026-01-01 23:59:59"))
+                self.data_orm.add(model=model, item=model(name="2025-12", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, money_management_id=4, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 self.data_orm.add(model=model, item=model(name="2025-11", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, money_management_id=4, date_from="2025-11-01 00:00:00", date_to="2025-12-01 00:00:00"))
                 self.data_orm.add(model=model, item=model(name="2025-10", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, money_management_id=4, date_from="2025-10-01 00:00:00", date_to="2025-11-01 00:00:00"))
                 self.data_orm.add(model=model, item=model(name="2025-09", strategy_item_id=8, account_id=1, step=1, profit_manager_id=5, money_management_id=4, date_from="2025-09-01 00:00:00", date_to="2025-10-01 00:00:00"))

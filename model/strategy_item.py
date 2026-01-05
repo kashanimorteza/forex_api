@@ -21,12 +21,9 @@ class model_strategy_item_db(BaseModel_db):
     name = Column(String, default='')
     symbols = Column(String, default='')
     actions = Column(String, default='')
-    amount = Column(Integer, default=0)
+    amount = Column(Float, default=0.0)
     tp_pips = Column(Integer, default=0)
     sl_pips = Column(Integer, default=0)
-    limit_trade = Column(Integer, default=0)
-    limit_profit = Column(Integer, default=0)
-    limit_loss = Column(Integer, default=0)
     params = Column(String, default='')
     description = Column(String, default='')
     enable = Column(Boolean, default=True)
@@ -42,12 +39,9 @@ class model_strategy_item_py(BaseModel_py):
     name : str = ''
     symbols : str = ''
     actions : str = ''
-    amount : int = 0
+    amount : float = 0
     tp_pips : int = 0
     sl_pips : int = 0
-    limit_trade : int = 0
-    limit_profit : int = 0
-    limit_loss : int = 0
     params : str = ''
     description : Optional[str] = ''
     enable : bool = True

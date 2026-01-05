@@ -207,8 +207,12 @@ class Dowjones:
                                 if action == "buy":
                                     price = cal_price_pips(self.ask, -self.order_pip , digits, point_size)
                                 else:
-                                    price = cal_price_pips(self.bid, self.order_pip , digits, point_size) 
-                                amount = cal_size(balance=self.balance, price=price, pips=self.sl_pips, risk=self.risk, digits=digits, point_size=point_size)
+                                    price = cal_price_pips(self.bid, self.order_pip , digits, point_size)
+                                if self.risk > 0 :
+                                    amount = cal_size(balance=self.balance, price=price, pips=self.sl_pips, risk=self.risk, digits=digits, point_size=point_size)
+                                else:
+                                    amount = self.amount
+                                amount = float(f"{amount:.{2}f}")
                                 item = {
                                     "run": Strategy_Run.ORDER_PENDING,
                                     "date": date,

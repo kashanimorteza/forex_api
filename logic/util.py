@@ -119,7 +119,7 @@ def cal_size(balance, price, pips, risk, digits, point_size)-> float:
 
 #--------------------------------------------- cal_tp_sl
 def cal_tp_sl(action, ask, bid, tp_pips, sl_pips, digits, point_size)-> model_output:
-    spred = abs(ask-bid)
+    spred =float(f"{abs(ask-bid):.{digits}f}")
     if action == "buy":
         price_open = ask
         tp = cal_price_pips(bid, tp_pips, digits, point_size)
@@ -133,10 +133,7 @@ def cal_tp_sl(action, ask, bid, tp_pips, sl_pips, digits, point_size)-> model_ou
 #--------------------------------------------- cal_movement
 def cal_movement(action, price, ask, bid, digits, point_size)-> model_output:
     #--------------Action
-    if action == "buy":
-        output = (bid - price)
-    else:
-        output = (price - ask)
+    output = (bid - price) if action == "buy" else (price - ask)
     output = float(f"{output:.{digits}f}")
     #--------------Return
     return output
@@ -148,3 +145,16 @@ def cal_percent_of_value(value_1, value_2)-> int:
 #--------------------------------------------- cal_value_of_percent
 def cal_value_of_percent(value_1, value_2, digits, point_size )-> int:
     return float(f"{((value_1 * value_2) / 100):.{digits}f}")
+
+#--------------------------------------------- cal_profit
+def cal_profit(action, amount, price_open, ask, bid, digits, point_size)-> model_output:
+    #--------------Action
+    if action == "buy" :
+        price_close = bid 
+        profit = (bid - price_open) * amount
+    if action == "sell" : 
+        price_close = ask
+        profit = (price_open - ask) * amount
+    profit = float(f"{profit:.{2}f}")
+    #--------------Return
+    return profit, price_close
