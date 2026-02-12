@@ -17,7 +17,7 @@ log_instance.table(drop=True, create=True, add=True)
 #--------------------------------------------------------------------------------- Implementation_Management
 IM = Logic_Implementation()
 IM.create_all_table()
-#IM.truncate_all_table()
+IM.truncate_all_table()
 IM.account(drop=True, create=True,truncate=True, add=True)
 IM.instrument(drop=True, create=True,truncate=True, add=True)
 IM.strategy(drop=True, create=True,truncate=True, add=True)

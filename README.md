@@ -515,8 +515,3 @@ python download.py account=acc-history1 instrument=all timeframe=W1,D1,H8,H6,H4,
 # Install
 [Python](https://github.com/kashanimorteza/python_document/blob/main/doc/install.md)  
 [Database](https://github.com/kashanimorteza/forex_api/blob/main/database.md)
-
-
-
-
-

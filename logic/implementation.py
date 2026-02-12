@@ -24,7 +24,7 @@ class Logic_Implementation:
         self.log = log if log else log_instance
         self.data_orm = data_orm if data_orm else data_instance["management_orm"]
         self.data_sql = data_sql if data_sql else data_instance["data_sql"]
-
+    
     #--------------------------------------------- create_all_table
     def create_all_table(self):
         #-------------- Description

@@ -69,10 +69,11 @@ def load_instrument():
     from logic.data_orm import Data_Orm
     from model.instrument import model_instrument_db
     db:Data_Orm = data_instance["management_orm"]
-    result= db.items(model=model_instrument_db, enable=True)
-    if result.status : 
-        for item in result.data : 
-            list_instrument[item.instrument] = item.toDict()
+    if db.table_exist(model=model_instrument_db).data:
+        result= db.items(model=model_instrument_db, enable=True)
+        if result.status : 
+            for item in result.data : 
+                list_instrument[item.instrument] = item.toDict()
 
 #--------------------------------------------------------------------------------- Enum
 #-------------------------- Strategy_Action
