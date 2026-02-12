@@ -582,7 +582,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO forex;
 Install
 ```bash
 sudo apt update
-sudo apt install openvpn
+sudo apt install openvpn -y
 ```
 <!-------------------------- transfer -->
 Transfer
