@@ -58,9 +58,9 @@ menu_main()
     while true; do
         getHeader
         echo -e  ${YELLOW}"1)  ${GREEN}All"          ${ENDCOLOR}
-        echo -e  ${YELLOW}"2)  ${GREEN}Menu Install" ${ENDCOLOR}
-        echo -e  ${YELLOW}"3)  ${GREEN}Menu Config"  ${ENDCOLOR}
-        echo -e  ${YELLOW}"4)  ${GREEN}Menu Service" ${ENDCOLOR}
+        echo -e  ${YELLOW}"2)  ${GREEN}Install" ${ENDCOLOR}
+        echo -e  ${YELLOW}"3)  ${GREEN}Config"  ${ENDCOLOR}
+        echo -e  ${YELLOW}"4)  ${GREEN}Service" ${ENDCOLOR}
         echo -e  ${YELLOW}"5)  ${GREEN}Monitor"      ${ENDCOLOR}
         echo -e "${YELLOW}${LINE2}                   ${ENDCOLOR}"
         echo -e  ${YELLOW}"q)  ${GREEN}Exit"         ${ENDCOLOR}
