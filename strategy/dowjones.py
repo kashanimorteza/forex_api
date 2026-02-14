@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from datetime import datetime
+from datetime import datetime, timedelta
 from logic.startup import debug, log_instance, list_instrument, Strategy_Run, Strategy_Action, Strategy_Run, database_management, database_data
 from logic.util import model_output, sort, time_change_newyork_utc, time_change_utc_newyork, cal_price_pips, cal_size, get_tbl_name
 from logic.log import Logic_Log
@@ -372,6 +372,7 @@ class Dowjones:
         output.method_name = this_method
         #--------------Variable
         result = model_output()
+        data = {}
         #--------------Action
         try:
             #------Database
@@ -387,9 +388,11 @@ class Dowjones:
             self.risk = self.money_management[1]
             #------Data
             table = get_tbl_name(self.symbol, "t1")
-            time_from_ny_to_utc = str(time_change_newyork_utc(datetime.combine(self.date_from.date(), self.time_start)).time())
-            time_to_ny_to_utc = str(time_change_newyork_utc(datetime.combine(self.date_from.date(), self.time_end)).time())
-            cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' AND date::time BETWEEN '{time_from_ny_to_utc}' AND '{time_to_ny_to_utc}' ORDER BY date ASC"
+            time_from_ny_to_utc = time_change_newyork_utc(datetime.combine(self.date_from.date(), self.time_start))
+            time_from_ny_to_utc = time_from_ny_to_utc - timedelta(hours=1)
+            time_to_ny_to_utc = time_change_newyork_utc(datetime.combine(self.date_from.date(), self.time_end))
+            time_to_ny_to_utc = time_to_ny_to_utc + timedelta(hours=1)
+            cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' AND date::time BETWEEN '{time_from_ny_to_utc.time()}' AND '{time_to_ny_to_utc.time()}' ORDER BY date ASC"
             result = self.data_sql.db.items(cmd=cmd)
             if result.status == True : data = result.data
             #------Step
@@ -445,9 +448,11 @@ class Dowjones:
                         ask=logic_back.ask,
                         bid=logic_back.bid
                     )
-                    if result.data : logic_back.action(items=result.data)
+                    if result.data : 
+                        logic_back.action(items=result.data)
                 #------order_open_accept
-                if not logic_back.order_open_accept : break
+                if not logic_back.order_open_accept : 
+                    break
             #--------------Stop
             result = self.stop(father_id=-1, step=step)
             if result.data : logic_back.action(items=result.data)

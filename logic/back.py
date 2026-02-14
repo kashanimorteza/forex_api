@@ -135,7 +135,7 @@ class Logic_Back:
             execute_detaile:model_output = self.execute_detaile(id=execute_id)
             strategy_name = execute_detaile["strategy_name"]
             strategy = self.get_strategy_instance(strategy_name, execute_detaile).data
-            strategy.back()
+            output = strategy.back()
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
@@ -143,8 +143,6 @@ class Logic_Back:
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #------Output
         output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-        output.data = None
-        output.message = None
         #------Verbose
         if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #------Log

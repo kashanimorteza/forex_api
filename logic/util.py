@@ -102,11 +102,11 @@ def time_change_utc_newyork(date):
     return output
 
 #--------------------------------------------- time_change_newyork_utc
-def time_change_newyork_utc(time):
+def time_change_newyork_utc(date):
     #--------------Action
     utc = pytz.utc
     ny = pytz.timezone("America/New_York")
-    ny_dt = ny.localize(time)
+    ny_dt = ny.localize(date)
     output = ny_dt.astimezone(utc)
     #--------------Return
     return output
