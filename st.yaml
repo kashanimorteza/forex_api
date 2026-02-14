@@ -1,0 +1,282 @@
+#--------------------------------------------------------------------------------- General
+general:
+  #---Info
+  name: forex
+  time_zone: UTC
+  path_api: /root/forex_api
+  path_gui: /root/forex_gui
+  #---Debug
+  debug: false
+  log: false
+  verbose: false
+  #---Database
+  database_management: management
+  database_data: data
+  database_log: log
+
+#--------------------------------------------------------------------------------- Git
+git:
+  name: morteza
+  email: kashani.morteza@gmail.com
+
+#--------------------------------------------------------------------------------- Database
+database:
+  #---Data
+  data:
+    server: postgresql
+    host: 127.0.0.1
+    port: 5432
+    username: forex
+    password: "&WnA8v!(THG%)czK"
+    database: forex
+  #---Management
+  management:
+    server: postgresql
+    host: 127.0.0.1
+    port: 5432
+    username: forex
+    password: "&WnA8v!(THG%)czK"
+    database: management
+  #---Log
+  log:
+    server: postgresql
+    host: 127.0.0.1
+    port: 5432
+    username: forex
+    password: "&WnA8v!(THG%)czK"
+    database: log
+
+#--------------------------------------------------------------------------------- Webapi
+webapi:
+  title: forex_api
+  description: This is my custom API schema description
+  version: '1.0.0'
+  openapi_url: /schema
+  docs_url: /doc1
+  redoc_url: /doc2
+  key: "57b3e8ae-4aca-4776-9aa1-9ccce396dc6f"
+  host: 127.0.0.1
+  port: 8000
+  workers: 1
+
+#--------------------------------------------------------------------------------- Nginx
+nginx:
+  #---API
+  api:
+    host: 0.0.0.0
+    port: 8001
+    key: "57b3e8ae-4aca-4776-9aa1-9ccce396dc6f"
+  #---GUI
+  gui:
+    host: 0.0.0.0
+    port: 8002
+    key: "57b3e8ae-4aca-4776-9aa1-9ccce396dc6f"
+
+#--------------------------------------------------------------------------------- Log
+log:
+  #---General
+  general:
+    table: forex
+    file: log.txt
+  #---Error
+  error:
+    verbose: True
+    file: False
+    database: False
+  #---Report
+  report:
+    verbose: True
+    file: False
+    database: False
+  #---Notification
+  notification:
+    verbose: True
+    file: False
+    database: False
+
+#--------------------------------------------------------------------------------- FXCM
+forex_connect:
+  default: acc-history1
+  delay: 0.5
+  acc-history1:
+    broker    : 'fxcm'
+    type      : 'Demo'
+    username  : '52035534'
+    password  : 'fjf0tzq'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : ''
+  acc-history2:
+    broker    : 'fxcm'
+    type      : 'Demo'
+    username  : '52032860'
+    password  : 'aq8iwnf'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : ''
+  acc-live:
+    broker    : 'fxcm'
+    type      : 'Demo'
+    username  : '52035533'
+    password  : 'iaee0at'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : ''
+  acc-trade:
+    broker    : 'fxcm'
+    type      : 'Demo'
+    username  : '52047997'
+    password  : 'pdk2cnf'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : ''
+
+#--------------------------------------------------------------------------------- Download
+download:
+  instrument: XAU/USD
+  timeframe: t1
+  mode: complete
+  count: 1000
+  repeat: 1
+  delay: 0
+  save: True
+  bulk: False
+  clear: False
+  dedicate: False
+  datefrom: '1993-01-01 00:00:00'
+  dateto: '2030-01-01 21:00:00'
+  
+#--------------------------------------------------------------------------------- instrument
+instrument:
+  table: instrument
+  useDefaultSymbols: False
+  defaultSymbols: [
+      "EUR/USD", "EUR/GBP", "EUR/CHF", "EUR/JPY", "EUR/AUD", "EUR/CAD", "EUR/NZD",
+      "GBP/USD", "GBP/JPY", "GBP/CHF", "GBP/NZD", "GBP/AUD", "GBP/CAD",
+      "AUD/USD", "AUD/CAD", "AUD/JPY", "AUD/NZD", "AUD/CHF",
+      "NZD/USD", "NZD/JPY", "NZD/CHF", "NZD/CAD",
+      "USD/JPY", "USD/CHF", "USD/CAD",
+      "CAD/JPY", "CAD/CHF",
+      "CHF/JPY",
+      "USOil", "UKOil", "XAU/USD", "XAG/USD",
+      "US30",]
+
+#--------------------------------------------------------------------------------- timeframe
+timeframe: ["W1", "D1", "H8", "H6", "H4", "H3", "H2", "H1", "m30", "m15", "m5", "m1", "t1"]
+
+#--------------------------------------------------------------------------------- Debug
+debug:
+  Database_Orm:
+    add: {log: false, verbose: false, model: "Database_Orm"}
+    items: {log: false, verbose: false, model: "Database_Orm"}
+    update: {log: false, verbose: false, model: "Database_Orm"}
+    delete: {log: false, verbose: false, model: "Database_Orm"}
+    create_all_tables: {log: false, verbose: false, model: "Database_Orm"}
+    create: {log: false, verbose: false, model: "Database_Orm"}
+    truncate: {log: false, verbose: false, model: "Database_Orm"}
+    drop: {log: false, verbose: false, model: "Database_Orm"}
+  Database_SQL:
+    add: {log: false, verbose: false, model: "Database_Orm"}
+    items: {log: false, verbose: false, model: "Database_Orm"}
+    update: {log: false, verbose: false, model: "Database_Orm"}
+    delete: {log: false, verbose: false, model: "Database_Orm"}
+    create_all_tables: {log: false, verbose: false, model: "Database_Orm"}
+    create: {log: false, verbose: false, model: "Database_Orm"}
+    truncate: {log: false, verbose: false, model: "Database_Orm"}
+    drop: {log: false, verbose: false, model: "Database_Orm"}
+  Data_Orm:
+    add: {log: false, verbose: false, model: "Database_Orm"}
+    items: {log: false, verbose: false, model: "Database_Orm"}
+    update: {log: false, verbose: false, model: "Database_Orm"}
+    delete: {log: false, verbose: false, model: "Database_Orm"}
+    create_all_tables: {log: false, verbose: false, model: "Database_Orm"}
+    create: {log: false, verbose: false, model: "Database_Orm"}
+    truncate: {log: false, verbose: false, model: "Database_Orm"}
+    drop: {log: false, verbose: false, model: "Database_Orm"}
+  Data_SQL:
+    add: {log: false, verbose: false, model: "Database_Orm"}
+    items: {log: false, verbose: false, model: "Database_Orm"}
+    update: {log: false, verbose: false, model: "Database_Orm"}
+    delete: {log: false, verbose: false, model: "Database_Orm"}
+    create_all_tables: {log: false, verbose: false, model: "Database_Orm"}
+    create: {log: false, verbose: false, model: "Database_Orm"}
+    truncate: {log: false, verbose: false, model: "Database_Orm"}
+    drop: {log: false, verbose: false, model: "Database_Orm"}
+  Logic_Implementation:
+    create_all_table: {log: false, verbose: true, model: "Logic_Implementation"}
+    truncate_all_table: {log: false, verbose: true, model: "Logic_Implementation"}
+    instrument: {log: false, verbose: true, model: "Logic_Implementation"}
+    account: {log: false, verbose: true, model: "Logic_Implementation"}
+    strategy: {log: false, verbose: true, model: "Logic_Implementation"}
+    strategy_item: {log: false, verbose: true, model: "Logic_Implementation"}
+    live_execute: {log: false, verbose: true, model: "Logic_Implementation"}
+    live_order: {log: false, verbose: true, model: "Logic_Implementation"}
+    back_execute: {log: false, verbose: true, model: "Logic_Implementation"}
+    back_order: {log: false, verbose: true, model: "Logic_Implementation"}
+    create_instrument_timeframe_table: {log: false, verbose: true, model: "Logic_Implementation_Data"}
+  Logic_Management:
+    order_close: {log: false, verbose: false, model: "Logic_Management"}
+    order_detaile: {log: false, verbose: false, model: "Logic_Management"}
+    live_action: {log: false, verbose: false, model: "Logic_Management"}
+    get_strategy_item_instance: {log: false, verbose: false, model: "Logic_Management"}
+  Logic_Live:
+    login: {log: false, verbose: false, model: "Logic_Live"}
+    logout: {log: false, verbose: false, model: "Logic_Live"}
+    info: {log: false, verbose: false, model: "Logic_Live"}
+    store: {log: false, verbose: true, model: "Logic_Live"}
+    save: {log: false, verbose: true, model: "Logic_Live"}
+    symbol: {log: false, verbose: false, model: "Logic_Live"}
+    account_info: {log: false, verbose: false, model: "Logic_Live"}
+    trade_list: {log: false, verbose: false, model: "Logic_Live"}
+    order_open: {log: false, verbose: false, model: "Logic_Live"}
+    order_close: {log: false, verbose: false, model: "Logic_Live"}
+    order_close_all: {log: false, verbose: false, model: "Logic_Live"}
+  Logic_Back:
+    run: {log: false, verbose: true, model: "Logic_Back"}
+    start: {log: false, verbose: true, model: "Logic_Back"}
+    stop: {log: false, verbose: true, model: "Logic_Back"}
+    next: {log: false, verbose: true, model: "Logic_Back"}
+    order_open: {log: false, verbose: true, model: "Logic_Back"}
+    order_pending: {log: false, verbose: true, model: "Logic_Back"}
+    order_close: {log: false, verbose: true, model: "Logic_Back"}
+    profit_manager: {log: false, verbose: false, model: "Logic_Back"}
+  Fxcm_API:
+    login: {log: false, verbose: true, model: "Fxcm_API"}
+    logout: {log: false, verbose: true, model: "Fxcm_API"}
+    info: {log: false, verbose: true, model: "Fxcm_API"}
+    store: {log: false, verbose: true, model: "Fxcm_API"}
+    history: {log: false, verbose: true, model: "Fxcm_API"}
+    save: {log: false, verbose: true, model: "Fxcm_API"}
+    symbol: {log: false, verbose: true, model: "Fxcm_API"}
+    account_info: {log: false, verbose: true, model: "Fxcm_API"}
+    trade_list: {log: false, verbose: true, model: "Fxcm_API"}
+    order_open: {log: false, verbose: true, model: "Fxcm_API"}
+    order_close: {log: false, verbose: true, model: "Fxcm_API"}
+    get_table: {log: false, verbose: false, model: "Fxcm_API"}
+  Data:
+    save: {log: false, verbose: true, model: "Data"}
+    get_max_min: {log: false, verbose: false, model: "Data"}
+  OneWay:
+    start: {log: false, verbose: true, model: "OneWay"}
+    stop: {log: false, verbose: true, model: "OneWay"}
+    order_close: {log: false, verbose: true, model: "OneWay"}
+    price_change: {log: false, verbose: true, model: "OneWay"}
+  Floating:
+    start: {log: false, verbose: false, model: "Floating"}
+    stop: {log: false, verbose: false, model: "Floating"}
+    order_close: {log: false, verbose: false, model: "Floating"}
+    price_change: {log: false, verbose: false, model: "Floating"}
+  Dowjones:
+    start: {log: false, verbose: true, model: "Dowjones"}
+    stop: {log: false, verbose: true, model: "Dowjones"}
+    order_close: {log: false, verbose: false, model: "Dowjones"}
+    price_change: {log: false, verbose: false, model: "Dowjones"}
+    back_run: {log: false, verbose: true, model: "Dowjones"}
+    back_next: {log: false, verbose: true, model: "Dowjones"}
+    back: {log: false, verbose: true, model: "Dowjones"}
+  ST_04:
+    start: {log: false, verbose: true, model: "ST_04"}
+    stop: {log: false, verbose: true, model: "ST_04"}
+    order_close: {log: false, verbose: true, model: "ST_04"}
+    price_change: {log: false, verbose: true, model: "ST_04"}
+  ST_05:
+    start: {log: false, verbose: true, model: "ST_05"}
+    stop: {log: false, verbose: true, model: "ST_05"}
+    order_close: {log: false, verbose: true, model: "ST_05"}
+    price_change: {log: false, verbose: true, model: "ST_05"}
