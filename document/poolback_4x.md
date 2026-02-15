@@ -5,6 +5,24 @@
 <br><br>
 
 ## parameter
+
+This is the name of strtegy
+```
+name: poolback_4x
+```
+
+This is the name of strtegy
+```
+time: utc
+```
+
+This is the name of strtegy
+```
+time_start: 00:00:00
+time_end: 21:00:00
+```
+
+
 Description
 ```
 name: poolback_4x
