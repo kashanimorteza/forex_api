@@ -42,6 +42,8 @@ class model_back_order_db(BaseModel_db):
     enable = Column(Boolean, default=True)
     balance = Column(Float, default=0.0)
     equity = Column(Float, default=0.0)
+    result = Column(String, default='')
+    rr = Column(String, default=0)
 
     #---Display
     def __repr__(self) : return f"{self.toDict()}"
@@ -79,3 +81,5 @@ class model_back_order_py(BaseModel_py):
     enable : bool = True
     balance : float = 0
     equity : float = 0
+    result : str = ''
+    rr : str = ''

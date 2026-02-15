@@ -4,8 +4,8 @@
 
 Identifies the unique name of the strategy.
 
-``` yaml
-name: poolback_4x
+``` puthon
+name=poolback_4x
 ```
 
 ------------------------------------------------------------------------

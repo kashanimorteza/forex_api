@@ -250,6 +250,8 @@ class Logic_Back:
             for order in self.list_order_open:
                 execute = False
                 #---Order
+                execute_id = order[1]
+                step = order[2]
                 order_id = order[0]
                 order_price_open = order[5]
                 order_action = order[11]
@@ -283,6 +285,9 @@ class Logic_Back:
                                 self.management_sql.db.execute(cmd=cmd)
                                 cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{self.date}', {order_id}, {self.ask}, {self.bid}, 'TP', {tp})"
                                 self.management_sql.db.execute(cmd=cmd)
+                                #---update list
+                                self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{execute_id}' and step='{step}' AND status='open'").data
+                                #---verbose
                                 message = f"{self.date} | {self.symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | TP | old({order_price_tp}) | {pips} | new({tp})"
                                 output.time = sort(f"{(time.time() - start_time):.3f}", 3)
                                 self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
@@ -304,6 +309,9 @@ class Logic_Back:
                                 self.management_sql.db.execute(cmd=cmd)
                                 cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{self.date}', {order_id}, {self.ask}, {self.bid}, 'SL', {sl})"
                                 self.management_sql.db.execute(cmd=cmd)
+                                #---update list
+                                self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{execute_id}' and step='{step}' AND status='open'").data
+                                #---verbose
                                 message = f"{self.date} | {self.symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | SL | old({order_price_sl}) | {pips} | new({sl})"
                                 output.time = sort(f"{(time.time() - start_time):.3f}", 3)
                                 self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
@@ -443,6 +451,7 @@ class Logic_Back:
         output.method_name = this_method
         #--------------Variable
         items = []
+        result = ''
         #--------------Action
         try:
             for order in self.list_order_open :
@@ -454,18 +463,27 @@ class Logic_Back:
                 sl = order[14]
                 #------Check Buy
                 if action == "buy":
-                    if self.bid > tp and tp > 0 : fire = True
-                    if self.bid < sl and sl > 0 : fire = True
+                    if self.bid > tp and tp > 0 : 
+                        fire = True
+                        result = 'T'
+                    if self.bid < sl and sl > 0 : 
+                        fire = True
+                        result = 'S'
                 #------Check Sell
                 if action == "sell":
-                    if self.ask < tp and tp > 0 :fire = True
-                    if self.ask > sl and sl > 0 : fire = True
+                    if self.ask < tp and tp > 0 :
+                        fire = True
+                        result = 'T'
+                    if self.ask > sl and sl > 0 : 
+                        fire = True
+                        result = 'S'
                 #------Fire
                 if fire :
                     item = self.order_to_dict(order)
                     item['date'] = self.date
                     item['ask'] = self.ask
                     item['bid'] = self.bid
+                    item['result'] = result
                     item = self.order_close(item=item).data
                     items.append(item)
         except Exception as e:  
@@ -640,14 +658,21 @@ class Logic_Back:
             point_size = item.get("point_size")
             execute_id = item.get("execute_id")
             step = item.get("step")
+            result = item.get("result")
+            rr = ''
             #------ Profit
             profit, price_close = cal_profit(action, amount, price_open, ask, bid, digits, point_size)
             item["profit"] = profit
             item["price_close"] = price_close
             item["date_close"] = date
             item["status"] = 'close'
+            #------ risk-to-reward ratio (R/R)
+            if profit>0:
+                loss_price = cal_price_pips(price_open, -self.sl_pips, self.digits, self.point_size)
+                p_loss, _ = cal_profit(action, amount, price_open, loss_price, loss_price, digits, point_size)
+                rr = abs(float(f"{profit/p_loss:.{2}f}"))
             #------ Database
-            cmd = f"UPDATE back_order SET date_close='{date}', price_close={price_close}, profit={profit}, status='close' WHERE id='{id}'"
+            cmd = f"UPDATE back_order SET date_close='{date}', price_close={price_close}, profit={profit}, result='{result}', rr='{rr}', status='close' WHERE id='{id}'"
             result_database:model_output = self.management_sql.db.execute(cmd=cmd)
             #------Update
             self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{execute_id}' and step='{step}' AND status='open'").data
