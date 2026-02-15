@@ -1,8 +1,6 @@
-# poolback_4x
+## Parameters
 
-### Parameters
-
-#### Strategy Name
+### Strategy Name
 
 Identifies the unique name of the strategy.
 
@@ -12,7 +10,7 @@ name: poolback_4x
 
 ------------------------------------------------------------------------
 
-#### Time Zone
+### Time Zone
 
 Defines the reference time standard used by the system.
 
