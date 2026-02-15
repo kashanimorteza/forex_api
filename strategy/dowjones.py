@@ -64,52 +64,6 @@ class Dowjones:
         self.ask = None
         self.bid = None
         self.price = None
-
-    #---------------------------------------------start
-    def database(self, action):
-        #--------------Description
-        # IN     : 
-        # OUT    : 
-        # Action : Just buy|sell order
-        #--------------Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #--------------Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method        
-        #--------------Action
-        try:
-            if action=="open":
-                if self.management_orm == None:
-                    self.management_orm = Data_Orm(database=database_management)
-                if self.management_sql ==None:
-                    self.management_sql = Data_SQL(database=database_management)
-                    self.management_sql.db.open()
-                if self.data_sql==None:
-                    self.data_sql = Data_SQL(database=database_data)
-                    self.data_sql.db.open()
-            if action=="close":
-                self.management_sql.db.close()
-                self.data_sql.db.close()
-        except Exception as e:  
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-        output.data = None
-        output.message = None
-        #--------------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
-        #--------------Log
-        if log : self.log.log(log_model, output)
-        #--------------Return
-        return output
     
     #---------------------------------------------start
     def start(
@@ -372,15 +326,10 @@ class Dowjones:
         output.method_name = this_method
         #--------------Variable
         result = model_output()
-        data = {}
         #--------------Action
         try:
             #------Database
             self.database(action="open")
-            #------Logic_Back
-            from logic.back import Logic_Back
-            logic_back = Logic_Back(management_sql=self.management_sql, data_sql=self.data_sql, management_orm=self.management_orm)
-            logic_back.load(params=self.params)
             #------money_management
             cmd = f"SELECT balance, risk, limit_profit, limit_loss, limit_trade, limit_stop FROM money_management WHERE id={self.money_management_id}"
             self.money_management = self.management_sql.db.items(cmd=cmd).data[0]
@@ -389,11 +338,18 @@ class Dowjones:
             #------Data
             table = get_tbl_name(self.symbol, "t1")
             cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
-            result = self.data_sql.db.items(cmd=cmd)
-            if result.status == True : data = result.data
+            data = self.data_sql.db.items(cmd=cmd).data
             #------Step
             step = self.management_sql.db.item(cmd=f"SELECT MAX(step) FROM back_order WHERE execute_id={self.execute_id}").data
             step = (step + 1) if step else 1
+            #------Logic_Back
+            from logic.back import Logic_Back
+            logic_back = Logic_Back(
+                management_sql=self.management_sql, 
+                data_sql=self.data_sql, 
+                management_orm=self.management_orm
+            )
+            logic_back.load(params=self.params)
             logic_back.step= step
             #------Verbose
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
@@ -471,6 +427,52 @@ class Dowjones:
         #--------------Return
         return output
 
+    #---------------------------------------------database
+    def database(self, action):
+        #--------------Description
+        # IN     : 
+        # OUT    : 
+        # Action : Just buy|sell order
+        #--------------Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #--------------Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method        
+        #--------------Action
+        try:
+            if action=="open":
+                if self.management_orm == None:
+                    self.management_orm = Data_Orm(database=database_management)
+                if self.management_sql ==None:
+                    self.management_sql = Data_SQL(database=database_management)
+                    self.management_sql.db.open()
+                if self.data_sql==None:
+                    self.data_sql = Data_SQL(database=database_data)
+                    self.data_sql.db.open()
+            if action=="close":
+                self.management_sql.db.close()
+                self.data_sql.db.close()
+        except Exception as e:  
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Output
+        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.data = None
+        output.message = None
+        #--------------Verbose
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
+        #--------------Log
+        if log : self.log.log(log_model, output)
+        #--------------Return
+        return output
+    
 #---------------------------------------------Comment
 #time_from_ny_to_utc = time_change_newyork_utc(datetime.combine(self.date_from.date(), self.time_start))
 #time_from_ny_to_utc = time_from_ny_to_utc - timedelta(hours=1)
