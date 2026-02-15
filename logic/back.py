@@ -666,6 +666,11 @@ class Logic_Back:
             item["price_close"] = price_close
             item["date_close"] = date
             item["status"] = 'close'
+
+            if profit>0: 
+                item["result"] = 'T'
+                result = 'T'
+
             #------ risk-to-reward ratio (R/R)
             if profit>0:
                 loss_price = cal_price_pips(price_open, -self.sl_pips, self.digits, self.point_size)
