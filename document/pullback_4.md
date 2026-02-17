@@ -75,18 +75,18 @@ max_order=1
 ## Actions
 
 <!----------------data--->
-#### Step 01 : data 
+#### Step 01 | data 
 ```
 سسسسس
 ```
 ```
 action_1: gereftane dataye  tamame item haye count
 action_2: mohasebeye average bar ase high va low 
-action_3 : average[10] = {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234 }
+action_3 | average[10] = {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234 }
 ```
 
 <!----------------average--->
-#### Step 02 : average 
+#### Step 02 | average 
 ```
 سسسسس
 ```
@@ -96,16 +96,16 @@ action_2: sa2[10]:average = (count_t_2 + count_k_2)/2
 ```
 
 <!----------------candel_close--->
-#### Step 03 : candel_close 
+#### Step 03 | candel_close 
 ```
 سسسسس
 ```
 ```
-action_1: candel_close : price shoro minute
+action_1: candel_close | price shoro minute
 ```
 
 <!----------------switch_up_1--->
-#### Step 04 : switch_up_1
+#### Step 04 | switch_up_1
 ```
 سسسسس
 ```
@@ -121,7 +121,7 @@ action_1:
 ```
 
 <!----------------switch_down_1--->
-#### Step 05 : switch_down_1
+#### Step 05 | switch_down_1
 ```
 سسسسس
 ```
@@ -137,7 +137,7 @@ action_1:
 ```
 
 <!----------------tk_up--->
-#### Step 06 : tk_up
+#### Step 06 | tk_up
 ```
 سسسسس
 ```
@@ -146,7 +146,7 @@ action_1: if average(count["count_t_2"]) > average(count["count_k_2"])
 ```
 
 <!----------------tk_down--->
-#### Step 07 : tk_down 
+#### Step 07 | tk_down 
 ```
 سسسسس
 ```
@@ -155,7 +155,7 @@ action_1: if average(count["count_t_2"]) < average(count["count_k_2"])
 ```
 
 <!----------------switch_up_2--->
-#### Step 08 : switch_up_2
+#### Step 08 | switch_up_2
 ```
 سسسسس
 ```
@@ -171,7 +171,7 @@ action_1:
 ```
 
 <!----------------switch_down_2--->
-#### Step 09 : switch_down_2
+#### Step 09 | switch_down_2
 ```
 سسسسس
 ```
@@ -188,7 +188,7 @@ action_1:
 ```
 
 <!----------------enter--->
-#### Step 10 : enter
+#### Step 10 | enter
 ```
 سسسسس
 ```
