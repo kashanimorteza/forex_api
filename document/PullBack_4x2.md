@@ -15,6 +15,8 @@ Ichimoku Dual Cloud Switch Backtest
 ```
 
 <!--------------------------------------------------------------------------------- Parameters --->
+<br><br>
+
 ## Parameters
 
 <!----------------name--->
