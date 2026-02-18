@@ -99,7 +99,7 @@ sa2 = (t2 + k2)/2
 
 ## Actions
 <!----------------data--->
-#### Step 01 | data 
+#### data 
 ```
 سسسسس
 ```
@@ -112,7 +112,7 @@ action_3 | average[10] = {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "co
 <!----------------average--->
 <br>
 
-#### Step 02 | average 
+#### average 
 ```
 سسسسس
 ```
@@ -124,7 +124,7 @@ action_2: sa2[10]:average = (count_t_2 + count_k_2)/2
 <!----------------candel_close--->
 <br>
 
-#### Step 03 | candel_close 
+#### candel_close 
 ```
 سسسسس
 ```
@@ -135,7 +135,7 @@ action_1: candel_close | price shoro minute
 <!----------------switch_up_1--->
 <br>
 
-#### Step 04 | switch_up_1
+#### switch_up_1
 ```
 سسسسس
 ```
@@ -153,7 +153,7 @@ action_1:
 <!----------------switch_down_1--->
 <br>
 
-#### Step 05 | switch_down_1
+#### switch_down_1
 ```
 سسسسس
 ```
@@ -171,7 +171,7 @@ action_1:
 <!----------------tk_up--->
 <br>
 
-#### Step 06 | tk_up
+#### tk_up
 ```
 سسسسس
 ```
@@ -182,7 +182,7 @@ action_1: if average(count["count_t_2"]) > average(count["count_k_2"])
 <!----------------tk_down--->
 <br>
 
-#### Step 07 | tk_down 
+#### tk_down 
 ```
 سسسسس
 ```
@@ -193,7 +193,7 @@ action_1: if average(count["count_t_2"]) < average(count["count_k_2"])
 <!----------------switch_up_2--->
 <br>
 
-#### Step 08 | switch_up_2
+#### switch_up_2
 ```
 سسسسس
 ```
@@ -211,7 +211,7 @@ action_1:
 <!----------------switch_down_2--->
 <br>
 
-#### Step 09 | switch_down_2
+#### switch_down_2
 ```
 سسسسس
 ```
@@ -230,7 +230,7 @@ action_1:
 <!----------------enter--->
 <br>
 
-#### Step 10 | enter
+#### enter
 ```
 سسسسس
 ```
