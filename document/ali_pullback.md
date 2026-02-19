@@ -76,11 +76,9 @@ max_order=1
 period = {
     "t1": 9,
     "k1": 26,
-    "sa1": 17.5,
     "sb1": 78,
     "t2": 36,
     "k2": 104,
-    "sa2": 70,
     "sb2": 234
 }
 ```
@@ -90,8 +88,10 @@ period = {
 تمام پارامترها در یکجا
 ```
 ```python
-params="{'name': 'poolback_4x', 'time_frame': '1min', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'period': {'t1': 9, 'k1': 26, 'sa1': 17.5, 'sb1': 78, 't2': 36, 'k2': 104, 'sa2': 70, 'sb2': 234}}"
+params="{'name': 'poolback_4x', 'time_frame': '1min', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
 ```
+
+
 
 <!--------------------------------------------------------------------------------- Actions --->
 <br><br>
@@ -106,6 +106,20 @@ params="{'name': 'poolback_4x', 'time_frame': '1min', 'region': 'UTC', 'time_fro
 action_1: gereftane dataye  tamame item haye count
 action_2: mohasebeye average bar ase high va low 
 action_3 | average[10] = {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234 }
+```
+
+<!----------------average--->
+<br>
+
+#### aaa
+```
+میانگین ھای و لول های مختلف کندل
+```
+```
+محاسبه sa1 وsa2
+میانگن t1 , k1
+sa1 = (t1 + k1)/2
+sa2 = (t2 + k2)/2
 ```
 
 <!----------------average--->
@@ -238,4 +252,33 @@ action_1: if switch_up_2 ** tk_up_2 && switch_down_1
 action_2: buy
 action_3: if switch_down_2 ** tk_down_2 && switch_up_1
 action_4: sell
+```
+
+
+<!--------------------------------------------------------------------------------- Methods --->
+<br><br>
+
+## Methods
+<!----------------enter--->
+<br>
+
+#### box
+```
+این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
+```
+```
+Name : box
+input : date | count | time_frame
+output : high | low
+```
+```python
+if time_frame == "1min":
+    table = get_tbl_name(self.symbol, "t1")
+    date_to = date
+    date_from = date - timedelta(minutes=count)
+    cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
+    result = self.data_sql.db.item(cmd=cmd).data
+    high = result[0]
+    low = result[1]
+    return high, low
 ```

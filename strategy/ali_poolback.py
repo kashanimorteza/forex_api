@@ -6,7 +6,9 @@
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from sqlalchemy import table
 from logic.startup import debug, log_instance, list_instrument, Strategy_Run, Strategy_Action, Strategy_Run, database_management, database_data
 from logic.util import model_output, sort, time_change_newyork_utc, time_change_utc_newyork, cal_price_pips, cal_size, get_tbl_name
 from logic.log import Logic_Log
@@ -36,8 +38,8 @@ class Ali_PoolBack:
         #--------------strategy | params
         self.time_frame = params["params"]["time_frame"]
         self.region = params["params"]["region"]
-        self.time_from = datetime.strptime(params["params"]["time_from"], "%H:%M:%S").time()
-        self.time_to = datetime.strptime(params["params"]["time_to"], "%H:%M:%S").time()
+        self.time_from = params["params"]["time_from"]
+        self.time_to = params["params"]["time_to"]
         self.max_order = params["params"]["max_order"]
         self.period = params["params"]["period"]
         #--------------execute | items
@@ -352,8 +354,8 @@ class Ali_PoolBack:
             output.message = f"exi({self.execute_id}) | sym({self.symbol}) | stp({step})"
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #------Data
-            table = get_tbl_name(self.symbol, "t1")
-            cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
+            table = get_tbl_name(self.symbol, "m1")
+            cmd = f"SELECT id, date, askopen, bidopen FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
             data = self.data_sql.db.items(cmd=cmd).data
             #------Start
             result= self.start(father_id=-1, step=step)
@@ -477,3 +479,52 @@ class Ali_PoolBack:
         if log : self.log.log(log_model, output)
         #--------------Return
         return output
+    
+    #---------------------------------------------box
+    def box(
+            self,
+            date:int, 
+            count:int,
+            time_frame:str,
+        ):
+        #--------------Description
+        # IN     : date | count | time_frame
+        # OUT    : high | low
+        # Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
+        #--------------Debug
+        this_method = inspect.currentframe().f_code.co_name
+        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
+        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
+        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
+        start_time = time.time()
+        #--------------Output
+        output = model_output()
+        output.class_name = self.this_class
+        output.method_name = this_method
+        #--------------Action
+        try:
+            if time_frame == "1min":
+                table = get_tbl_name(self.symbol, "t1")
+                date_to = date
+                date_from = date - timedelta(minutes=count)
+                cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
+                result = self.data_sql.db.item(cmd=cmd).data
+                high = result[0]
+                low = result[1]
+                return high, low
+        except Exception as e:  
+            output.status = False
+            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
+            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
+            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
+        #--------------Output
+        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.data = None
+        output.message = f"exi({self.execute_id}) | sym({self.symbol}) | stp({step})"
+        #--------------Verbose
+        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
+        #--------------Log
+        if log : self.log.log(log_model, output)
+        #--------------Return
+        return output
+    
