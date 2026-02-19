@@ -97,6 +97,28 @@ params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from'
 <br><br>
 
 ## Actions
+<!----------------average--->
+<br>
+
+#### High Low 
+```
+گرفتن های و لوی همه آیتم‌های داخل متغیر پریود
+```
+```python
+#---------high_low_items
+high_low_items = {}
+for key, value in self.period.items():
+    high, low = self.box(date=date, count=value, time_frame=self.time_frame)
+    high_low_items[key] = {"high": high, "low": low , "average": (high+low)/2}
+```
+
+
+
+
+
+
+
+
 <!----------------data--->
 #### data 
 ```
@@ -108,8 +130,26 @@ action_2: mohasebeye average bar ase high va low
 action_3 | average[10] = {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234 }
 ```
 
+
+
+
+
+
+
+
 <!----------------average--->
 <br>
+#### average 
+```
+گرفتن های و لوی همه آیتم‌های داخل متغیر پریود
+```
+```
+action_1: sa1[10]:average = (count_t_1 + count_k_1)/2
+action_2: sa2[10]:average = (count_t_2 + count_k_2)/2
+```
+
+
+
 
 #### aaa
 ```
@@ -122,17 +162,7 @@ sa1 = (t1 + k1)/2
 sa2 = (t2 + k2)/2
 ```
 
-<!----------------average--->
-<br>
 
-#### average 
-```
-سسسسس
-```
-```
-action_1: sa1[10]:average = (count_t_1 + count_k_1)/2
-action_2: sa2[10]:average = (count_t_2 + count_k_2)/2
-```
 
 <!----------------candel_close--->
 <br>
@@ -266,17 +296,24 @@ action_4: sell
 این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
 ```
 ```python
-#--------------Description
-# IN     : date | count | time_frame
-# OUT    : high | low
-# Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
-#--------------Action
-table = get_tbl_name(self.symbol, self.time_frame)
-date_to = date
-date_from = date - timedelta(minutes=count)
-cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
-result = self.data_sql.db.item(cmd=cmd).data
-high = result[0]
-low = result[1]
-return high, low
+  #---------------------------------------------box
+  def box(
+          self,
+          date:int, 
+          count:int,
+          time_frame:str,
+      ):
+      #--------------Description
+      # IN     : date | count | time_frame
+      # OUT    : high | low
+      # Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
+      #--------------Action
+      table = get_tbl_name(self.symbol, self.time_frame)
+      date_to = date
+      date_from = date - timedelta(minutes=count)
+      cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
+      result = self.data_sql.db.item(cmd=cmd).data
+      high = result[0]
+      low = result[1]
+      return high, low
 ```

@@ -244,7 +244,23 @@ class Ali_PoolBack:
         items = []
         #--------------Action
         try:
-            #---------Everyday
+            #---------high_low_items
+            high_low_items = {}
+            for key, value in self.period.items():
+                high, low = self.box(date=date, count=value, time_frame=self.time_frame)
+                high_low_items[key] = {"high": high, "low": low , "average": (high+low)/2}
+
+
+
+
+
+
+
+
+
+
+
+
             if (self.set_order is None) or (self.set_order is False) or (date.date()> self.date.date()):
                 #---------Time
                 ny_date = time_change_utc_newyork(date)
@@ -491,39 +507,13 @@ class Ali_PoolBack:
         # IN     : date | count | time_frame
         # OUT    : high | low
         # Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
-        #--------------Debug
-        this_method = inspect.currentframe().f_code.co_name
-        verbose = debug.get(self.this_class, {}).get(this_method, {}).get('verbose', False)
-        log = debug.get(self.this_class, {}).get(this_method, {}).get('log', False)
-        log_model = debug.get(self.this_class, {}).get(this_method, {}).get('model', False)
-        start_time = time.time()
-        #--------------Output
-        output = model_output()
-        output.class_name = self.this_class
-        output.method_name = this_method
         #--------------Action
-        try:
-            table = get_tbl_name(self.symbol, self.time_frame)
-            date_to = date
-            date_from = date - timedelta(minutes=count)
-            cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
-            result = self.data_sql.db.item(cmd=cmd).data
-            high = result[0]
-            low = result[1]
-            return high, low
-        except Exception as e:  
-            output.status = False
-            output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
-            self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
-            self.log.log("err", f"{self.this_class} | {this_method}", str(e))
-        #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
-        output.data = None
-        output.message = f"exi({self.execute_id}) | sym({self.symbol}) | stp({step})"
-        #--------------Verbose
-        if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
-        #--------------Log
-        if log : self.log.log(log_model, output)
-        #--------------Return
-        return output
+        table = get_tbl_name(self.symbol, self.time_frame)
+        date_to = date
+        date_from = date - timedelta(minutes=count)
+        cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
+        result = self.data_sql.db.items(cmd=cmd).data
+        high = result[0][0]
+        low = result[0][1]
+        return high, low
     
