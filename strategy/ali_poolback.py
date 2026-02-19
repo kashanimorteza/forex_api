@@ -8,7 +8,7 @@
 import inspect, time
 from datetime import datetime, timedelta
 
-from sqlalchemy import table
+from sqlalchemy import table, true
 from logic.startup import debug, log_instance, list_instrument, Strategy_Run, Strategy_Action, Strategy_Run, database_management, database_data
 from logic.util import model_output, sort, time_change_newyork_utc, time_change_utc_newyork, cal_price_pips, cal_size, get_tbl_name
 from logic.log import Logic_Log
@@ -41,6 +41,7 @@ class Ali_PoolBack:
         self.time_from = params["params"]["time_from"]
         self.time_to = params["params"]["time_to"]
         self.max_order = params["params"]["max_order"]
+        self.domain = params["params"]["domain"]
         self.period = params["params"]["period"]
         #--------------execute | items
         self.execute_id = params["execute_id"]
@@ -242,13 +243,135 @@ class Ali_PoolBack:
         output.method_name = this_method
         #--------------Variable
         items = []
+        #--------------Method
+        def inner(lpp):
+            lpp = lpp -1
+            if lpp > 0:
+                a = average[lpp]['sa1']
+                b = average[lpp]['sb1']['average']
+                a = 1
+                b = 1
+                if a > b :
+                    lpp = -1
+                    switch_up = False
+                if a < b : 
+                    switch_up = True
+                    lpp = -1
+                if a == b : 
+                    inner(lpp)
         #--------------Action
         try:
-            #---------high_low_items
-            high_low_items = {}
-            for key, value in self.period.items():
-                high, low = self.box(date=date, count=value, time_frame=self.time_frame)
-                high_low_items[key] = {"high": high, "low": low , "average": (high+low)/2}
+            #---------average
+            average = {}
+            average_date = date
+            for i in range(10, 0, -1):
+                average_item = {}
+                #---------average
+                for key, value in self.period.items():
+                    high, low = self.box(date=average_date, count=value, time_frame=self.time_frame)
+                    average_item[key] = {"high": high, "low": low , "average": (high+low)/2}
+                #---------sa
+                average_item['sa1'] = (average_item['t1']['average'] + average_item['k1']['average']) / 2
+                average_item['sa2'] = (average_item['t2']['average'] + average_item['k2']['average']) / 2
+                average[i] = average_item
+                average_date = average_date - timedelta(minutes=1)
+            #---------tk
+            if average[self.domain]['t2']['average'] > average[self.domain]['k2']['average'] :
+                tk_up = True
+                tk_down = False
+            else:
+                tk_up = False
+                tk_down = True
+            #---------kumo
+            if average[self.domain]['sa2'] > average[self.domain]['sb2']['average'] :
+                kumo_up = True
+                kumo_down = False
+            else:
+                kumo_up = False
+                kumo_down = True
+            #---------switch_down
+            keep = False
+            switch_up = False
+            switch_down = False
+            lp = self.domain
+            # if ask < average[self.domain]['sa1'] and ask < average[self.domain]['sb1']['average']:
+            #     if average[self.domain]['sa1'] < average[self.domain]['sb1']['average']:
+            # avg1 = average[self.domain]['sa1']
+            # avg2 = average[self.domain]['sb1']['average']
+            avg1=1
+            avg2=1
+            #---Live Big
+            #if avg1 > avg2:
+            lpp = self.domain +1
+            inner(lpp)
+            print("aaa")
+
+                                
+                    
+                    
+                    #     #---Gozahste
+                    #     while lp > 1:
+                    #         avg11 = average[self.domain-1]['sa1']
+                    #         avg21 = average[self.domain-1]['sb1']['average']
+                    #         if avg11 > avg21 : 
+                    #             break
+                    #         if avg11 < avg21 : 
+                    #             switch_up = True
+                    #             break
+                    #         if avg11 == avg21 : 
+                    #             avg11 = average[self.domain-2]['sa1']
+                    #             avg21 = average[self.domain-2]['sb1']['average']
+                    #             if avg11 > avg21 : 
+                    #                 break
+                    #             if avg11 < avg21 : 
+                    #                 switch_up = True
+                    #                 break
+                    #             if avg11 == avg21 : 
+                    #                 avg11 = average[self.domain-3]['sa1']
+                    #                 avg21 = average[self.domain-3]['sb1']['average']
+                    #                 if avg11 > avg21 : 
+                    #                     break
+                    #                 if avg11 < avg21 : 
+                    #                     switch_up = True
+                    #                     break
+                    #                 if avg11 == avg21 : 
+                    #                     avg11 = average[self.domain-4]['sa1']
+                    #                     avg21 = average[self.domain-4]['sb1']['average']
+
+
+                    # #---Small
+                    # if avg1 > avg2:
+                    #     pass
+
+
+
+
+
+
+
+
+
+
+# #sa1 | sb1 
+# action_1: loop 10 ta 1
+# action_1: if sa1[1] < average(count["count_sb_1"])
+# action_1: 
+#           if sa1[i-1] > average(count["count_sb_1"])
+#             javab
+#           else == 
+#             sa1[i-2] > average(count["count_sb_1"])
+
+
+
+
+
+
+
+
+#             high_low_items = {}
+#             for key, value in self.period.items():
+#                 high, low = self.box(date=date, count=value, time_frame=self.time_frame)
+#                 high_low_items[key] = {"high": high, "low": low , "average": (high+low)/2}
 
 
 
@@ -261,54 +384,54 @@ class Ali_PoolBack:
 
 
 
-            if (self.set_order is None) or (self.set_order is False) or (date.date()> self.date.date()):
-                #---------Time
-                ny_date = time_change_utc_newyork(date)
-                if self.time_from <= ny_date.time() <= self.time_to:
-                    #---Set_Price
-                    if not self.set_price or date.date()> self.date.date():
-                        self.set_order = False
-                        self.set_price = True
-                        self.ask = ask
-                        self.bid = bid
-                        self.date = date
-                    #---Check_Price
-                    if self.set_price: 
-                        movement = abs(ask - self.ask)
-                        if movement >= self.change_pip:
-                            self.set_order = True
-                            self.set_price = False
-                            action = self.up if ask > self.ask else self.down
-                            if action == "buy":
-                                price = cal_price_pips(self.ask, -self.order_pip , self.digits, self.point_size)
-                            else:
-                                price = cal_price_pips(self.bid, self.order_pip , self.digits, self.point_size)
-                            if self.risk > 0 :
-                                amount = cal_size(balance=self.balance, price=price, pips=self.sl_pips, risk=self.risk, digits=self.digits, point_size=self.point_size)
-                            else:
-                                amount = self.amount
-                            amount = float(f"{amount:.{2}f}")
-                            item = {
-                                #---General
-                                "state": Strategy_Action.PRICE_CHANGE,
-                                "run": Strategy_Run.ORDER_PENDING,
-                                "father_id": father_id,
-                                "step": step,
-                                "execute_id": self.execute_id,
-                                "tp_pips": self.tp_pips, 
-                                "sl_pips": self.sl_pips,
-                                "digits": self.digits, 
-                                "point_size": self.point_size,
-                                #---Data
-                                "symbol": symbol, 
-                                "action": action, 
-                                "amount": amount, 
-                                "date": date,
-                                "ask": price,
-                                "bid": price,
-                                "pending_limit": self.pending_limit,
-                            }
-                            items.append(item)
+#             if (self.set_order is None) or (self.set_order is False) or (date.date()> self.date.date()):
+#                 #---------Time
+#                 ny_date = time_change_utc_newyork(date)
+#                 if self.time_from <= ny_date.time() <= self.time_to:
+#                     #---Set_Price
+#                     if not self.set_price or date.date()> self.date.date():
+#                         self.set_order = False
+#                         self.set_price = True
+#                         self.ask = ask
+#                         self.bid = bid
+#                         self.date = date
+#                     #---Check_Price
+#                     if self.set_price: 
+#                         movement = abs(ask - self.ask)
+#                         if movement >= self.change_pip:
+#                             self.set_order = True
+#                             self.set_price = False
+#                             action = self.up if ask > self.ask else self.down
+#                             if action == "buy":
+#                                 price = cal_price_pips(self.ask, -self.order_pip , self.digits, self.point_size)
+#                             else:
+#                                 price = cal_price_pips(self.bid, self.order_pip , self.digits, self.point_size)
+#                             if self.risk > 0 :
+#                                 amount = cal_size(balance=self.balance, price=price, pips=self.sl_pips, risk=self.risk, digits=self.digits, point_size=self.point_size)
+#                             else:
+#                                 amount = self.amount
+#                             amount = float(f"{amount:.{2}f}")
+#                             item = {
+#                                 #---General
+#                                 "state": Strategy_Action.PRICE_CHANGE,
+#                                 "run": Strategy_Run.ORDER_PENDING,
+#                                 "father_id": father_id,
+#                                 "step": step,
+#                                 "execute_id": self.execute_id,
+#                                 "tp_pips": self.tp_pips, 
+#                                 "sl_pips": self.sl_pips,
+#                                 "digits": self.digits, 
+#                                 "point_size": self.point_size,
+#                                 #---Data
+#                                 "symbol": symbol, 
+#                                 "action": action, 
+#                                 "amount": amount, 
+#                                 "date": date,
+#                                 "ask": price,
+#                                 "bid": price,
+#                                 "pending_limit": self.pending_limit,
+#                             }
+#                             items.append(item)
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
@@ -371,7 +494,7 @@ class Ali_PoolBack:
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #------Data
             table = get_tbl_name(self.symbol, self.time_frame)
-            cmd = f"SELECT id, date, askopen, bidopen FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
+            cmd = f"SELECT id, date, askclose, bidclose FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
             data = self.data_sql.db.items(cmd=cmd).data
             #------Start
             result= self.start(father_id=-1, step=step)

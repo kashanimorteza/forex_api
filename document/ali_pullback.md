@@ -69,6 +69,14 @@ time_to='21:00:00'
 ```python
 max_order=1
 ```
+<!----------------domain--->
+#### domain
+```
+گرفتن های و لو همه آیتم‌های داخل متغیر پریود برای دومین دامنه گذشته
+```
+```python
+domain=10
+```
 <!----------------period--->
 #### period
 ```
@@ -87,7 +95,7 @@ period = {
 <!----------------python--->
 #### python
 ```python
-params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
 ```
 
 
@@ -97,68 +105,87 @@ params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from'
 
 ## Actions
 
-<!----------------high_low_items--->
-#### high_low_items
+<!----------------average--->
+#### average
 ```
 گرفتن های و لوی همه آیتم‌های داخل متغیر پریود
 ```
 ```python
-#---------high_low_items
-high_low_items = {}
+average = {}
 for key, value in self.period.items():
     high, low = self.box(date=date, count=value, time_frame=self.time_frame)
-    high_low_items[key] = {"high": high, "low": low , "average": (high+low)/2}
+    average[key] = {"high": high, "low": low , "average": (high+low)/2}
 ```
 
-
-
-
-
-
-
-
-<!----------------data--->
-#### data 
-```
-سسسسس
-```
-```
-action_1: gereftane dataye  tamame item haye count
-action_2: mohasebeye average bar ase high va low 
-action_3 | average[10] = {"count_t_1":9 , "count_k_1":26 , "count_sb_1":78 , "count_t_2":36 , "count_k_2":104 , "count_sb_2":234 }
-```
-
-
-
-
-
-
-
-
-<!----------------average--->
+<!----------------sa--->
 <br>
-#### average 
+
+#### sa
 ```
-گرفتن های و لوی همه آیتم‌های داخل متغیر پریود
+محاسبه میانگین تی و کا
 ```
+```python
+sa1 = (average['t1']['average'] + average['k1']['average']) / 2
+sa2 = (average['t2']['average'] + average['k2']['average']) / 2
 ```
-action_1: sa1[10]:average = (count_t_1 + count_k_1)/2
-action_2: sa2[10]:average = (count_t_2 + count_k_2)/2
+
+<!----------------tk--->
+<br>
+
+#### tk
+```
+تنکن و کیجن صعودی ایچی 2
+وقتی تنکن بالای کیجن قرار دارد
+```
+```python
+if average['t2']['average'] > average['k2']['average'] :
+    tk_up = True
+    tk_down = False
+else:
+    tk_up = False
+    tk_down = True
+```
+
+<!----------------kumo--->
+<br>
+
+#### kumo
+```
+کوموی نزولی ایچی2
+وقتی sa2 بالای sb2 قرار دارد
+```
+```python
+if sa2 > average['sb2']['average'] :
+    kumo_up = True
+    kumo_down = False
+else:
+    kumo_up = False
+    kumo_down = True
+```
+
+<!----------------switch_down--->
+<br>
+
+#### switch_down
+```
+سویچ نزولی کوموی ایچی 1
+کلوز قیمت زیر اسپن آ و اسپن بی
+بررسی sa1 و sb1 در کندل لایو و کندل گذشته. وقتی در کندل لایو اسپن آ زیر اسپن بی قرار گرفته و در کندل قبل از لایو اسپن آ بالای اسپن بی قرار داشته است. 
+اگر در کندل قبل از لایو اسپن آ برابر با اسپن بی بود به کندل قبل از آن یا - 2 می رویم اگر باز هم برابر بود به - 3 و - 4 و... باید به کندلی برسیم که اسپن آ بالای اسپن بی باشد
+```
+```python
+
 ```
 
 
 
 
-#### aaa
-```
-میانگین ھای و لول های مختلف کندل
-```
-```
-محاسبه sa1 وsa2
-میانگن t1 , k1
-sa1 = (t1 + k1)/2
-sa2 = (t2 + k2)/2
-```
+
+
+
+
+
+
 
 
 
@@ -209,16 +236,7 @@ action_1:
             sa1[i-2] > average(count["count_sb_1"])
 ```
 
-<!----------------tk_up--->
-<br>
 
-#### tk_up
-```
-سسسسس
-```
-```
-action_1: if average(count["count_t_2"]) > average(count["count_k_2"]) 
-```
 
 <!----------------tk_down--->
 <br>
@@ -294,7 +312,6 @@ action_4: sell
 این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
 ```
 ```python
-  #---------------------------------------------box
   def box(
           self,
           date:int, 
