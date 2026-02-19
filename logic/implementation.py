@@ -242,6 +242,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name='Dowjones', description='Every day at 16:30'))
                 self.data_orm.add(model=model, item=model(name='OneWay', description='Buy|Sell'))
                 self.data_orm.add(model=model, item=model(name='Floating', description='Buy&Sell   if p>0:same   if p<0:reverse'))
+                self.data_orm.add(model=model, item=model(name='ali_poolback', description=''))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -391,7 +392,18 @@ class Logic_Implementation:
                     params=""
                 )
                 self.data_orm.add(model=model, item=item)
-
+                #-------------- ali_poolback
+                #item-1
+                item =model(
+                    name='item-1',
+                    strategy_id=4,
+                    symbols='US30',
+                    actions='buy,sell',
+                    amount=1,
+                    tp_pips=40, 
+                    sl_pips=20,
+                    params="")
+                self.data_orm.add(model=model, item=item)
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 3)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
