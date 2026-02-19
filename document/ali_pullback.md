@@ -97,10 +97,11 @@ params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from'
 <br><br>
 
 ## Actions
-<!----------------average--->
+
+<!----------------high_low_items--->
 <br>
 
-#### High Low 
+#### high_low_items
 ```
 گرفتن های و لوی همه آیتم‌های داخل متغیر پریود
 ```
