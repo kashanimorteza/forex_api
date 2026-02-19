@@ -84,8 +84,8 @@ period = {
     "sb2": 234
 }
 ```
-<!----------------Python--->
-#### Python
+<!----------------python--->
+#### python
 ```python
 params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
 ```
