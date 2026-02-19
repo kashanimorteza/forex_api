@@ -99,8 +99,6 @@ params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from'
 ## Actions
 
 <!----------------high_low_items--->
-<br>
-
 #### high_low_items
 ```
 گرفتن های و لوی همه آیتم‌های داخل متغیر پریود
