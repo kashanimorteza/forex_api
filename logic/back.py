@@ -87,11 +87,6 @@ class Logic_Back:
             self.date_from = params["date_from"]
             self.date_to = params["date_to"]
             self.trade_limit_profit= params["trade_limit_profit"]
-            self.change_pip = params["params"]["change_pip"]
-            self.order_pip = params["params"]["order_pip"]
-            self.down = params["params"]["down"]
-            self.up = params["params"]["up"]
-            self.pending_limit = params["params"]["pending_limit"]
             self.digits = list_instrument[self.symbol]["digits"]
             self.point_size = list_instrument[self.symbol]["point_size"]
             #--------------Data

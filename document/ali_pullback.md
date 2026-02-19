@@ -33,7 +33,7 @@ name='poolback_4x'
 تایم‌فریم
 ```
 ```python
-time_frame='1min'
+time_frame='m1'
 ```
 <!----------------region--->
 #### region
@@ -88,7 +88,7 @@ period = {
 تمام پارامترها در یکجا
 ```
 ```python
-params="{'name': 'poolback_4x', 'time_frame': '1min', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
 ```
 
 
@@ -259,26 +259,23 @@ action_4: sell
 <br><br>
 
 ## Methods
-<!----------------enter--->
-<br>
+<!----------------box--->
 
 #### box
 ```
 این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
 ```
-```
-Name : box
-input : date | count | time_frame
-output : high | low
-```
 ```python
-if time_frame == "1min":
-    table = get_tbl_name(self.symbol, "t1")
-    date_to = date
-    date_from = date - timedelta(minutes=count)
-    cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
-    result = self.data_sql.db.item(cmd=cmd).data
-    high = result[0]
-    low = result[1]
-    return high, low
+#--------------Description
+# IN     : date | count | time_frame
+# OUT    : high | low
+# Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
+table = get_tbl_name(self.symbol, self.time_frame)
+date_to = date
+date_from = date - timedelta(minutes=count)
+cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
+result = self.data_sql.db.item(cmd=cmd).data
+high = result[0]
+low = result[1]
+return high, low
 ```

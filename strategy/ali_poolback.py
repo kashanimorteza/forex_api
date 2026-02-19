@@ -354,7 +354,7 @@ class Ali_PoolBack:
             output.message = f"exi({self.execute_id}) | sym({self.symbol}) | stp({step})"
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #------Data
-            table = get_tbl_name(self.symbol, "m1")
+            table = get_tbl_name(self.symbol, self.time_frame)
             cmd = f"SELECT id, date, askopen, bidopen FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
             data = self.data_sql.db.items(cmd=cmd).data
             #------Start
@@ -503,15 +503,14 @@ class Ali_PoolBack:
         output.method_name = this_method
         #--------------Action
         try:
-            if time_frame == "1min":
-                table = get_tbl_name(self.symbol, "t1")
-                date_to = date
-                date_from = date - timedelta(minutes=count)
-                cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
-                result = self.data_sql.db.item(cmd=cmd).data
-                high = result[0]
-                low = result[1]
-                return high, low
+            table = get_tbl_name(self.symbol, self.time_frame)
+            date_to = date
+            date_from = date - timedelta(minutes=count)
+            cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
+            result = self.data_sql.db.item(cmd=cmd).data
+            high = result[0]
+            low = result[1]
+            return high, low
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
