@@ -90,15 +90,7 @@ period = {
 تمام پارامترها در یکجا
 ```
 ```python
-period = {
-    "name": "poolback_4x",
-    "time_frame": "1min",
-    "region": "UTC",
-    "time_from": "00:00:00",
-    "time_to": "21:00:00",
-    "max_order": 1,
-    "period": {"t1": 9, "k1": 26, "sa1": 17.5, "sb1": 78, "t2": 36, "k2": 104, "sa2": 70, "sb2": 234}
-}
+params="{'name': 'poolback_4x', 'time_frame': '1min', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'period': {'t1': 9, 'k1': 26, 'sa1': 17.5, 'sb1': 78, 't2': 36, 'k2': 104, 'sa2': 70, 'sb2': 234}}"
 ```
 
 <!--------------------------------------------------------------------------------- Actions --->

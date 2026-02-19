@@ -34,13 +34,12 @@ class Ali_PoolBack:
         self.sl_pips = params["sl_pips"]
         self.trade_limit_profit= params["trade_limit_profit"]
         #--------------strategy | params
-        self.time_start = datetime.strptime(params["params"]["time_start"], "%H:%M:%S").time()
-        self.time_end = datetime.strptime(params["params"]["time_end"], "%H:%M:%S").time()
-        self.change_pip = params["params"]["change_pip"]
-        self.order_pip = params["params"]["order_pip"]
-        self.down = params["params"]["down"]
-        self.up = params["params"]["up"]
-        self.pending_limit = params["params"]["pending_limit"]
+        self.time_frame = params["params"]["time_frame"]
+        self.region = params["params"]["region"]
+        self.time_from = datetime.strptime(params["params"]["time_from"], "%H:%M:%S").time()
+        self.time_to = datetime.strptime(params["params"]["time_to"], "%H:%M:%S").time()
+        self.max_order = params["params"]["max_order"]
+        self.period = params["params"]["period"]
         #--------------execute | items
         self.execute_id = params["execute_id"]
         self.date_from = params["date_from"]
@@ -247,7 +246,7 @@ class Ali_PoolBack:
             if (self.set_order is None) or (self.set_order is False) or (date.date()> self.date.date()):
                 #---------Time
                 ny_date = time_change_utc_newyork(date)
-                if self.time_start <= ny_date.time() <= self.time_end:
+                if self.time_from <= ny_date.time() <= self.time_to:
                     #---Set_Price
                     if not self.set_price or date.date()> self.date.date():
                         self.set_order = False
