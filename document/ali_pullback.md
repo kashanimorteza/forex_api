@@ -270,6 +270,7 @@ action_4: sell
 # IN     : date | count | time_frame
 # OUT    : high | low
 # Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
+#--------------Action
 table = get_tbl_name(self.symbol, self.time_frame)
 date_to = date
 date_from = date - timedelta(minutes=count)
