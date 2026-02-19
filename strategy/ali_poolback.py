@@ -14,7 +14,7 @@ from logic.data_sql import Data_SQL
 from logic.data_orm import Data_Orm
 
 #--------------------------------------------------------------------------------- Class
-class Dowjones:
+class Ali_PoolBack:
     #---------------------------------------------init
     def __init__(
             self, 
@@ -478,11 +478,3 @@ class Dowjones:
         if log : self.log.log(log_model, output)
         #--------------Return
         return output
-    
-#---------------------------------------------Comment
-#time_from_ny_to_utc = time_change_newyork_utc(datetime.combine(self.date_from.date(), self.time_start))
-#time_from_ny_to_utc = time_from_ny_to_utc - timedelta(hours=1)
-#time_to_ny_to_utc = time_change_newyork_utc(datetime.combine(self.date_from.date(), self.time_end))
-#time_to_ny_to_utc = time_to_ny_to_utc + timedelta(hours=1)
-#cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' AND date::time BETWEEN '{time_from_ny_to_utc.time()}' AND '{time_to_ny_to_utc.time()}' ORDER BY date ASC"
-#cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' and (date AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')::time BETWEEN '{self.time_start}' AND '{self.time_end}' ORDER BY date ASC"
