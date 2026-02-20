@@ -304,72 +304,6 @@ class Ali_PoolBack:
                     if point_avg_1 > point_avg_2 :
                         switch_down = inner(self.domain)
 
-                                
-                    
-                    
-                    #     #---Gozahste
-                    #     while lp > 1:
-                    #         avg11 = average[self.domain-1]['sa1']
-                    #         avg21 = average[self.domain-1]['sb1']['average']
-                    #         if avg11 > avg21 : 
-                    #             break
-                    #         if avg11 < avg21 : 
-                    #             switch_up = True
-                    #             break
-                    #         if avg11 == avg21 : 
-                    #             avg11 = average[self.domain-2]['sa1']
-                    #             avg21 = average[self.domain-2]['sb1']['average']
-                    #             if avg11 > avg21 : 
-                    #                 break
-                    #             if avg11 < avg21 : 
-                    #                 switch_up = True
-                    #                 break
-                    #             if avg11 == avg21 : 
-                    #                 avg11 = average[self.domain-3]['sa1']
-                    #                 avg21 = average[self.domain-3]['sb1']['average']
-                    #                 if avg11 > avg21 : 
-                    #                     break
-                    #                 if avg11 < avg21 : 
-                    #                     switch_up = True
-                    #                     break
-                    #                 if avg11 == avg21 : 
-                    #                     avg11 = average[self.domain-4]['sa1']
-                    #                     avg21 = average[self.domain-4]['sb1']['average']
-
-
-                    # #---Small
-                    # if avg1 > avg2:
-                    #     pass
-
-
-
-
-
-
-
-
-
-
-# #sa1 | sb1 
-# action_1: loop 10 ta 1
-# action_1: if sa1[1] < average(count["count_sb_1"])
-# action_1: 
-#           if sa1[i-1] > average(count["count_sb_1"])
-#             javab
-#           else == 
-#             sa1[i-2] > average(count["count_sb_1"])
-
-
-
-
-
-
-
-
-#             high_low_items = {}
-#             for key, value in self.period.items():
-#                 high, low = self.box(date=date, count=value, time_frame=self.time_frame)
-#                 high_low_items[key] = {"high": high, "low": low , "average": (high+low)/2}
 
 
 
@@ -382,54 +316,14 @@ class Ali_PoolBack:
 
 
 
-#             if (self.set_order is None) or (self.set_order is False) or (date.date()> self.date.date()):
-#                 #---------Time
-#                 ny_date = time_change_utc_newyork(date)
-#                 if self.time_from <= ny_date.time() <= self.time_to:
-#                     #---Set_Price
-#                     if not self.set_price or date.date()> self.date.date():
-#                         self.set_order = False
-#                         self.set_price = True
-#                         self.ask = ask
-#                         self.bid = bid
-#                         self.date = date
-#                     #---Check_Price
-#                     if self.set_price: 
-#                         movement = abs(ask - self.ask)
-#                         if movement >= self.change_pip:
-#                             self.set_order = True
-#                             self.set_price = False
-#                             action = self.up if ask > self.ask else self.down
-#                             if action == "buy":
-#                                 price = cal_price_pips(self.ask, -self.order_pip , self.digits, self.point_size)
-#                             else:
-#                                 price = cal_price_pips(self.bid, self.order_pip , self.digits, self.point_size)
-#                             if self.risk > 0 :
-#                                 amount = cal_size(balance=self.balance, price=price, pips=self.sl_pips, risk=self.risk, digits=self.digits, point_size=self.point_size)
-#                             else:
-#                                 amount = self.amount
-#                             amount = float(f"{amount:.{2}f}")
-#                             item = {
-#                                 #---General
-#                                 "state": Strategy_Action.PRICE_CHANGE,
-#                                 "run": Strategy_Run.ORDER_PENDING,
-#                                 "father_id": father_id,
-#                                 "step": step,
-#                                 "execute_id": self.execute_id,
-#                                 "tp_pips": self.tp_pips, 
-#                                 "sl_pips": self.sl_pips,
-#                                 "digits": self.digits, 
-#                                 "point_size": self.point_size,
-#                                 #---Data
-#                                 "symbol": symbol, 
-#                                 "action": action, 
-#                                 "amount": amount, 
-#                                 "date": date,
-#                                 "ask": price,
-#                                 "bid": price,
-#                                 "pending_limit": self.pending_limit,
-#                             }
-#                             items.append(item)
+
+
+
+
+
+
+
+                        
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
