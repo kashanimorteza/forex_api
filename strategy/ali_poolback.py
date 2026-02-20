@@ -319,19 +319,9 @@ class Ali_PoolBack:
                 switch_up = inner_up(count=self.domain)
             #---------Inter buy
             if tk_up and kumo_up and switch_down :
-                #---Amount
+                #---price, amount 
                 action = "buy"
-                price, amount = cal_size(
-                    balance=self.balance, 
-                    action=action, 
-                    ask=self.ask, 
-                    bid=self.bid, 
-                    price=price, 
-                    pips=self.sl_pips, 
-                    risk=self.risk, 
-                    digits=self.digits, 
-                    point_size=self.point_size
-                )
+                price, amount = cal_size(balance=self.balance, action=action, ask=self.ask, bid=self.bid, price=price, pips=self.sl_pips, risk=self.risk, digits=self.digits, point_size=self.point_size)
                 #---sl
                 self.sl_pips  = cal_movement(price, average[self.domain]['sb1']['low'], self.digits)
                 #---tp
@@ -361,17 +351,7 @@ class Ali_PoolBack:
             if tk_down and kumo_down and switch_up :
                 #---Amount
                 action = "sell"
-                price, amount = cal_size(
-                    balance=self.balance, 
-                    action=action, 
-                    ask=self.ask, 
-                    bid=self.bid, 
-                    price=price, 
-                    pips=self.sl_pips, 
-                    risk=self.risk, 
-                    digits=self.digits, 
-                    point_size=self.point_size
-                )
+                price, amount = cal_size(balance=self.balance, action=action, ask=self.ask, bid=self.bid, price=price, pips=self.sl_pips, risk=self.risk, digits=self.digits, point_size=self.point_size)
                 #---sl
                 self.sl_pips  = cal_movement(price, average[self.domain]['sb1']['high'], self.digits)
                 #---tp
