@@ -243,34 +243,36 @@ class Ali_PoolBack:
         output.method_name = this_method
         #--------------Variable
         items = []
+        keep = False
+        switch_up = False
+        switch_down = False
         #--------------Method
-        def inner(lpp):
-            lpp = lpp -1
-            if lpp > 0:
-                a = average[lpp]['sa1']
-                b = average[lpp]['sb1']['average']
-                a = 1
-                b = 1
-                if a > b :
-                    lpp = -1
-                    switch_up = False
-                if a < b : 
-                    switch_up = True
-                    lpp = -1
-                if a == b : 
-                    inner(lpp)
+        def inner(count):
+            count = count -1
+            while count > 0:
+                avg_1 = average[count]['sa1']
+                avg_2 = average[count]['sb1']['average']
+                if avg_1 > avg_2 : 
+                    return False
+                if avg_1 < avg_2 : 
+                    return True
+                if avg_1 == avg_2 : 
+                    count = count -1
+                    inner(count)
+            return False
+
         #--------------Action
         try:
-            #---------average
+            #------average
             average = {}
             average_date = date
             for i in range(10, 0, -1):
                 average_item = {}
-                #---------average
+                #---average
                 for key, value in self.period.items():
                     high, low = self.box(date=average_date, count=value, time_frame=self.time_frame)
                     average_item[key] = {"high": high, "low": low , "average": (high+low)/2}
-                #---------sa
+                #---sa
                 average_item['sa1'] = (average_item['t1']['average'] + average_item['k1']['average']) / 2
                 average_item['sa2'] = (average_item['t2']['average'] + average_item['k2']['average']) / 2
                 average[i] = average_item
@@ -289,22 +291,18 @@ class Ali_PoolBack:
             else:
                 kumo_up = False
                 kumo_down = True
+
+            #---------Test
+            switch_down = inner(self.domain)
+
             #---------switch_down
-            keep = False
-            switch_up = False
-            switch_down = False
-            lp = self.domain
-            # if ask < average[self.domain]['sa1'] and ask < average[self.domain]['sb1']['average']:
-            #     if average[self.domain]['sa1'] < average[self.domain]['sb1']['average']:
-            # avg1 = average[self.domain]['sa1']
-            # avg2 = average[self.domain]['sb1']['average']
-            avg1=1
-            avg2=1
-            #---Live Big
-            #if avg1 > avg2:
-            lpp = self.domain +1
-            inner(lpp)
-            print("aaa")
+            if ask < average[self.domain]['sa1'] and ask < average[self.domain]['sb1']['average']:
+                if average[self.domain]['sa1'] < average[self.domain]['sb1']['average']:
+                    point_avg_1 = average[self.domain]['sa1']
+                    point_avg_2 = average[self.domain]['sb1']['average']
+                    #---Live Big
+                    if point_avg_1 > point_avg_2 :
+                        switch_down = inner(self.domain)
 
                                 
                     

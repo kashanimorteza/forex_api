@@ -112,33 +112,27 @@ params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from'
 ```
 ```python
 average = {}
-for key, value in self.period.items():
-    high, low = self.box(date=date, count=value, time_frame=self.time_frame)
-    average[key] = {"high": high, "low": low , "average": (high+low)/2}
-```
-
-<!----------------sa--->
-<br>
-
-#### sa
-```
-محاسبه میانگین تی و کا
-```
-```python
-sa1 = (average['t1']['average'] + average['k1']['average']) / 2
-sa2 = (average['t2']['average'] + average['k2']['average']) / 2
+average_date = date
+for i in range(10, 0, -1):
+    average_item = {}
+    #---average
+    for key, value in self.period.items():
+        high, low = self.box(date=average_date, count=value, time_frame=self.time_frame)
+        average_item[key] = {"high": high, "low": low , "average": (high+low)/2}
+    #---sa
+    average_item['sa1'] = (average_item['t1']['average'] + average_item['k1']['average']) / 2
+    average_item['sa2'] = (average_item['t2']['average'] + average_item['k2']['average']) / 2
+    average[i] = average_item
+    average_date = average_date - timedelta(minutes=1)
 ```
 
 <!----------------tk--->
-<br>
-
 #### tk
 ```
-تنکن و کیجن صعودی ایچی 2
-وقتی تنکن بالای کیجن قرار دارد
+tk
 ```
 ```python
-if average['t2']['average'] > average['k2']['average'] :
+if average[self.domain]['t2']['average'] > average[self.domain]['k2']['average'] :
     tk_up = True
     tk_down = False
 else:
@@ -147,158 +141,33 @@ else:
 ```
 
 <!----------------kumo--->
-<br>
-
 #### kumo
 ```
-کوموی نزولی ایچی2
-وقتی sa2 بالای sb2 قرار دارد
+kumo
 ```
 ```python
-if sa2 > average['sb2']['average'] :
+if average[self.domain]['sa2'] > average[self.domain]['sb2']['average'] :
     kumo_up = True
     kumo_down = False
 else:
     kumo_up = False
     kumo_down = True
 ```
-
 <!----------------switch_down--->
-<br>
-
 #### switch_down
 ```
-سویچ نزولی کوموی ایچی 1
-کلوز قیمت زیر اسپن آ و اسپن بی
-بررسی sa1 و sb1 در کندل لایو و کندل گذشته. وقتی در کندل لایو اسپن آ زیر اسپن بی قرار گرفته و در کندل قبل از لایو اسپن آ بالای اسپن بی قرار داشته است. 
-اگر در کندل قبل از لایو اسپن آ برابر با اسپن بی بود به کندل قبل از آن یا - 2 می رویم اگر باز هم برابر بود به - 3 و - 4 و... باید به کندلی برسیم که اسپن آ بالای اسپن بی باشد
+switch_down
 ```
 ```python
-
+if ask < average[self.domain]['sa1'] and ask < average[self.domain]['sb1']['average']:
+    if average[self.domain]['sa1'] < average[self.domain]['sb1']['average']:
+        point_avg_1 = average[self.domain]['sa1']
+        point_avg_2 = average[self.domain]['sb1']['average']
+        #---Live Big
+        if point_avg_1 > point_avg_2 :
+            switch_down = inner(self.domain)
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-<!----------------candel_close--->
-<br>
-
-#### candel_close 
-```
-سسسسس
-```
-```
-action_1: candel_close | price shoro minute
-```
-
-<!----------------switch_up_1--->
-<br>
-
-#### switch_up_1
-```
-سسسسس
-```
-``` 
-#sa1 | sb1 
-action_1: loop 10 ta 1
-action_1: if sa1[1] > average(count["count_sb_1"])
-action_1: 
-          if sa1[i-1] < average(count["count_sb_1"])
-            javab
-          else == 
-            sa1[i-2] < average(count["count_sb_1"])
-```
-
-<!----------------switch_down_1--->
-<br>
-
-#### switch_down_1
-```
-سسسسس
-```
-```python
-#sa1 | sb1 
-action_1: loop 10 ta 1
-action_1: if sa1[1] < average(count["count_sb_1"])
-action_1: 
-          if sa1[i-1] > average(count["count_sb_1"])
-            javab
-          else == 
-            sa1[i-2] > average(count["count_sb_1"])
-```
-
-
-
-<!----------------tk_down--->
-<br>
-
-#### tk_down 
-```
-سسسسس
-```
-```
-action_1: if average(count["count_t_2"]) < average(count["count_k_2"]) 
-```
-
-<!----------------switch_up_2--->
-<br>
-
-#### switch_up_2
-```
-سسسسس
-```
-```
-#sa2 | sb2
-action_1: loop 10 ta 1
-action_1: if sa2[1] > average(count["count_sb_1"])
-action_1: 
-          if sa1[i-1] < average(count["count_sb_1"])
-            javab
-          else == 
-            sa1[i-2] < average(count["count_sb_1"])
-```
-
-<!----------------switch_down_2--->
-<br>
-
-#### switch_down_2
-```
-سسسسس
-```
-```
-#sa2 | sb2
-action_1: switch_down_2
-action_1: loop 10 ta 1
-action_1: if sa1[1] < average(count["count_sb_1"])
-action_1: 
-          if sa1[i-1] > average(count["count_sb_1"])
-            javab
-          else == 
-            sa1[i-2] > average(count["count_sb_1"])
-```
-
-<!----------------enter--->
-<br>
-
-#### enter
-```
-سسسسس
-```
-```
-action_1: if switch_up_2 ** tk_up_2 && switch_down_1
-action_2: buy
-action_3: if switch_down_2 ** tk_down_2 && switch_up_1
-action_4: sell
-```
 
 
 <!--------------------------------------------------------------------------------- Methods --->
@@ -312,23 +181,23 @@ action_4: sell
 این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
 ```
 ```python
-  def box(
-          self,
-          date:int, 
-          count:int,
-          time_frame:str,
-      ):
-      #--------------Description
-      # IN     : date | count | time_frame
-      # OUT    : high | low
-      # Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
-      #--------------Action
-      table = get_tbl_name(self.symbol, self.time_frame)
-      date_to = date
-      date_from = date - timedelta(minutes=count)
-      cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
-      result = self.data_sql.db.item(cmd=cmd).data
-      high = result[0]
-      low = result[1]
-      return high, low
+def box(
+        self,
+        date:int, 
+        count:int,
+        time_frame:str,
+    ):
+    #--------------Description
+    # IN     : date | count | time_frame
+    # OUT    : high | low
+    # Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
+    #--------------Action
+    table = get_tbl_name(self.symbol, self.time_frame)
+    date_to = date
+    date_from = date - timedelta(minutes=count)
+    cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
+    result = self.data_sql.db.items(cmd=cmd).data
+    high = result[0][0]
+    low = result[0][1]
+    return high, low
 ```
