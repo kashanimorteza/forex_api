@@ -28,42 +28,56 @@ Ichimoku Dual Cloud Switch Backtest
 name='poolback_4x'
 ```
 <!----------------time_frame--->
+<br>
+
 #### time_frame
 تایم‌فریم
 ```python
 time_frame='m1'
 ```
 <!----------------region--->
+<br>
+
 #### region
 برای تعیین نوع تایم می‌باشد
 ```python
 region='UTC'
 ```
 <!----------------time_from--->
+<br>
+
 #### time_from
 زمان شروع مجاز معامله
 ```python
 time_from='00:00:00'
 ```
 <!----------------time_to--->
+<br>
+
 #### time_to
 زمان پایان مجاز معامله
 ```python
 time_to='21:00:00'
 ```
 <!----------------max_order--->
+<br>
+
 #### max_order
 حداکثر پوزیشن همزمان
 ```python
 max_order=1
 ```
 <!----------------domain--->
+<br>
+
 #### domain
 گرفتن های و لو همه آیتم‌های داخل متغیر پریود برای دومین دامنه گذشته
 ```python
 domain=10
 ```
 <!----------------period--->
+<br>
+
 #### period
 تعداد کندل دوره‌های مختلف که کندل بر اساس متغیر تایم فریم تعیین می‌شود
 ```python
@@ -77,6 +91,8 @@ period = {
 }
 ```
 <!----------------python--->
+<br>
+
 #### python
 ```python
 params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
