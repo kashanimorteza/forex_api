@@ -129,6 +129,7 @@ for i in range(10, 0, -1):
 <!----------------const--->
 #### const
 ```
+
 ```
 ```python
 sa_1 = average[self.domain]['sa1']
@@ -144,7 +145,7 @@ sb2 = average[self.domain]['sb2']['average']
 
 #### tk
 ```
-tk
+
 ```
 ```python
 if t2 > k2 :
@@ -160,7 +161,7 @@ else:
 
 #### kumo
 ```
-kumo
+
 ```
 ```python
 if sa2 > sb2 :
@@ -175,7 +176,7 @@ else:
 
 #### switch_down
 ```
-switch_down
+
 ```
 ```python
 if ask < sa_1 and ask < sb_1 and sa_1 < sb_1:
@@ -186,7 +187,7 @@ if ask < sa_1 and ask < sb_1 and sa_1 < sb_1:
 
 #### switch_up
 ```
-switch_up
+
 ```
 ```python
 if ask > sa_1 and ask > sb_1 and sa_1 > sb_1:
@@ -198,7 +199,7 @@ if ask > sa_1 and ask > sb_1 and sa_1 > sb_1:
 
 #### inter_buy
 ```
-inter_buy
+
 ```
 ```python
 if tk_up and kumo_up and switch_down :
@@ -237,7 +238,7 @@ if tk_up and kumo_up and switch_down :
 
 #### inter_sell
 ```
-inter_sell
+
 ```
 ```python
 if tk_down and kumo_down and switch_up :
@@ -310,6 +311,7 @@ def box(
 
 #### inner_down
 ```
+
 ```
 ```python
 def inner_down(self,count, average):
@@ -330,6 +332,7 @@ def inner_down(self,count, average):
 
 #### inner_up
 ```
+
 ```
 ```python
 def inner_up(self, count, average):
