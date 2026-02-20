@@ -8,7 +8,7 @@
 import inspect, time
 from datetime import datetime
 from logic.startup import debug, log_instance, list_instrument, Strategy_Run, Strategy_Action, Strategy_Run, database_management, database_data
-from logic.util import model_output, sort, time_change_newyork_utc, time_change_utc_newyork, cal_price_pips, cal_size, get_tbl_name
+from logic.util import model_output, sort, time_change_newyork_utc, time_change_utc_newyork, cal_price, cal_size, get_tbl_name
 from logic.log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.data_orm import Data_Orm

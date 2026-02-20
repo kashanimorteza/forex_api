@@ -126,6 +126,19 @@ for i in range(10, 0, -1):
     average_date = average_date - timedelta(minutes=1)
 ```
 
+<!----------------const--->
+#### const
+```
+```
+```python
+sa_1 = average[self.domain]['sa1']
+sb_1 = average[self.domain]['sb1']['average']
+t2 =average[self.domain]['t2']['average']
+k2 = average[self.domain]['k2']['average']
+sa2 =average[self.domain]['sa2']
+sb2 = average[self.domain]['sb2']['average']
+```
+
 <!----------------tk--->
 <br>
 
@@ -134,7 +147,7 @@ for i in range(10, 0, -1):
 tk
 ```
 ```python
-if average[self.domain]['t2']['average'] > average[self.domain]['k2']['average'] :
+if t2 > k2 :
     tk_up = True
     tk_down = False
 else:
@@ -150,7 +163,7 @@ else:
 kumo
 ```
 ```python
-if average[self.domain]['sa2'] > average[self.domain]['sb2']['average'] :
+if sa2 > sb2 :
     kumo_up = True
     kumo_down = False
 else:
@@ -165,16 +178,8 @@ else:
 switch_down
 ```
 ```python
-if ask < average[self.domain]['sa1'] and ask < average[self.domain]['sb1']['average']:
-    if average[self.domain]['sa1'] < average[self.domain]['sb1']['average']:
-        point_avg_1 = average[self.domain]['sa1']
-        point_avg_2 = average[self.domain]['sb1']['average']
-        if point_avg_1 > point_avg_2 :
-            switch_down = True
-        if point_avg_1 < point_avg_2 :
-            switch_down = False
-        if point_avg_1 == point_avg_2 :
-            switch_down = inner_down(count=self.domain)
+if ask < sa_1 and ask < sb_1 and sa_1 < sb_1:
+    switch_down = inner_down(count=self.domain)
 ```
 <!----------------switch_up--->
 <br>
@@ -184,16 +189,82 @@ if ask < average[self.domain]['sa1'] and ask < average[self.domain]['sb1']['aver
 switch_up
 ```
 ```python
-if ask < average[self.domain]['sa1'] and ask > average[self.domain]['sb1']['average']:
-    if average[self.domain]['sa1'] < average[self.domain]['sb1']['average']:
-        point_avg_1 = average[self.domain]['sa1']
-        point_avg_2 = average[self.domain]['sb1']['average']
-        if point_avg_1 > point_avg_2 :
-            switch_up = True
-        if point_avg_1 < point_avg_2 :
-            switch_up = False
-        if point_avg_1 == point_avg_2 :
-            switch_up = inner_up(count=self.domain)
+if ask > sa_1 and ask > sb_1 and sa_1 > sb_1:
+    switch_up = inner_up(count=self.domain)
+```
+
+<!----------------inter_buy--->
+#### inter_buy
+```
+inter_buy
+```
+```python
+if tk_up and kumo_up and switch_down :
+    #---price, amount 
+    action = "buy"
+    price, amount = cal_size(balance=self.balance, action=action, ask=self.ask, bid=self.bid, pips=self.sl_pips, risk=self.risk, digits=self.digits, amount=self.amount, point_size=self.point_size)
+    #---sl
+    self.sl_pips  = cal_price_movement(price, average[self.domain]['sb1']['low'], self.point_size)
+    #---tp
+    self.tp_pips = self.sl_pips
+    #---Item
+    item = {
+        #---General
+        "state": Strategy_Action.PRICE_CHANGE,
+        "run": Strategy_Run.ORDER_OPEN,
+        "father_id": father_id,
+        "step": step,
+        "execute_id": self.execute_id,
+        "tp_pips": self.tp_pips, 
+        "sl_pips": self.sl_pips,
+        "digits": self.digits, 
+        "point_size": self.point_size,
+        #---Data
+        "symbol": symbol, 
+        "action": "buy", 
+        "amount": amount, 
+        "date": date,
+        "ask": price,
+        "bid": price,
+    }
+    items.append(item)
+```
+
+<!----------------inter_sell--->
+#### inter_sell
+```
+inter_sell
+```
+```python
+if tk_down and kumo_down and switch_up :
+#---Amount
+action = "sell"
+price, amount = cal_size(balance=self.balance, action=action, ask=ask, bid=bid, pips=self.sl_pips, risk=self.risk, digits=self.digits, amount=self.amount,point_size=self.point_size)
+#---sl
+self.sl_pips  = cal_price_movement(price, average[self.domain]['sb1']['high'], self.point_size)
+#---tp
+self.tp_pips = self.sl_pips
+#---Item
+item = {
+    #---General
+    "state": Strategy_Action.PRICE_CHANGE,
+    "run": Strategy_Run.ORDER_OPEN,
+    "father_id": father_id,
+    "step": step,
+    "execute_id": self.execute_id,
+    "tp_pips": self.tp_pips, 
+    "sl_pips": self.sl_pips,
+    "digits": self.digits, 
+    "point_size": self.point_size,
+    #---Data
+    "symbol": symbol, 
+    "action": "buy", 
+    "amount": amount, 
+    "date": date,
+    "ask": price,
+    "bid": price,
+}
+items.append(item)
 ```
 
 

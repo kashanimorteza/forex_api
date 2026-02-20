@@ -120,11 +120,11 @@ def cal_price(price, pips, digits, point_size)-> float:
     #--------------Return
     return output
 
-#--------------------------------------------- cal_movement
-def cal_movement(price1, price2, digits)-> float:
+#--------------------------------------------- cal_price_movement
+def cal_price_movement(price1, price2, point_size)-> float:
     #--------------Action
-    output = price1 - price2
-    output = abs(float(f"{output:.{digits}f}"))
+    output = abs(price1 - price2)
+    output = round(output / point_size)
     #--------------Return
     return output
 
@@ -156,7 +156,7 @@ def cal_tp_sl(action, ask, bid, tp_pips, sl_pips, digits, point_size)-> model_ou
     return price_open, tp, sl, spred
 
 #--------------------------------------------- cal_movement
-def cal_movement(action, price, ask, bid, digits, point_size)-> model_output:
+def cal_movement(action, price, ask, bid, digits)-> model_output:
     #--------------Action
     output = (bid - price) if action == "buy" else (price - ask)
     output = float(f"{output:.{digits}f}")

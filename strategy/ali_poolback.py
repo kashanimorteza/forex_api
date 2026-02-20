@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import table, true
 from logic.startup import debug, log_instance, list_instrument, Strategy_Run, Strategy_Action, Strategy_Run, database_management, database_data
-from logic.util import model_output, sort, cal_size, get_tbl_name, cal_movement
+from logic.util import model_output, sort, cal_size, get_tbl_name, cal_movement, cal_price_movement
 from logic.log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.data_orm import Data_Orm
@@ -38,8 +38,8 @@ class Ali_PoolBack:
         #--------------strategy | params
         self.time_frame = params["params"]["time_frame"]
         self.region = params["params"]["region"]
-        self.time_from = params["params"]["time_from"]
-        self.time_to = params["params"]["time_to"]
+        self.time_from = datetime.strptime(params["params"]["time_from"], "%H:%M:%S").time()
+        self.time_to = datetime.strptime(params["params"]["time_to"], "%H:%M:%S").time()
         self.max_order = params["params"]["max_order"]
         self.domain = params["params"]["domain"]
         self.period = params["params"]["period"]
@@ -276,107 +276,109 @@ class Ali_PoolBack:
             return False
         #--------------Action
         try:
-            #------average
-            average = {}
-            average_date = date
-            for i in range(10, 0, -1):
-                average_item = {}
-                #---average
-                for key, value in self.period.items():
-                    high, low = self.box(date=average_date, count=value, time_frame=self.time_frame)
-                    average_item[key] = {"high": high, "low": low , "average": (high+low)/2}
-                #---sa
-                average_item['sa1'] = (average_item['t1']['average'] + average_item['k1']['average']) / 2
-                average_item['sa2'] = (average_item['t2']['average'] + average_item['k2']['average']) / 2
-                average[i] = average_item
-                average_date = average_date - timedelta(minutes=1)
-            #------data
-            sa_1 = average[self.domain]['sa1']
-            sb_1 = average[self.domain]['sb1']['average']
-            t2 =average[self.domain]['t2']['average']
-            k2 = average[self.domain]['k2']['average']
-            sa2 =average[self.domain]['sa2']
-            sb2 = average[self.domain]['sb2']['average']
-            #---------tk
-            if t2 > k2 :
-                tk_up = True
-                tk_down = False
-            else:
-                tk_up = False
-                tk_down = True
-            #---------kumo
-            if sa2 > sb2 :
-                kumo_up = True
-                kumo_down = False
-            else:
-                kumo_up = False
-                kumo_down = True
-            #---------switch_down
-            if ask < sa_1 and ask < sb_1 and sa_1 < sb_1:
-                switch_down = inner_down(count=self.domain)
-            #---------switch_up
-            if ask > sa_1 and ask > sb_1 and sa_1 > sb_1:
-                switch_up = inner_up(count=self.domain)
-            #---------Inter buy
-            if tk_up and kumo_up and switch_down :
-                #---price, amount 
-                action = "buy"
-                price, amount = cal_size(balance=self.balance, action=action, ask=self.ask, bid=self.bid, price=price, pips=self.sl_pips, risk=self.risk, digits=self.digits, point_size=self.point_size)
-                #---sl
-                self.sl_pips  = cal_movement(price, average[self.domain]['sb1']['low'], self.digits)
-                #---tp
-                self.tp_pips = self.sl_pips
-                #---Item
-                item = {
-                    #---General
-                    "state": Strategy_Action.PRICE_CHANGE,
-                    "run": Strategy_Run.ORDER_OPEN,
-                    "father_id": father_id,
-                    "step": step,
-                    "execute_id": self.execute_id,
-                    "tp_pips": self.tp_pips, 
-                    "sl_pips": self.sl_pips,
-                    "digits": self.digits, 
-                    "point_size": self.point_size,
-                    #---Data
-                    "symbol": symbol, 
-                    "action": "buy", 
-                    "amount": amount, 
-                    "date": date,
-                    "ask": price,
-                    "bid": price,
-                }
-                items.append(item)
-            #---------Inter sell
-            if tk_down and kumo_down and switch_up :
-                #---Amount
-                action = "sell"
-                price, amount = cal_size(balance=self.balance, action=action, ask=self.ask, bid=self.bid, price=price, pips=self.sl_pips, risk=self.risk, digits=self.digits, point_size=self.point_size)
-                #---sl
-                self.sl_pips  = cal_movement(price, average[self.domain]['sb1']['high'], self.digits)
-                #---tp
-                self.tp_pips = self.sl_pips
-                #---Item
-                item = {
-                    #---General
-                    "state": Strategy_Action.PRICE_CHANGE,
-                    "run": Strategy_Run.ORDER_OPEN,
-                    "father_id": father_id,
-                    "step": step,
-                    "execute_id": self.execute_id,
-                    "tp_pips": self.tp_pips, 
-                    "sl_pips": self.sl_pips,
-                    "digits": self.digits, 
-                    "point_size": self.point_size,
-                    #---Data
-                    "symbol": symbol, 
-                    "action": "buy", 
-                    "amount": amount, 
-                    "date": date,
-                    "ask": price,
-                    "bid": price,
-                }
-                items.append(item)
+            if len(list_order_open) <= self.max_order:
+                if self.time_from <= date.time() <= self.time_to:
+                    #------average
+                    average = {}
+                    average_date = date
+                    for i in range(10, 0, -1):
+                        average_item = {}
+                        #---average
+                        for key, value in self.period.items():
+                            high, low = self.box(date=average_date, count=value, time_frame=self.time_frame)
+                            average_item[key] = {"high": high, "low": low , "average": (high+low)/2}
+                        #---sa
+                        average_item['sa1'] = (average_item['t1']['average'] + average_item['k1']['average']) / 2
+                        average_item['sa2'] = (average_item['t2']['average'] + average_item['k2']['average']) / 2
+                        average[i] = average_item
+                        average_date = average_date - timedelta(minutes=1)
+                    #------const
+                    sa_1 = average[self.domain]['sa1']
+                    sb_1 = average[self.domain]['sb1']['average']
+                    t2 =average[self.domain]['t2']['average']
+                    k2 = average[self.domain]['k2']['average']
+                    sa2 =average[self.domain]['sa2']
+                    sb2 = average[self.domain]['sb2']['average']
+                    #---------tk
+                    if t2 > k2 :
+                        tk_up = True
+                        tk_down = False
+                    else:
+                        tk_up = False
+                        tk_down = True
+                    #---------kumo
+                    if sa2 > sb2 :
+                        kumo_up = True
+                        kumo_down = False
+                    else:
+                        kumo_up = False
+                        kumo_down = True
+                    #---------switch_down
+                    if ask < sa_1 and ask < sb_1 and sa_1 < sb_1:
+                        switch_down = inner_down(count=self.domain)
+                    #---------switch_up
+                    if ask > sa_1 and ask > sb_1 and sa_1 > sb_1:
+                        switch_up = inner_up(count=self.domain)
+                    #---------Inter buy
+                    if tk_up and kumo_up and switch_down :
+                        #---price, amount 
+                        action = "buy"
+                        price, amount = cal_size(balance=self.balance, action=action, ask=self.ask, bid=self.bid, pips=self.sl_pips, risk=self.risk, digits=self.digits, amount=self.amount, point_size=self.point_size)
+                        #---sl
+                        self.sl_pips  = cal_price_movement(price, average[self.domain]['sb1']['low'], self.point_size)
+                        #---tp
+                        self.tp_pips = self.sl_pips
+                        #---Item
+                        item = {
+                            #---General
+                            "state": Strategy_Action.PRICE_CHANGE,
+                            "run": Strategy_Run.ORDER_OPEN,
+                            "father_id": father_id,
+                            "step": step,
+                            "execute_id": self.execute_id,
+                            "tp_pips": self.tp_pips, 
+                            "sl_pips": self.sl_pips,
+                            "digits": self.digits, 
+                            "point_size": self.point_size,
+                            #---Data
+                            "symbol": symbol, 
+                            "action": "buy", 
+                            "amount": amount, 
+                            "date": date,
+                            "ask": price,
+                            "bid": price,
+                        }
+                        items.append(item)
+                    #---------Inter sell
+                    if tk_down and kumo_down and switch_up :
+                        #---Amount
+                        action = "sell"
+                        price, amount = cal_size(balance=self.balance, action=action, ask=ask, bid=bid, pips=self.sl_pips, risk=self.risk, digits=self.digits, amount=self.amount,point_size=self.point_size)
+                        #---sl
+                        self.sl_pips  = cal_price_movement(price, average[self.domain]['sb1']['high'], self.point_size)
+                        #---tp
+                        self.tp_pips = self.sl_pips
+                        #---Item
+                        item = {
+                            #---General
+                            "state": Strategy_Action.PRICE_CHANGE,
+                            "run": Strategy_Run.ORDER_OPEN,
+                            "father_id": father_id,
+                            "step": step,
+                            "execute_id": self.execute_id,
+                            "tp_pips": self.tp_pips, 
+                            "sl_pips": self.sl_pips,
+                            "digits": self.digits, 
+                            "point_size": self.point_size,
+                            #---Data
+                            "symbol": symbol, 
+                            "action": "buy", 
+                            "amount": amount, 
+                            "date": date,
+                            "ask": price,
+                            "bid": price,
+                        }
+                        items.append(item)
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}

@@ -8,7 +8,7 @@
 from operator import eq
 import inspect, time, ast
 from logic.startup import Strategy_Action, Strategy_Run, debug, list_instrument, log_instance, database_management, database_data
-from logic.util import model_output, sort, get_tbl_name, time_change_utc_newyork, cal_price_pips, cal_size, cal_tp_sl, cal_movement, cal_percent_of_value, cal_value_of_percent, cal_profit
+from logic.util import model_output, sort, get_tbl_name, time_change_utc_newyork, cal_price, cal_tp_sl, cal_movement, cal_percent_of_value, cal_value_of_percent, cal_profit
 from logic.startup import data_instance
 from logic.log import Logic_Log
 from logic.data_sql import Data_SQL
@@ -254,7 +254,7 @@ class Logic_Back:
                 order_price_sl = order[14]
                 order_pm = order[16]
                 #---Movement
-                movement = cal_movement(order_action, order_price_open, self.ask, self.bid, self.digits, self.point_size)
+                movement = cal_movement(order_action, order_price_open, self.ask, self.bid, self.digits)
                 #---PM
                 if movement>0:
                     for pm in self.profit_manager_items:
@@ -268,14 +268,14 @@ class Logic_Back:
                                 pips = cal_value_of_percent(self.tp_pips, abs(tp_value), self.digits, self.point_size)
                                 if tp_value>0:
                                     if order_action == "buy":
-                                        tp = cal_price_pips(order_price_tp, pips, self.digits, self.point_size)
+                                        tp = cal_price(order_price_tp, pips, self.digits, self.point_size)
                                     else:
-                                        tp = cal_price_pips(order_price_tp, -pips, self.digits, self.point_size)
+                                        tp = cal_price(order_price_tp, -pips, self.digits, self.point_size)
                                 else:
                                     if order_action == "buy":
-                                        tp = cal_price_pips(order_price_tp, -pips, self.digits, self.point_size)
+                                        tp = cal_price(order_price_tp, -pips, self.digits, self.point_size)
                                     else:
-                                        tp = cal_price_pips(order_price_tp, +pips, self.digits, self.point_size)
+                                        tp = cal_price(order_price_tp, +pips, self.digits, self.point_size)
                                 cmd = f"UPDATE back_order SET tp={tp}, profit_manager='{pm[2]}' WHERE id={order_id}"
                                 self.management_sql.db.execute(cmd=cmd)
                                 cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{self.date}', {order_id}, {self.ask}, {self.bid}, 'TP', {tp})"
@@ -292,14 +292,14 @@ class Logic_Back:
                                 pips = cal_value_of_percent(self.sl_pips, abs(sl_value), self.digits, self.point_size)
                                 if sl_value>0:
                                     if order_action == "buy":
-                                        sl = cal_price_pips(order_price_sl, -pips, self.digits, self.point_size)
+                                        sl = cal_price(order_price_sl, -pips, self.digits, self.point_size)
                                     else:
-                                        sl = cal_price_pips(order_price_sl, pips, self.digits, self.point_size)
+                                        sl = cal_price(order_price_sl, pips, self.digits, self.point_size)
                                 else:
                                     if order_action == "buy":
-                                        sl = cal_price_pips(order_price_sl, pips, self.digits, self.point_size)
+                                        sl = cal_price(order_price_sl, pips, self.digits, self.point_size)
                                     else:
-                                        sl = cal_price_pips(order_price_sl, -pips, self.digits, self.point_size)
+                                        sl = cal_price(order_price_sl, -pips, self.digits, self.point_size)
                                 cmd = f"UPDATE back_order SET sl={sl}, profit_manager='{pm[2]}' WHERE id={order_id}"
                                 self.management_sql.db.execute(cmd=cmd)
                                 cmd = f"INSERT INTO back_profit_manager_detaile (date, order_id, ask, bid, execute, value) VALUES('{self.date}', {order_id}, {self.ask}, {self.bid}, 'SL', {sl})"
@@ -668,7 +668,7 @@ class Logic_Back:
 
             #------ risk-to-reward ratio (R/R)
             if profit>0:
-                loss_price = cal_price_pips(price_open, -self.sl_pips, self.digits, self.point_size)
+                loss_price = cal_price(price_open, -self.sl_pips, self.digits, self.point_size)
                 p_loss, _ = cal_profit(action, amount, price_open, loss_price, loss_price, digits, point_size)
                 rr = abs(float(f"{profit/p_loss:.{2}f}"))
             #------ Database
