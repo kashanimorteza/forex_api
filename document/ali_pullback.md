@@ -127,6 +127,8 @@ for i in range(10, 0, -1):
 ```
 
 <!----------------tk--->
+<br>
+
 #### tk
 ```
 tk
@@ -141,6 +143,8 @@ else:
 ```
 
 <!----------------kumo--->
+<br>
+
 #### kumo
 ```
 kumo
@@ -154,6 +158,8 @@ else:
     kumo_down = True
 ```
 <!----------------switch_down--->
+<br>
+
 #### switch_down
 ```
 switch_down
@@ -175,7 +181,6 @@ if ask < average[self.domain]['sa1'] and ask < average[self.domain]['sb1']['aver
 
 ## Methods
 <!----------------box--->
-
 #### box
 ```
 این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
