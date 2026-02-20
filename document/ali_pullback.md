@@ -194,6 +194,8 @@ if ask > sa_1 and ask > sb_1 and sa_1 > sb_1:
 ```
 
 <!----------------inter_buy--->
+<br>
+
 #### inter_buy
 ```
 inter_buy
@@ -231,6 +233,8 @@ if tk_up and kumo_up and switch_down :
 ```
 
 <!----------------inter_sell--->
+<br>
+
 #### inter_sell
 ```
 inter_sell
@@ -299,4 +303,44 @@ def box(
     high = result[0][0]
     low = result[0][1]
     return high, low
+```
+
+<!----------------inner_down--->
+<br>
+
+#### inner_down
+```
+```
+```python
+def inner_down(self,count, average):
+    count = count -1
+    while count > 0:
+        sa1 = average[count]['sa1']
+        sb1 = average[count]['sb1']['average']
+        if sa1 < sb1 : return False
+        if sa1 > sb1 : return True
+        if sa1 == sb1 : 
+            count = count -1
+            self.inner_down(count)
+    return False
+```
+
+<!----------------inner_up--->
+<br>
+
+#### inner_up
+```
+```
+```python
+def inner_up(self, count, average):
+    count = count -1
+    while count > 0:
+        sa1 = average[count]['sa1']
+        sb1 = average[count]['sb1']['average']
+        if sa1 > sb1 : return False
+        if sa1 < sb1 : return True
+        if sa1 == sb1 : 
+            count = count -1
+            self.inner_up(count)
+    return False
 ```

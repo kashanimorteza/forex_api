@@ -249,31 +249,31 @@ class Ali_PoolBack:
         tk_down = False
         kumo_up = False
         kumo_down = False
-        #--------------Method
-        #---inner_down
-        def inner_down(count):
-            count = count -1
-            while count > 0:
-                sa1 = average[count]['sa1']
-                sb1 = average[count]['sb1']['average']
-                if sa1 < sb1 : return False
-                if sa1 > sb1 : return True
-                if sa1 == sb1 : 
-                    count = count -1
-                    inner_down(count)
-            return False
-        #---inner_up
-        def inner_up(count):
-            count = count -1
-            while count > 0:
-                sa1 = average[count]['sa1']
-                sb1 = average[count]['sb1']['average']
-                if sa1 > sb1 : return False
-                if sa1 < sb1 : return True
-                if sa1 == sb1 : 
-                    count = count -1
-                    inner_up(count)
-            return False
+        # #--------------Method
+        # #---inner_down
+        # def inner_down(count):
+        #     count = count -1
+        #     while count > 0:
+        #         sa1 = average[count]['sa1']
+        #         sb1 = average[count]['sb1']['average']
+        #         if sa1 < sb1 : return False
+        #         if sa1 > sb1 : return True
+        #         if sa1 == sb1 : 
+        #             count = count -1
+        #             inner_down(count)
+        #     return False
+        # #---inner_up
+        # def inner_up(count):
+        #     count = count -1
+        #     while count > 0:
+        #         sa1 = average[count]['sa1']
+        #         sb1 = average[count]['sb1']['average']
+        #         if sa1 > sb1 : return False
+        #         if sa1 < sb1 : return True
+        #         if sa1 == sb1 : 
+        #             count = count -1
+        #             inner_up(count)
+        #     return False
         #--------------Action
         try:
             if len(list_order_open) <= self.max_order:
@@ -315,10 +315,10 @@ class Ali_PoolBack:
                         kumo_down = True
                     #---------switch_down
                     if ask < sa_1 and ask < sb_1 and sa_1 < sb_1:
-                        switch_down = inner_down(count=self.domain)
+                        switch_down = self.inner_down(count=self.domain, average=average)
                     #---------switch_up
                     if ask > sa_1 and ask > sb_1 and sa_1 > sb_1:
-                        switch_up = inner_up(count=self.domain)
+                        switch_up = self.inner_up(count=self.domain, average=average)
                     #---------Inter buy
                     if tk_up and kumo_up and switch_down :
                         #---price, amount 
@@ -586,4 +586,29 @@ class Ali_PoolBack:
         high = result[0][0]
         low = result[0][1]
         return high, low
+
+    #---------------------------------------------inner_down
+    def inner_down(self,count, average):
+        count = count -1
+        while count > 0:
+            sa1 = average[count]['sa1']
+            sb1 = average[count]['sb1']['average']
+            if sa1 < sb1 : return False
+            if sa1 > sb1 : return True
+            if sa1 == sb1 : 
+                count = count -1
+                self.inner_down(count)
+        return False
     
+    #---------------------------------------------inner_up
+    def inner_up(self, count, average):
+        count = count -1
+        while count > 0:
+            sa1 = average[count]['sa1']
+            sb1 = average[count]['sb1']['average']
+            if sa1 > sb1 : return False
+            if sa1 < sb1 : return True
+            if sa1 == sb1 : 
+                count = count -1
+                self.inner_up(count)
+        return False
