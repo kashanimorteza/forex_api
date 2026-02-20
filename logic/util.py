@@ -113,33 +113,46 @@ def time_change_newyork_utc(date):
 
 
 
-#--------------------------------------------- price_pips
-def cal_price_pips(price, pips, digits, point_size)-> float:
+#--------------------------------------------- cal_price
+def cal_price(price, pips, digits, point_size)-> float:
     #--------------Action
     output = round(price + pips * point_size, digits)
     #--------------Return
     return output
 
-#--------------------------------------------- cal_size
-def cal_size(balance, price, pips, risk, digits, point_size)-> float:
+#--------------------------------------------- cal_movement
+def cal_movement(price1, price2, digits)-> float:
     #--------------Action
-    pip_value = cal_price_pips(price, pips, digits, point_size) -price
-    risk_value = balance * (risk / 100)
-    size = risk_value/pip_value
+    output = price1 - price2
+    output = abs(float(f"{output:.{digits}f}"))
     #--------------Return
-    return size
+    return output
+
+#--------------------------------------------- cal_size
+def cal_size(balance, action, ask, bid, pips, risk, amount, digits, point_size)-> float:
+    #--------------Action
+    price = ask if action == "buy" else bid
+    if risk > 0 :
+        pip_value = cal_price(price, pips, digits, point_size) -price
+        risk_value = balance * (risk / 100)
+        size = risk_value/pip_value
+    else:
+        size = amount
+    size = float(f"{size:.2f}")
+    #--------------Return
+    return price, size
 
 #--------------------------------------------- cal_tp_sl
 def cal_tp_sl(action, ask, bid, tp_pips, sl_pips, digits, point_size)-> model_output:
     spred =float(f"{abs(ask-bid):.{digits}f}")
     if action == "buy":
         price_open = ask
-        tp = cal_price_pips(bid, (tp_pips + spred), digits, point_size)
-        sl = cal_price_pips(bid, -(sl_pips - spred), digits, point_size)
+        tp = cal_price(bid, (tp_pips + spred), digits, point_size)
+        sl = cal_price(bid, -(sl_pips - spred), digits, point_size)
     elif action == "sell":
         price_open = bid
-        tp = cal_price_pips(ask, -(tp_pips + spred), digits, point_size)
-        sl = cal_price_pips(ask, (sl_pips - spred), digits, point_size)
+        tp = cal_price(ask, -(tp_pips + spred), digits, point_size)
+        sl = cal_price(ask, (sl_pips - spred), digits, point_size)
     return price_open, tp, sl, spred
 
 #--------------------------------------------- cal_movement

@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import table, true
 from logic.startup import debug, log_instance, list_instrument, Strategy_Run, Strategy_Action, Strategy_Run, database_management, database_data
-from logic.util import model_output, sort, time_change_newyork_utc, time_change_utc_newyork, cal_price_pips, cal_size, get_tbl_name
+from logic.util import model_output, sort, cal_size, get_tbl_name, cal_movement
 from logic.log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.data_orm import Data_Orm
@@ -243,24 +243,37 @@ class Ali_PoolBack:
         output.method_name = this_method
         #--------------Variable
         items = []
-        keep = False
         switch_up = False
         switch_down = False
+        tk_up = False
+        tk_down = False
+        kumo_up = False
+        kumo_down = False
         #--------------Method
-        def inner(count):
+        #---inner_down
+        def inner_down(count):
             count = count -1
             while count > 0:
-                avg_1 = average[count]['sa1']
-                avg_2 = average[count]['sb1']['average']
-                if avg_1 > avg_2 : 
-                    return False
-                if avg_1 < avg_2 : 
-                    return True
-                if avg_1 == avg_2 : 
+                sa1 = average[count]['sa1']
+                sb1 = average[count]['sb1']['average']
+                if sa1 < sb1 : return False
+                if sa1 > sb1 : return True
+                if sa1 == sb1 : 
                     count = count -1
-                    inner(count)
+                    inner_down(count)
             return False
-
+        #---inner_up
+        def inner_up(count):
+            count = count -1
+            while count > 0:
+                sa1 = average[count]['sa1']
+                sb1 = average[count]['sb1']['average']
+                if sa1 > sb1 : return False
+                if sa1 < sb1 : return True
+                if sa1 == sb1 : 
+                    count = count -1
+                    inner_up(count)
+            return False
         #--------------Action
         try:
             #------average
@@ -277,53 +290,113 @@ class Ali_PoolBack:
                 average_item['sa2'] = (average_item['t2']['average'] + average_item['k2']['average']) / 2
                 average[i] = average_item
                 average_date = average_date - timedelta(minutes=1)
+            #------data
+            sa_1 = average[self.domain]['sa1']
+            sb_1 = average[self.domain]['sb1']['average']
+            t2 =average[self.domain]['t2']['average']
+            k2 = average[self.domain]['k2']['average']
+            sa2 =average[self.domain]['sa2']
+            sb2 = average[self.domain]['sb2']['average']
             #---------tk
-            if average[self.domain]['t2']['average'] > average[self.domain]['k2']['average'] :
+            if t2 > k2 :
                 tk_up = True
                 tk_down = False
             else:
                 tk_up = False
                 tk_down = True
             #---------kumo
-            if average[self.domain]['sa2'] > average[self.domain]['sb2']['average'] :
+            if sa2 > sb2 :
                 kumo_up = True
                 kumo_down = False
             else:
                 kumo_up = False
                 kumo_down = True
-
-            #---------Test
-            switch_down = inner(self.domain)
-
             #---------switch_down
-            if ask < average[self.domain]['sa1'] and ask < average[self.domain]['sb1']['average']:
-                if average[self.domain]['sa1'] < average[self.domain]['sb1']['average']:
-                    point_avg_1 = average[self.domain]['sa1']
-                    point_avg_2 = average[self.domain]['sb1']['average']
-                    #---Live Big
-                    if point_avg_1 > point_avg_2 :
-                        switch_down = inner(self.domain)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        
+            if ask < sa_1 and ask < sb_1 and sa_1 < sb_1:
+                switch_down = inner_down(count=self.domain)
+            #---------switch_up
+            if ask > sa_1 and ask > sb_1 and sa_1 > sb_1:
+                switch_up = inner_up(count=self.domain)
+            #---------Inter buy
+            if tk_up and kumo_up and switch_down :
+                #---Amount
+                action = "buy"
+                price, amount = cal_size(
+                    balance=self.balance, 
+                    action=action, 
+                    ask=self.ask, 
+                    bid=self.bid, 
+                    price=price, 
+                    pips=self.sl_pips, 
+                    risk=self.risk, 
+                    digits=self.digits, 
+                    point_size=self.point_size
+                )
+                #---sl
+                self.sl_pips  = cal_movement(price, average[self.domain]['sb1']['low'], self.digits)
+                #---tp
+                self.tp_pips = self.sl_pips
+                #---Item
+                item = {
+                    #---General
+                    "state": Strategy_Action.PRICE_CHANGE,
+                    "run": Strategy_Run.ORDER_OPEN,
+                    "father_id": father_id,
+                    "step": step,
+                    "execute_id": self.execute_id,
+                    "tp_pips": self.tp_pips, 
+                    "sl_pips": self.sl_pips,
+                    "digits": self.digits, 
+                    "point_size": self.point_size,
+                    #---Data
+                    "symbol": symbol, 
+                    "action": "buy", 
+                    "amount": amount, 
+                    "date": date,
+                    "ask": price,
+                    "bid": price,
+                }
+                items.append(item)
+            #---------Inter sell
+            if tk_down and kumo_down and switch_up :
+                #---Amount
+                action = "sell"
+                price, amount = cal_size(
+                    balance=self.balance, 
+                    action=action, 
+                    ask=self.ask, 
+                    bid=self.bid, 
+                    price=price, 
+                    pips=self.sl_pips, 
+                    risk=self.risk, 
+                    digits=self.digits, 
+                    point_size=self.point_size
+                )
+                #---sl
+                self.sl_pips  = cal_movement(price, average[self.domain]['sb1']['high'], self.digits)
+                #---tp
+                self.tp_pips = self.sl_pips
+                #---Item
+                item = {
+                    #---General
+                    "state": Strategy_Action.PRICE_CHANGE,
+                    "run": Strategy_Run.ORDER_OPEN,
+                    "father_id": father_id,
+                    "step": step,
+                    "execute_id": self.execute_id,
+                    "tp_pips": self.tp_pips, 
+                    "sl_pips": self.sl_pips,
+                    "digits": self.digits, 
+                    "point_size": self.point_size,
+                    #---Data
+                    "symbol": symbol, 
+                    "action": "buy", 
+                    "amount": amount, 
+                    "date": date,
+                    "ask": price,
+                    "bid": price,
+                }
+                items.append(item)
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}

@@ -169,10 +169,33 @@ if ask < average[self.domain]['sa1'] and ask < average[self.domain]['sb1']['aver
     if average[self.domain]['sa1'] < average[self.domain]['sb1']['average']:
         point_avg_1 = average[self.domain]['sa1']
         point_avg_2 = average[self.domain]['sb1']['average']
-        #---Live Big
         if point_avg_1 > point_avg_2 :
-            switch_down = inner(self.domain)
+            switch_down = True
+        if point_avg_1 < point_avg_2 :
+            switch_down = False
+        if point_avg_1 == point_avg_2 :
+            switch_down = inner_down(count=self.domain)
 ```
+<!----------------switch_up--->
+<br>
+
+#### switch_up
+```
+switch_up
+```
+```python
+if ask < average[self.domain]['sa1'] and ask > average[self.domain]['sb1']['average']:
+    if average[self.domain]['sa1'] < average[self.domain]['sb1']['average']:
+        point_avg_1 = average[self.domain]['sa1']
+        point_avg_2 = average[self.domain]['sb1']['average']
+        if point_avg_1 > point_avg_2 :
+            switch_up = True
+        if point_avg_1 < point_avg_2 :
+            switch_up = False
+        if point_avg_1 == point_avg_2 :
+            switch_up = inner_up(count=self.domain)
+```
+
 
 
 
