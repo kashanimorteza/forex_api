@@ -78,7 +78,7 @@ class OneWay:
                 cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id={self.execute_id}"
                 self.data_sql.db.execute(cmd=cmd)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = self.execute_id
             output.message = self.execute_id
             #--------------Verbose
@@ -123,7 +123,7 @@ class OneWay:
                 for order in orders.data : order_ids.append(order.order_id)
                 if len(order_ids)>0 : self.forex.order_close(order_ids=order_ids)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = self.execute_id
             output.message = self.execute_id
             #--------------Verbose
@@ -178,7 +178,7 @@ class OneWay:
                 cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id={self.execute_id};"
                 self.data_sql.db.execute(cmd=cmd)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = self.execute_id
             output.message = f" {trade_id} | {order_detaile['action']}:{profit} | {action},{symbol},{amount},{tp_pips},{sl_pips},{result.status}"
             #--------------Verbose
@@ -238,7 +238,7 @@ class OneWay:
                 cmd = f"UPDATE live_execute SET status='{this_method}' WHERE id={execute_id};"
                 database:model_output = self.data_sql.db.execute(cmd=cmd)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = execute_id
             output.message = f"{execute_id} | {result.status} | {database.status} | {action} | {symbol} | {amount} | {tp_pips} | {sl_pips}"
             #--------------Verbose

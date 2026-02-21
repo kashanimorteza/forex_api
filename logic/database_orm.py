@@ -63,7 +63,7 @@ class Database_Orm:
             else:
                 output.status = False
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -111,7 +111,7 @@ class Database_Orm:
                 query = query.order_by(model.id.asc())
             result = query.all()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.status = True if result else False
             output.message =f"{model}"
             output.data = result
@@ -156,7 +156,7 @@ class Database_Orm:
             else:
                 output.status = False
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -198,7 +198,7 @@ class Database_Orm:
             else:
                 output.status = False
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -234,7 +234,7 @@ class Database_Orm:
             import model
             BaseModel.metadata.create_all(self.engine)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -282,7 +282,7 @@ class Database_Orm:
                     
                     self.session.commit()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = None
             output.message = f"Truncated {len(BaseModel.metadata.sorted_tables)} tables"
             #--------------Verbose
@@ -319,7 +319,7 @@ class Database_Orm:
             #--------------Action
             model.__table__.create(self.engine, checkfirst=True)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message =f"Create table : {model.__tablename__}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -368,7 +368,7 @@ class Database_Orm:
             
             self.session.commit()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Truncate table : {model.__tablename__}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -404,7 +404,7 @@ class Database_Orm:
             #--------------Action
             model.__table__.drop(self.engine, checkfirst=True)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message =f"Drop table : {model.__tablename__}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -440,7 +440,7 @@ class Database_Orm:
             #--------------Action
             output.data = sqlalchemy_inspect(self.engine).has_table(model.__tablename__)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message =f"Drop table : {model.__tablename__}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)

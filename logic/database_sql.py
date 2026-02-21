@@ -57,7 +57,7 @@ class Database_SQL:
                 self.cursor = self.connection.cursor()
                 self.status = True
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -96,7 +96,7 @@ class Database_SQL:
                     self.connection.close()
                     self.status = False
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -131,7 +131,7 @@ class Database_SQL:
             #--------------Action
             result = self.cursor.execute(cmd)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = result
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -170,7 +170,7 @@ class Database_SQL:
             self.cursor.execute(cmd)
             result = self.cursor.fetchall()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = result
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -209,7 +209,7 @@ class Database_SQL:
             if result is not None :
                 result = result[0]
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = result
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)

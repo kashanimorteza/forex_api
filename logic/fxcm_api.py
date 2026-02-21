@@ -56,7 +56,7 @@ class Fxcm_API:
             result = self.fx.login(self.username, self.password, self.url, self.type, self.session_status_changed)
             self.connected = True
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = result
             output.message = f"{self.name} | {self.type} | {self.id}" 
             #--------------Verbose
@@ -94,7 +94,7 @@ class Fxcm_API:
             result = self.fx.logout()
             self.connected = False
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = result
             output.message= f"{self.type} | {self.id} | {self.name}" 
             #--------------Verbose
@@ -132,7 +132,7 @@ class Fxcm_API:
             accounts_table = self.fx.get_table(ForexConnect.ACCOUNTS)
             for account in accounts_table : break
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = account
             output.message= f"{self.name} | {self.id} | Balance: {self.balance} | Equity: {self.equity}"
             #--------------Verbose
@@ -175,7 +175,7 @@ class Fxcm_API:
                 symbol = getattr(offer, "symbol", None)
                 if instrument_name and symbol : instruments[instrument_name] = symbol
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = instruments
             output.message = {"count": len(instruments)}
             #--------------Verbose
@@ -251,7 +251,7 @@ class Fxcm_API:
             else:
                 output.status = False
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message =f"{instrument} | {timeframe} | {sort(data_count, 6)} | {start} | {end}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -352,7 +352,7 @@ class Fxcm_API:
                     response = self.fx.send_request(request)
                     order_id = getattr(response, "order_id", None) if response else None
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = order_id, tp, sl, price_open, date_open
             output.message = f"{execute_id} | {order_id} | {symbol} | {action} | {amount} | {price_open} | {bid} | {ask} | {tp} | {sl}"
             #--------------Verbose
@@ -427,7 +427,7 @@ class Fxcm_API:
                         self.fx.send_request(request)
                         break
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = price_open, date_open
             output.message =None
             #--------------Verbose
@@ -497,7 +497,7 @@ class Fxcm_API:
                         close_order_ids.append(order_id)
                         count += 1
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = close_order_ids
             output.message =f"{count} | {len(order_ids)} | {len(close_order_ids)}"
             #--------------Verbose
@@ -547,7 +547,7 @@ class Fxcm_API:
                 for column in columns : info[column] = getattr(item, column, None)
                 result.append(info)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = result
             output.message = f"{table} | {len(result)}"
             #--------------Verbose

@@ -52,7 +52,7 @@ class Data_Orm:
             #--------------Action
             output:model_output = self.db.add(model=model, item=item)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message=f"Item added"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -88,7 +88,7 @@ class Data_Orm:
             #--------------Action
             output:model_output = self.db.items(model=model, order_by=order_by, **filters)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message =f"{model}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -124,7 +124,7 @@ class Data_Orm:
             #--------------Action
             output:model_output = self.db.update(model=model, item=item)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message=f"Item updated"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -160,7 +160,7 @@ class Data_Orm:
             #--------------Action
             output:model_output = self.db.delete(model=model, id=id)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message=f"item deleted"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -200,7 +200,7 @@ class Data_Orm:
                 item.enable = True
                 output:model_output = self.db.update(model=model, item=item)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message=f"item enabled"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -240,7 +240,7 @@ class Data_Orm:
                 item.enable = False
                 output:model_output = self.db.update(model=model, item=item)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message=f"item disabled"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -280,7 +280,7 @@ class Data_Orm:
                 item.enable = not item.enable
                 output:model_output = self.db.update(model=model, item=item)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"item {'enabled' if item.enable else 'disabled'}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -316,7 +316,7 @@ class Data_Orm:
             #--------------Action
             output:model_output = self.db.create_all_tables()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message =None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -352,7 +352,7 @@ class Data_Orm:
             #--------------Action
             output:model_output = self.db.truncate_all_table()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message =None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -388,7 +388,7 @@ class Data_Orm:
             #--------------Action
             output:model_output = self.db.create(model=model)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"{model.__tablename__} table created"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -424,7 +424,7 @@ class Data_Orm:
             #--------------Action
             output:model_output = self.db.truncate(model=model)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"{model.__tablename__} table truncated"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -460,7 +460,7 @@ class Data_Orm:
             #--------------Action
             output:model_output = self.db.drop(model=model)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"{model.__tablename__} table dropped"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -496,7 +496,7 @@ class Data_Orm:
             #--------------Action
             output:model_output = self.db.table_exist(model=model)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message =f"{model}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)

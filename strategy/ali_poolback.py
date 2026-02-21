@@ -105,7 +105,7 @@ class Ali_PoolBack:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.data = items
         output.message = f"exi({self.execute_id}) | sym({self.symbol}) | stp({step})"
         #--------------Verbose
@@ -153,7 +153,7 @@ class Ali_PoolBack:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.data = items
         output.message = f"exi({self.execute_id}) | sym({self.symbol}) | stp({step})"
         #--------------Verbose
@@ -204,7 +204,7 @@ class Ali_PoolBack:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.data = items
         output.message = f"exi({self.execute_id}) | sym({self.symbol}) | stp({step})"
         #--------------Verbose
@@ -385,7 +385,7 @@ class Ali_PoolBack:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.data = items
         output.message = None
         #--------------Verbose
@@ -436,7 +436,7 @@ class Ali_PoolBack:
             logic_back.load(params=self.params)
             logic_back.step= step
             #------Verbose
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"exi({self.execute_id}) | sym({self.symbol}) | stp({step})"
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #------Data
@@ -510,7 +510,7 @@ class Ali_PoolBack:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.data = None
         output.message = f"{self.execute_id} | {self.this_class} | {self.symbol}"
         #--------------Verbose
@@ -556,7 +556,7 @@ class Ali_PoolBack:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.data = None
         output.message = None
         #--------------Verbose

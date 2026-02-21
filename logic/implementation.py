@@ -45,7 +45,7 @@ class Logic_Implementation:
         try:
             self.data_orm.create_all_tables()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = True
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
@@ -80,7 +80,7 @@ class Logic_Implementation:
         try:
             self.data_orm.truncate_all_table()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = True
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
@@ -150,7 +150,7 @@ class Logic_Implementation:
                         obj = model_instrument_db(name=name, instrument=instrument, description="", enable=True, digits=digits, point_size=point_size)
                         self.data_orm.add(model=model_instrument_db, item=obj)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
@@ -196,7 +196,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name='back', broker='back', type='', currency='', server='', username='', password='', description="", enable=True))
                 self.data_orm.add(model=model, item=model(name='live-demo', broker='FXCM', type='Demo', currency='USD', server='FXCM-USDDemo02', username='52047997', password='pdk2cnf', description="", enable=True))
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
@@ -244,7 +244,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name='Floating', description='Buy&Sell   if p>0:same   if p<0:reverse'))
                 self.data_orm.add(model=model, item=model(name='Ali_PoolBack', description=''))
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
@@ -406,7 +406,7 @@ class Logic_Implementation:
                 )
                 self.data_orm.add(model=model, item=item)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
@@ -457,7 +457,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=6, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=2, step=1, date_from="2025-01-01 00:00:00", date_to="2025-02-01 23:59:59"))
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
@@ -525,7 +525,7 @@ class Logic_Implementation:
                 #-------------- ali_poolback
                 self.data_orm.add(model=model, item=model(name="2026-02", strategy_item_id=10, account_id=1, profit_manager_id=6, money_management_id=1, date_from="2026-02-20 00:52:00", date_to="2027-01-01 00:00:00"))
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
@@ -575,7 +575,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name="5", description="1 to 5"))
                 self.data_orm.add(model=model, item=model(name="10", description="1 to 10"))
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
@@ -645,7 +645,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(profit_manager_id=6, name="9", value=900, tp_value=100, sl_value=-100, at_value=0))
                 self.data_orm.add(model=model, item=model(profit_manager_id=6, name="10", value=1000, tp_value=100, sl_value=-100, at_value=0))
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
@@ -693,7 +693,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name="10", balance=1000, risk=10, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
                 self.data_orm.add(model=model, item=model(name="15", balance=1000, risk=15, limit_trade=-1, limit_profit=-1, limit_loss=-1, limit_stop=-1,))
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)
@@ -766,7 +766,7 @@ class Logic_Implementation:
                             output.data["create"] = self.data_sql.db.execute(query)
                             self.log.verbose("rep", f"{sort(self.this_class, 8)} | {sort(this_method, 8)}", f"Create table {tblName} : {output.status}")
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = True
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 12)} | {sort(this_method, 35)} | {output.time}", output.message)

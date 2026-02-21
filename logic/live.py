@@ -63,7 +63,7 @@ class Logic_Live:
             result:model_output = self.api.login()
             #--------------Output
             output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -99,7 +99,7 @@ class Logic_Live:
             result:model_output = self.api.logout()
             #--------------Output
             output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -135,7 +135,7 @@ class Logic_Live:
             result:model_output = self.api.info()
             #--------------Output
             output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -171,7 +171,7 @@ class Logic_Live:
             result:model_output = self.api.instruments()
             #--------------Output
             output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -235,7 +235,7 @@ class Logic_Live:
             #--------------Action
             result = self.data_sql.db.item(query)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = result.data
             output.message=f"{instrument} | {timeframe} | {mode} | {filed}"
             #--------------Verbose
@@ -308,7 +308,7 @@ class Logic_Live:
                         q = query + (f"('{row['Date']}',{row['BidOpen']},{row['BidClose']},{row['BidHigh']},{row['BidLow']},{row['AskOpen']},{row['AskClose']},{row['AskHigh']},{row['AskLow']})")
                         if self.data_sql.db.execute(q).status : insert += 1
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = insert
             output.message = f"{instrument} | {timeframe} | {sort(insert, 6)} |"
             #--------------Verbose
@@ -370,7 +370,7 @@ class Logic_Live:
                 if delay == 0: break; 
                 time.sleep(delay)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = None
             output.message = f"{instrument} | {timeframe} |"
             #--------------Verbose
@@ -409,7 +409,7 @@ class Logic_Live:
             result:model_output = self.api.history(instrument, timeframe, datefrom=datefrom, dateto=dateto, count=count)
             #--------------Output
             output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -445,7 +445,7 @@ class Logic_Live:
             result:model_output = self.api.get_table(table = table)
             #--------------Output
             output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -495,7 +495,7 @@ class Logic_Live:
                 self.management_sql.db.execute(cmd=cmd)
             #--------------Output
             output = result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -534,7 +534,7 @@ class Logic_Live:
             order_detaile = self.order_detaile(order_id=order_id)
             if order_detaile["execute_status"] != "stop" : self.strategy_action(action=Strategy_Action.ORDER_CLOSE, order_detaile=order_detaile)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = order_detaile
             output.message = f"{order_id} | {profit}"
             #--------------Verbose
@@ -572,7 +572,7 @@ class Logic_Live:
             result:model_output = self.api.order_close(order_ids=order_ids)
             #--------------Output
             output=result
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #--------------Log
@@ -618,7 +618,7 @@ class Logic_Live:
                         self.management_sql.db.execute(cmd=cmd)
                         count += 1
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = count
             output.message =f"{len(result.data)} | {len(order_ids)} | {count}"
             #--------------Verbose
@@ -656,7 +656,7 @@ class Logic_Live:
             max_count = self.management_sql.db.items(cmd=cmd).data[0][0]
             if max_count is None : max_count = 0
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = max_count
             output.message=max_count
             #--------------Verbose
@@ -696,7 +696,7 @@ class Logic_Live:
             cmd = f"DELETE FROM live_execute_detaile WHERE execute_id={execute_id}"
             self.management_sql.db.execute(cmd=cmd)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = None
             output.message=None
             #--------------Verbose
@@ -793,7 +793,7 @@ class Logic_Live:
                     cmd = f"UPDATE live_execute SET status='{state}' WHERE id={execute_id}"
                     self.management_sql.db.execute(cmd=cmd)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = None
             output.message = None
             #--------------Verbose
@@ -922,7 +922,7 @@ class Logic_Live:
                 detaile["close"] = {"count":close_count, "amount":close_amount/100000, "profit":round(close_profit, 2), "buy":close_buy, "sell":close_sell}
                 detaile["open"] = {"count":open_count, "amount":open_amount/100000, "profit":round(open_profit, 2), "buy":open_buy, "sell":open_sell}
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = detaile
             output.message=id
             #--------------Verbose
@@ -973,7 +973,7 @@ class Logic_Live:
             max_step = self.management_sql.db.items(cmd=cmd).data[0][0]
             if max_step is None : max_step = 0
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = max_step
             output.message=max_step
             #--------------Verbose
@@ -1013,7 +1013,7 @@ class Logic_Live:
             cmd = f"DELETE FROM live_execute_detaile WHERE execute_id={execute_id}"
             self.management_sql.db.execute(cmd=cmd)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = None
             output.message=None
             #--------------Verbose
@@ -1050,7 +1050,7 @@ class Logic_Live:
             #--------------Acion
             self.management_orm.truncate_all_table()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = None
             output.message=None
             #--------------Verbose
@@ -1199,7 +1199,7 @@ class Logic_Live:
                         "param":param
                     })
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = detaile
             output.message=execute_id
             #--------------Verbose
@@ -1245,7 +1245,7 @@ class Logic_Live:
             else:
                 result.data = []
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = result.data 
             output.message=None
             #--------------Verbose

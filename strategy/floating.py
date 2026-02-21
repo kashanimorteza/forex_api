@@ -63,7 +63,7 @@ class Floating:
                         }
                     items.append(item)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = items
             output.message = None
             #--------------Verbose
@@ -106,7 +106,7 @@ class Floating:
             }
             items.append(item)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = items
             output.message = output.status
             #--------------Verbose
@@ -165,7 +165,7 @@ class Floating:
             }
             items.append(item)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = items
             output.message = f"{trade_id} | {action}:{profit} | {symbol},{amount},{self.tp_pips},{self.sl_pips}"
             #--------------Verbose
@@ -205,7 +205,7 @@ class Floating:
             #--------------Rule
             #--------------Action
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = items
             output.message = None
             #--------------Verbose

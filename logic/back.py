@@ -110,7 +110,7 @@ class Logic_Back:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.data = params
         output.message = None
         #------Verbose
@@ -148,7 +148,7 @@ class Logic_Back:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         #------Verbose
         if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #------Log
@@ -181,7 +181,7 @@ class Logic_Back:
                             #---update
                             order.update({"date": self.date, "ask": self.ask, "bid": self.bid})
                             #---verbose
-                            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
                             output.message = f"{self.date} | {self.symbol} | {sort(order['action'], 4)} | amt({order['amount']}) | prc({order['ask']}) | ask({self.ask}) | Active"
                             self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
                             #---action
@@ -193,7 +193,7 @@ class Logic_Back:
                             #---update
                             order.update({"date": self.date, "ask": self.ask, "bid": self.bid})
                             #---verbose
-                            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
                             output.message = f"{self.date} | {self.symbol} | {sort(order['action'], 4)} | amt({order['amount']}) | prc({order['bid']}) | bid({self.bid}) | Active"
                             self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
                             #---action
@@ -202,7 +202,7 @@ class Logic_Back:
                             output.data = order
                 else:
                     #---verbose
-                    output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                    output.time = sort(f"{(time.time() - start_time):.3f}", 7)
                     output.message = f"{self.date} | {self.symbol} | {sort(order['action'], 4)} | amt({order['amount']}) | prc({order['ask']}) | Remove"
                     self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
                     #---action
@@ -214,7 +214,7 @@ class Logic_Back:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         #--------------Verbose
         if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
         #--------------Log
@@ -284,7 +284,7 @@ class Logic_Back:
                                 self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{execute_id}' and step='{step}' AND status='open'").data
                                 #---verbose
                                 message = f"{self.date} | {self.symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | TP | old({order_price_tp}) | {pips} | new({tp})"
-                                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                                output.time = sort(f"{(time.time() - start_time):.3f}", 7)
                                 self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
                                 items.append(order)
                                 execute = True
@@ -308,7 +308,7 @@ class Logic_Back:
                                 self.list_order_open = self.management_sql.db.items(cmd=f"select * FROM back_order WHERE execute_id='{execute_id}' and step='{step}' AND status='open'").data
                                 #---verbose
                                 message = f"{self.date} | {self.symbol} | {sort(order_action, 4)} | {order_id} | {pm[2]} | SL | old({order_price_sl}) | {pips} | new({sl})"
-                                output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+                                output.time = sort(f"{(time.time() - start_time):.3f}", 7)
                                 self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", message)
                                 items.append(order)
                                 execute = True
@@ -319,7 +319,7 @@ class Logic_Back:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.data = items
         output.message =  f"{self.date} | {len(output.data)}"
         #--------------Verbose
@@ -419,7 +419,7 @@ class Logic_Back:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.message = f"{self.date} | {len(output.data)}"
         #--------------Verbose
         if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -487,7 +487,7 @@ class Logic_Back:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.data = items
         output.message = None
         #--------------Verbose
@@ -536,7 +536,7 @@ class Logic_Back:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.status = True
         output.data = self.list_order_pending
         output.message = f"{item['date']} | {item['symbol']} | {sort(item['action'], 4)} | amt({item['amount']}) | prc({item['ask']}) | lim({item['pending_limit']}) | Placed"
@@ -611,7 +611,7 @@ class Logic_Back:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.status = result_database.status
         output.data = item
         output.message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({price_open}) | tpt({tp}) | sls({sl})"
@@ -685,7 +685,7 @@ class Logic_Back:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.status = result_database.status
         output.data = item
         output.message = f"{date} | {symbol} | {sort(action, 4)} | amt({amount}) | prc({price_close}) | prf({profit})"
@@ -732,7 +732,7 @@ class Logic_Back:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.data = None
         output.message = len(self.list_order_open)
         #--------------Verbose
@@ -773,7 +773,7 @@ class Logic_Back:
                 if result.status == True :
                     output.data[symbol] = result.data
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = None
             #--------------Verbose
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
@@ -810,7 +810,7 @@ class Logic_Back:
             max_step = self.management_sql.db.items(cmd=cmd).data[0][0]
             if max_step is None : max_step = 0
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = max_step
             output.message=max_step
             #--------------Verbose
@@ -850,7 +850,7 @@ class Logic_Back:
             cmd = f"DELETE FROM back_execute_detaile WHERE execute_id={execute_id}"
             self.management_sql.db.execute(cmd=cmd)
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = None
             output.message=None
             #--------------Verbose
@@ -887,7 +887,7 @@ class Logic_Back:
             #--------------Acion
             self.management_orm.truncate_all_table()
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = None
             output.message=None
             #--------------Verbose
@@ -1044,7 +1044,7 @@ class Logic_Back:
                         "param":param
                     })
             #--------------Output
-            output.time = sort(f"{(time.time() - start_time):.3f}", 3)
+            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = detaile
             output.message=execute_id
             #--------------Verbose
