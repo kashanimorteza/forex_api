@@ -402,7 +402,7 @@ class Logic_Implementation:
                     amount=1,
                     tp_pips=40, 
                     sl_pips=20,
-                    params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+                    params="{'name': 'poolback_4x', 'time_frame': 'm15', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
                 )
                 self.data_orm.add(model=model, item=item)
             #--------------Output
@@ -523,7 +523,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 #-------------- ali_poolback
-                self.data_orm.add(model=model, item=model(name="2026-02", strategy_item_id=10, account_id=1, profit_manager_id=6, money_management_id=1, date_from="2026-02-20 05:58:00", date_to="2027-01-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2026-02", strategy_item_id=10, account_id=1, profit_manager_id=6, money_management_id=1, date_from="2026-02-01 18:00:00", date_to="2027-01-01 00:00:00"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

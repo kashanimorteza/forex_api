@@ -7,8 +7,6 @@
 #--------------------------------------------------------------------------------- Import
 import inspect, time
 from datetime import datetime, timedelta
-
-from sqlalchemy import table, true
 from logic.startup import debug, log_instance, list_instrument, Strategy_Run, Strategy_Action, Strategy_Run, database_management, database_data
 from logic.util import model_output, sort, cal_size, get_tbl_name, cal_movement, cal_price_movement
 from logic.log import Logic_Log
@@ -66,6 +64,15 @@ class Ali_PoolBack:
         self.ask = None
         self.bid = None
         self.price = None
+        self.time_frame_multipliers = {
+            "m1": 1,
+            "m5": 5,
+            "m15": 15,
+            "m30": 30,
+            "h1": 60,
+            "h4": 240,
+            "d1": 1440
+        }
     
     #---------------------------------------------start
     def start(
@@ -243,6 +250,7 @@ class Ali_PoolBack:
         output.method_name = this_method
         #--------------Variable
         items = []
+        keep = True
         switch_up = False
         switch_down = False
         tk_up = False
@@ -286,99 +294,104 @@ class Ali_PoolBack:
                         #---average
                         for key, value in self.period.items():
                             high, low = self.box(date=average_date, count=value, time_frame=self.time_frame)
+                            if high is None or low is None : 
+                                keep = False
+                                break
                             average_item[key] = {"high": high, "low": low , "average": (high+low)/2}
                         #---sa
+                        if not keep : break 
                         average_item['sa1'] = (average_item['t1']['average'] + average_item['k1']['average']) / 2
                         average_item['sa2'] = (average_item['t2']['average'] + average_item['k2']['average']) / 2
                         average[i] = average_item
-                        average_date = average_date - timedelta(minutes=1)
-                    #------const
-                    sa_1 = average[self.domain]['sa1']
-                    sb_1 = average[self.domain]['sb1']['average']
-                    t2 =average[self.domain]['t2']['average']
-                    k2 = average[self.domain]['k2']['average']
-                    sa2 =average[self.domain]['sa2']
-                    sb2 = average[self.domain]['sb2']['average']
-                    #---------tk
-                    if t2 > k2 :
-                        tk_up = True
-                        tk_down = False
-                    else:
-                        tk_up = False
-                        tk_down = True
-                    #---------kumo
-                    if sa2 > sb2 :
-                        kumo_up = True
-                        kumo_down = False
-                    else:
-                        kumo_up = False
-                        kumo_down = True
-                    #---------switch_down
-                    if ask < sa_1 and ask < sb_1 and sa_1 < sb_1:
-                        switch_down = inner_down(count=self.domain)
-                    #---------switch_up
-                    if ask > sa_1 and ask > sb_1 and sa_1 > sb_1:
-                        switch_up = inner_up(count=self.domain)
-                    #---------Inter buy
-                    if tk_up and kumo_up and switch_down :
-                        #---price, amount 
-                        action = "buy"
-                        price, amount = cal_size(balance=self.balance, action=action, ask=self.ask, bid=self.bid, pips=self.sl_pips, risk=self.risk, digits=self.digits, amount=self.amount, point_size=self.point_size)
-                        #---sl
-                        self.sl_pips  = cal_price_movement(price, average[self.domain]['sb1']['low'], self.point_size)
-                        #---tp
-                        self.tp_pips = self.sl_pips
-                        #---Item
-                        item = {
-                            #---General
-                            "state": Strategy_Action.PRICE_CHANGE,
-                            "run": Strategy_Run.ORDER_OPEN,
-                            "father_id": father_id,
-                            "step": step,
-                            "execute_id": self.execute_id,
-                            "tp_pips": self.tp_pips, 
-                            "sl_pips": self.sl_pips,
-                            "digits": self.digits, 
-                            "point_size": self.point_size,
-                            #---Data
-                            "symbol": symbol, 
-                            "action": action, 
-                            "amount": amount, 
-                            "date": date,
-                            "ask": price,
-                            "bid": price,
-                        }
-                        items.append(item)
-                    #---------Inter sell
-                    if tk_down and kumo_down and switch_up :
-                        #---Amount
-                        action = "sell"
-                        price, amount = cal_size(balance=self.balance, action=action, ask=ask, bid=bid, pips=self.sl_pips, risk=self.risk, digits=self.digits, amount=self.amount,point_size=self.point_size)
-                        #---sl
-                        self.sl_pips  = cal_price_movement(price, average[self.domain]['sb1']['high'], self.point_size)
-                        #---tp
-                        self.tp_pips = self.sl_pips
-                        #---Item
-                        item = {
-                            #---General
-                            "state": Strategy_Action.PRICE_CHANGE,
-                            "run": Strategy_Run.ORDER_OPEN,
-                            "father_id": father_id,
-                            "step": step,
-                            "execute_id": self.execute_id,
-                            "tp_pips": self.tp_pips, 
-                            "sl_pips": self.sl_pips,
-                            "digits": self.digits, 
-                            "point_size": self.point_size,
-                            #---Data
-                            "symbol": symbol, 
-                            "action": action, 
-                            "amount": amount, 
-                            "date": date,
-                            "ask": price,
-                            "bid": price,
-                        }
-                        items.append(item)
+                        average_date = average_date - timedelta(minutes=self.time_frame_multipliers.get(self.time_frame))
+                    if keep:
+                        #------const 
+                        sa_1 = average[self.domain]['sa1']
+                        sb_1 = average[self.domain]['sb1']['average']
+                        t2 =average[self.domain]['t2']['average']
+                        k2 = average[self.domain]['k2']['average']
+                        sa2 =average[self.domain]['sa2']
+                        sb2 = average[self.domain]['sb2']['average']
+                        #---------tk
+                        if t2 > k2 :
+                            tk_up = True
+                            tk_down = False
+                        else:
+                            tk_up = False
+                            tk_down = True
+                        #---------kumo
+                        if sa2 > sb2 :
+                            kumo_up = True
+                            kumo_down = False
+                        else:
+                            kumo_up = False
+                            kumo_down = True
+                        #---------switch_down
+                        if ask < sa_1 and ask < sb_1 and sa_1 < sb_1:
+                            switch_down = inner_down(count=self.domain)
+                        #---------switch_up
+                        if ask > sa_1 and ask > sb_1 and sa_1 > sb_1:
+                            switch_up = inner_up(count=self.domain)
+                        #---------Inter buy
+                        if tk_up and kumo_up and switch_down :
+                            #---price, amount 
+                            action = "buy"
+                            price, amount = cal_size(balance=self.balance, action=action, ask=ask, bid=bid, pips=self.sl_pips, risk=self.risk, digits=self.digits, amount=self.amount, point_size=self.point_size)
+                            #---sl
+                            self.sl_pips  = cal_price_movement(price, average[self.domain]['sb1']['low'], self.point_size)
+                            #---tp
+                            self.tp_pips = self.sl_pips
+                            #---Item
+                            item = {
+                                #---General
+                                "state": Strategy_Action.PRICE_CHANGE,
+                                "run": Strategy_Run.ORDER_OPEN,
+                                "father_id": father_id,
+                                "step": step,
+                                "execute_id": self.execute_id,
+                                "tp_pips": self.tp_pips, 
+                                "sl_pips": self.sl_pips,
+                                "digits": self.digits, 
+                                "point_size": self.point_size,
+                                #---Data
+                                "symbol": symbol, 
+                                "action": action, 
+                                "amount": amount, 
+                                "date": date,
+                                "ask": price,
+                                "bid": price,
+                            }
+                            items.append(item)
+                        #---------Inter sell
+                        if tk_down and kumo_down and switch_up :
+                            #---Amount
+                            action = "sell"
+                            price, amount = cal_size(balance=self.balance, action=action, ask=ask, bid=bid, pips=self.sl_pips, risk=self.risk, digits=self.digits, amount=self.amount,point_size=self.point_size)
+                            #---sl
+                            self.sl_pips  = cal_price_movement(price, average[self.domain]['sb1']['high'], self.point_size)
+                            #---tp
+                            self.tp_pips = self.sl_pips
+                            #---Item
+                            item = {
+                                #---General
+                                "state": Strategy_Action.PRICE_CHANGE,
+                                "run": Strategy_Run.ORDER_OPEN,
+                                "father_id": father_id,
+                                "step": step,
+                                "execute_id": self.execute_id,
+                                "tp_pips": self.tp_pips, 
+                                "sl_pips": self.sl_pips,
+                                "digits": self.digits, 
+                                "point_size": self.point_size,
+                                #---Data
+                                "symbol": symbol, 
+                                "action": action, 
+                                "amount": amount, 
+                                "date": date,
+                                "ask": price,
+                                "bid": price,
+                            }
+                            items.append(item)
         except Exception as e:  
             output.status = False
             output.message = {"class":self.this_class, "method":this_method, "error": str(e)}
@@ -577,12 +590,15 @@ class Ali_PoolBack:
         # IN     : date | count | time_frame
         # OUT    : high | low
         # Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
+        #--------------Data
+        domain = count * self.time_frame_multipliers.get(time_frame, 1)
         #--------------Action
         table = get_tbl_name(self.symbol, self.time_frame)
         date_to = date
-        date_from = date - timedelta(minutes=count)
+        date_from = date - timedelta(minutes=domain)
         cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
         result = self.data_sql.db.items(cmd=cmd).data
-        high = result[0][0]
-        low = result[0][1]
-        return high, low
+        if len(result)>0:
+            high = result[0][0]
+            low = result[0][1]
+            return high, low
