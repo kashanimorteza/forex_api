@@ -590,3 +590,22 @@ Connect
 ```bash
 sudo openvpn --config /root/ID-DE2.ovpn --auth-user-pass /root/pass.txt
 ```
+
+
+
+
+
+softwareupdate --install-rosetta --agree-to-license
+arch -x86_64 /bin/zsh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+arch
+
+arch -x86_64 brew install pyenv
+arch -x86_64 pyenv install 3.7.17
+arch -x86_64 pyenv global 3.7.17
+python -c "import platform; print(platform.machine())"
+
+python -m venv forex_env
+source forex_env/bin/activate
+python -c "import platform; print(platform.machine())"
+pip install forexconnect

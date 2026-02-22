@@ -523,7 +523,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 #-------------- ali_poolback
-                self.data_orm.add(model=model, item=model(name="2026-02", strategy_item_id=10, account_id=1, profit_manager_id=6, money_management_id=1, date_from="2026-02-01 18:00:00", date_to="2027-01-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="2026-02", strategy_item_id=10, account_id=1, profit_manager_id=6, money_management_id=1, date_from="2025-01-01 00:00:00", date_to="2027-01-01 00:00:00"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"

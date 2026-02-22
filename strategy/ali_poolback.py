@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------------- Location
-# strategy/dowjones.py
+# strategy/ali_poolback.py
 
 #--------------------------------------------------------------------------------- Description
-# dowjones
+# Ali_PoolBack
 
 #--------------------------------------------------------------------------------- Import
 import inspect, time
@@ -12,6 +12,7 @@ from logic.util import model_output, sort, cal_size, get_tbl_name, cal_movement,
 from logic.log import Logic_Log
 from logic.data_sql import Data_SQL
 from logic.data_orm import Data_Orm
+import pandas as pd
 
 #--------------------------------------------------------------------------------- Class
 class Ali_PoolBack:
@@ -70,7 +71,11 @@ class Ali_PoolBack:
             "m15": 15,
             "m30": 30,
             "h1": 60,
+            "h2": 120,
+            "h3": 180,
             "h4": 240,
+            "h6": 360,
+            "h8": 480,
             "d1": 1440
         }
     
@@ -314,18 +319,14 @@ class Ali_PoolBack:
                         sb2 = average[self.domain]['sb2']['average']
                         #---------tk
                         if t2 > k2 :
-                            tk_up = True
-                            tk_down = False
+                            tk_up, tk_down = True, False
                         else:
-                            tk_up = False
-                            tk_down = True
+                            tk_up, tk_down = False, True
                         #---------kumo
                         if sa2 > sb2 :
-                            kumo_up = True
-                            kumo_down = False
+                            kumo_up, kumo_down = True, False
                         else:
-                            kumo_up = False
-                            kumo_down = True
+                            kumo_up, kumo_down = False, True
                         #---------switch_down
                         if ask < sa_1 and ask < sb_1 and sa_1 < sb_1:
                             switch_down = inner_down(count=self.domain)
@@ -456,6 +457,8 @@ class Ali_PoolBack:
             table = get_tbl_name(self.symbol, self.time_frame)
             cmd = f"SELECT id, date, askclose, bidclose FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
             data = self.data_sql.db.items(cmd=cmd).data
+            #------DF
+            self.data_df = self.load_df(symbol=self.symbol, time_frame=self.time_frame, date_from=self.date_from, date_to=self.date_to)
             #------Start
             result= self.start(father_id=-1, step=step)
             if result.data : logic_back.action(items=result.data)
@@ -578,6 +581,30 @@ class Ali_PoolBack:
         if log : self.log.log(log_model, output)
         #--------------Return
         return output
+
+    #---------------------------------------------load_df
+    def load_df(
+            self,
+            symbol:str,
+            time_frame:str,
+            date_from:datetime=None,
+            date_to:datetime=None
+        ):
+        #--------------Description
+        # IN     : symbol | time_frame
+        # OUT    : pandas data
+        # Action : 
+        #--------------Variable
+        df = None
+        #--------------Data
+        table = get_tbl_name(symbol, time_frame)
+        #--------------Action
+        cmd = f"SELECT id,date,bidopen,bidclose,bidhigh,bidlow,askopen,askclose,askhigh,asklow FROM {table} WHERE date>='{date_from}' and date<='{date_to}' ORDER BY date ASC"
+        result = self.data_sql.db.items(cmd=cmd).data
+        if len(result) > 0:
+            df = pd.DataFrame(result, columns=['id', 'date', 'bidopen', 'bidclose', 'bidhigh', 'bidlow', 'askopen', 'askclose', 'askhigh', 'asklow'])
+        #--------------Return
+        return df
     
     #---------------------------------------------box
     def box(
@@ -592,13 +619,16 @@ class Ali_PoolBack:
         # Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
         #--------------Data
         domain = count * self.time_frame_multipliers.get(time_frame, 1)
-        #--------------Action
-        table = get_tbl_name(self.symbol, self.time_frame)
         date_to = date
         date_from = date - timedelta(minutes=domain)
-        cmd = f"SELECT MAX(askhigh), MIN(asklow) FROM {table} WHERE date>='{date_from}' and date<='{date_to}'"
-        result = self.data_sql.db.items(cmd=cmd).data
-        if len(result)>0:
-            high = result[0][0]
-            low = result[0][1]
-            return high, low
+        #--------------Action
+        mask = (self.data_df['date'] >= date_from) & (self.data_df['date'] <= date_to)
+        filtered_data = self.data_df[mask]
+        if not filtered_data.empty:
+            high = filtered_data['askhigh'].max()
+            low = filtered_data['asklow'].min()
+        else:
+            high = None
+            low = None
+        #--------------return
+        return high, low
