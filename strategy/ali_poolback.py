@@ -65,19 +65,7 @@ class Ali_PoolBack:
         self.ask = None
         self.bid = None
         self.price = None
-        self.time_frame_multipliers = {
-            "m1": 1,
-            "m5": 5,
-            "m15": 15,
-            "m30": 30,
-            "h1": 60,
-            "h2": 120,
-            "h3": 180,
-            "h4": 240,
-            "h6": 360,
-            "h8": 480,
-            "d1": 1440
-        }
+        self.time_frame_value = {"m1": 1, "m5": 5, "m15": 15, "m30": 30, "h1": 60, "h2": 120, "h3": 180, "h4": 240, "h6": 360, "h8": 480, "d1": 1440}
     
     #---------------------------------------------start
     def start(
@@ -308,7 +296,7 @@ class Ali_PoolBack:
                         average_item['sa1'] = (average_item['t1']['average'] + average_item['k1']['average']) / 2
                         average_item['sa2'] = (average_item['t2']['average'] + average_item['k2']['average']) / 2
                         average[i] = average_item
-                        average_date = average_date - timedelta(minutes=self.time_frame_multipliers.get(self.time_frame))
+                        average_date = average_date - timedelta(minutes=self.time_frame_value.get(self.time_frame))
                     if keep:
                         #------const 
                         sa_1 = average[self.domain]['sa1']
@@ -338,10 +326,8 @@ class Ali_PoolBack:
                             #---price, amount 
                             action = "buy"
                             price, amount = cal_size(balance=self.balance, action=action, ask=ask, bid=bid, pips=self.sl_pips, risk=self.risk, digits=self.digits, amount=self.amount, point_size=self.point_size)
-                            #---sl
-                            self.sl_pips  = cal_price_movement(price, average[self.domain]['sb1']['low'], self.point_size)
-                            #---tp
-                            self.tp_pips = self.sl_pips
+                            #---sl/tp
+                            sl_pips = tp_pips = cal_price_movement(price, average[self.domain]['sb1']['low'], self.point_size)
                             #---Item
                             item = {
                                 #---General
@@ -350,8 +336,8 @@ class Ali_PoolBack:
                                 "father_id": father_id,
                                 "step": step,
                                 "execute_id": self.execute_id,
-                                "tp_pips": self.tp_pips, 
-                                "sl_pips": self.sl_pips,
+                                "tp_pips": tp_pips, 
+                                "sl_pips": sl_pips,
                                 "digits": self.digits, 
                                 "point_size": self.point_size,
                                 #---Data
@@ -369,9 +355,7 @@ class Ali_PoolBack:
                             action = "sell"
                             price, amount = cal_size(balance=self.balance, action=action, ask=ask, bid=bid, pips=self.sl_pips, risk=self.risk, digits=self.digits, amount=self.amount,point_size=self.point_size)
                             #---sl
-                            self.sl_pips  = cal_price_movement(price, average[self.domain]['sb1']['high'], self.point_size)
-                            #---tp
-                            self.tp_pips = self.sl_pips
+                            sl_pips = tp_pips  = cal_price_movement(price, average[self.domain]['sb1']['high'], self.point_size)
                             #---Item
                             item = {
                                 #---General
@@ -380,15 +364,15 @@ class Ali_PoolBack:
                                 "father_id": father_id,
                                 "step": step,
                                 "execute_id": self.execute_id,
-                                "tp_pips": self.tp_pips, 
-                                "sl_pips": self.sl_pips,
+                                "tp_pips": tp_pips, 
+                                "sl_pips": sl_pips,
                                 "digits": self.digits, 
                                 "point_size": self.point_size,
                                 #---Data
                                 "symbol": symbol, 
                                 "action": action, 
                                 "amount": amount, 
-                                "date": date,
+                                "date":date,
                                 "ask": price,
                                 "bid": price,
                             }
@@ -455,7 +439,7 @@ class Ali_PoolBack:
             if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
             #------Data
             table = get_tbl_name(self.symbol, self.time_frame)
-            cmd = f"SELECT id, date, askclose, bidclose FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
+            cmd = f"SELECT id, date, askopen, bidopen FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
             data = self.data_sql.db.items(cmd=cmd).data
             #------DF
             self.data_df = self.load_df(symbol=self.symbol, time_frame=self.time_frame, date_from=self.date_from, date_to=self.date_to)
@@ -585,19 +569,21 @@ class Ali_PoolBack:
     #---------------------------------------------load_df
     def load_df(
             self,
-            symbol:str,
-            time_frame:str,
-            date_from:datetime=None,
-            date_to:datetime=None
+            symbol: str,
+            time_frame: str,
+            date_from: datetime,
+            date_to: datetime
         ):
         #--------------Description
-        # IN     : symbol | time_frame
+        # IN     : symbol | time_frame | date_from | date_to
         # OUT    : pandas data
         # Action : 
         #--------------Variable
         df = None
         #--------------Data
         table = get_tbl_name(symbol, time_frame)
+        max_period = max(self.period.values())
+        date_from = date_from - timedelta(minutes=self.time_frame_value.get(time_frame)*max_period)
         #--------------Action
         cmd = f"SELECT id,date,bidopen,bidclose,bidhigh,bidlow,askopen,askclose,askhigh,asklow FROM {table} WHERE date>='{date_from}' and date<='{date_to}' ORDER BY date ASC"
         result = self.data_sql.db.items(cmd=cmd).data
@@ -618,7 +604,7 @@ class Ali_PoolBack:
         # OUT    : high | low
         # Action : این متد یک دیت می‌گیرد یک عدد می‌گیرد و یک تایم فریم می‌گیرد و های و لو آن بازه را برای ما برمی‌گرداند
         #--------------Data
-        domain = count * self.time_frame_multipliers.get(time_frame, 1)
+        domain = count * self.time_frame_value.get(time_frame)
         date_to = date
         date_from = date - timedelta(minutes=domain)
         #--------------Action

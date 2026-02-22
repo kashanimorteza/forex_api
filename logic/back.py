@@ -670,7 +670,7 @@ class Logic_Back:
             if profit>0:
                 loss_price = cal_price(price_open, -self.sl_pips, self.digits, self.point_size)
                 p_loss, _ = cal_profit(action, amount, price_open, loss_price, loss_price, digits, point_size)
-                rr = abs(float(f"{profit/p_loss:.{2}f}"))
+                if p_loss != 0: rr = abs(float(f"{profit/p_loss:.{2}f}"))
             #------ Database
             cmd = f"UPDATE back_order SET date_close='{date}', price_close={price_close}, profit={profit}, result='{result}', rr='{rr}', status='close' WHERE id='{id}'"
             result_database:model_output = self.management_sql.db.execute(cmd=cmd)

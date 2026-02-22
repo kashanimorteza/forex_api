@@ -176,10 +176,12 @@ def cal_profit(action, amount, price_open, ask, bid, digits, point_size)-> model
     #--------------Action
     if action == "buy" :
         price_close = bid 
-        profit = (bid - price_open) * amount
+        difference = (bid - price_open)
     if action == "sell" : 
         price_close = ask
-        profit = (price_open - ask) * amount
+        difference = (price_open - ask)
+    
+    profit = 100000 * difference * amount
     profit = float(f"{profit:.{2}f}")
     #--------------Return
     return profit, price_close
