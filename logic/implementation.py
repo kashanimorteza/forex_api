@@ -393,9 +393,21 @@ class Logic_Implementation:
                 )
                 self.data_orm.add(model=model, item=item)
                 #-------------- ali_poolback
-                #item-1
+                #m1
                 item =model(
-                    name='EUR/USD',
+                    name='EUR/USD - m1',
+                    strategy_id=4,
+                    symbols='EUR/USD',
+                    actions='buy,sell',
+                    amount=1,
+                    tp_pips=40, 
+                    sl_pips=20,
+                    params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+                )
+                self.data_orm.add(model=model, item=item)
+                #m5
+                item =model(
+                    name='EUR/USD - m5',
                     strategy_id=4,
                     symbols='EUR/USD',
                     actions='buy,sell',
@@ -403,6 +415,42 @@ class Logic_Implementation:
                     tp_pips=40, 
                     sl_pips=20,
                     params="{'name': 'poolback_4x', 'time_frame': 'm5', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+                )
+                self.data_orm.add(model=model, item=item)
+                #m15
+                item =model(
+                    name='EUR/USD - m15',
+                    strategy_id=4,
+                    symbols='EUR/USD',
+                    actions='buy,sell',
+                    amount=1,
+                    tp_pips=40, 
+                    sl_pips=20,
+                    params="{'name': 'poolback_4x', 'time_frame': 'm15', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+                )
+                self.data_orm.add(model=model, item=item)
+                #m30
+                item =model(
+                    name='EUR/USD - m30',
+                    strategy_id=4,
+                    symbols='EUR/USD',
+                    actions='buy,sell',
+                    amount=1,
+                    tp_pips=40, 
+                    sl_pips=20,
+                    params="{'name': 'poolback_4x', 'time_frame': 'm30', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+                )
+                self.data_orm.add(model=model, item=item)
+                #h1
+                item =model(
+                    name='EUR/USD - h1',
+                    strategy_id=4,
+                    symbols='EUR/USD',
+                    actions='buy,sell',
+                    amount=1,
+                    tp_pips=40, 
+                    sl_pips=20,
+                    params="{'name': 'poolback_4x', 'time_frame': 'h1', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
                 )
                 self.data_orm.add(model=model, item=item)
             #--------------Output
@@ -523,7 +571,11 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=7, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 self.data_orm.add(model=model, item=model(name="Test-1", strategy_item_id=8, account_id=1, profit_manager_id=5, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2026-01-01 00:00:00"))
                 #-------------- ali_poolback
-                self.data_orm.add(model=model, item=model(name="2026-02", strategy_item_id=10, account_id=1, profit_manager_id=1, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2027-01-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="m1", strategy_item_id=10, account_id=1, profit_manager_id=1, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2027-01-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="m5", strategy_item_id=11, account_id=1, profit_manager_id=1, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2027-01-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="m15", strategy_item_id=12, account_id=1, profit_manager_id=1, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2027-01-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="m30", strategy_item_id=13, account_id=1, profit_manager_id=1, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2027-01-01 00:00:00"))
+                self.data_orm.add(model=model, item=model(name="h1", strategy_item_id=14, account_id=1, profit_manager_id=1, money_management_id=1, date_from="2025-12-01 00:00:00", date_to="2027-01-01 00:00:00"))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
