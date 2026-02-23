@@ -108,8 +108,8 @@ forex_connect:
   acc-history2:
     broker    : 'fxcm'
     type      : 'Demo'
-    username  : '52032860'
-    password  : 'aq8iwnf'
+    username  : '52067322'
+    password  : '1ezvcyi'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'
     key       : ''
   acc-live:
