@@ -20,20 +20,20 @@ Ichimoku Dual Cloud Switch Backtest
 <br><br>
 
 ## Parameters
-
-<!----------------name--->
-#### name
-این پارامتر برای تعیین نام استراتژی می‌باشد
+<!----------------block--->
+#### block
+block
 ```python
-name='poolback_4x'
+block='m1'
 ```
-<!----------------time_frame--->
+
+<!----------------attention--->
 <br>
 
-#### time_frame
-تایم‌فریم
+#### attention
+attention
 ```python
-time_frame='m1'
+attention='m1'
 ```
 <!----------------region--->
 <br>
@@ -41,7 +41,7 @@ time_frame='m1'
 #### region
 برای تعیین نوع تایم می‌باشد
 ```python
-region='UTC'
+region='utc'
 ```
 <!----------------time_from--->
 <br>

@@ -242,7 +242,7 @@ class Logic_Implementation:
                 self.data_orm.add(model=model, item=model(name='Dowjones', description='Every day at 16:30'))
                 self.data_orm.add(model=model, item=model(name='OneWay', description='Buy|Sell'))
                 self.data_orm.add(model=model, item=model(name='Floating', description='Buy&Sell   if p>0:same   if p<0:reverse'))
-                self.data_orm.add(model=model, item=model(name='Ali_PoolBack', description=''))
+                self.data_orm.add(model=model, item=model(name='Ali_PullBack', description=''))
             #--------------Output
             output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"Drop:{drop} | Create:{create} | Truncate:{truncate} | Add:{add}"
@@ -392,7 +392,7 @@ class Logic_Implementation:
                     params=""
                 )
                 self.data_orm.add(model=model, item=item)
-                #-------------- ali_poolback
+                #-------------- ali_pullback
                 #m1
                 item =model(
                     name='EUR/USD - m1',
@@ -402,7 +402,7 @@ class Logic_Implementation:
                     amount=1,
                     tp_pips=40, 
                     sl_pips=20,
-                    params="{'name': 'poolback_4x', 'time_frame': 'm1', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+                    params="{'block': 'm1', 'attention': 'm1', 'region': 'utc', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
                 )
                 self.data_orm.add(model=model, item=item)
                 #m5
@@ -414,7 +414,7 @@ class Logic_Implementation:
                     amount=1,
                     tp_pips=40, 
                     sl_pips=20,
-                    params="{'name': 'poolback_4x', 'time_frame': 'm5', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+                    params="{'block': 'm5', 'attention': 'm5', 'region': 'utc', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
                 )
                 self.data_orm.add(model=model, item=item)
                 #m15
@@ -426,7 +426,7 @@ class Logic_Implementation:
                     amount=1,
                     tp_pips=40, 
                     sl_pips=20,
-                    params="{'name': 'poolback_4x', 'time_frame': 'm15', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+                    params="{'block': 'm15', 'attention': 'm15', 'region': 'utc', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
                 )
                 self.data_orm.add(model=model, item=item)
                 #m30
@@ -438,7 +438,7 @@ class Logic_Implementation:
                     amount=1,
                     tp_pips=40, 
                     sl_pips=20,
-                    params="{'name': 'poolback_4x', 'time_frame': 'm30', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+                    params="{'block': 'm30', 'attention': 'm30', 'region': 'utc', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
                 )
                 self.data_orm.add(model=model, item=item)
                 #h1
@@ -450,7 +450,7 @@ class Logic_Implementation:
                     amount=1,
                     tp_pips=40, 
                     sl_pips=20,
-                    params="{'name': 'poolback_4x', 'time_frame': 'h1', 'region': 'UTC', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
+                    params="{'block': 'h1', 'attention': 'h1', 'region': 'utc', 'time_from': '00:00:00', 'time_to': '21:00:00', 'max_order': 1, 'domain': 10, 'period': {'t1': 9, 'k1': 26, 'sb1': 78, 't2': 36, 'k2': 104, 'sb2': 234}}"
                 )
                 self.data_orm.add(model=model, item=item)
             #--------------Output
