@@ -62,7 +62,7 @@ def load_forex_api():
         if account.name !="back" and account.broker.lower() == "fxcm":
             fxcm_api = Fxcm_API(account_info=account.toDict())
             forex_apis[account.id] = fxcm_api
-            #fxcm_api.login()
+            fxcm_api.login()
 
 #-------------------------- load_instrument
 def load_instrument():
