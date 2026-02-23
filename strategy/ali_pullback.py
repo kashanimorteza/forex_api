@@ -624,7 +624,7 @@ class Ali_PullBack:
         #--------------return
         return high, low
 
-    #---------------------------------------------attention
+    #---------------------------------------------atr
     def atr(
             self,
             date: datetime,
