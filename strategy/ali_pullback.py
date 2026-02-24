@@ -387,7 +387,7 @@ class Ali_PullBack:
             self.log.verbose("err", f"{self.this_class} | {this_method}", str(e))
             self.log.log("err", f"{self.this_class} | {this_method}", str(e))
         #--------------Output
-        #output.time = sort(f"{(time.time() - start_time):.3f}", 7)
+        output.time = sort(f"{(time.time() - start_time):.3f}", 7)
         output.time = None
         output.data = items
         output.message = None
@@ -439,9 +439,8 @@ class Ali_PullBack:
             logic_back.load(params=self.params)
             logic_back.step= step
             #------Verbose
-            output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.message = f"exi({self.execute_id}) | sym({self.symbol}) | stp({step})"
-            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} | {output.time}", output.message)
+            if verbose : self.log.verbose("rep", f"{sort(self.this_class, 15)} | {sort(this_method, 25)} |        ", output.message)
             #------Data
             table = get_tbl_name(self.symbol, 't1')
             cmd = f"SELECT id, date, ask, bid FROM {table} WHERE date>='{self.date_from}' and date<='{self.date_to}' ORDER BY date ASC"
@@ -456,20 +455,16 @@ class Ali_PullBack:
             for row in data:
                 #------price_data
                 logic_back.date = row[1]
-                logic_back.ask = float(row[2])
-                logic_back.bid = float(row[3])
+                logic_back.ask = row[2]
+                logic_back.bid = row[3]
                 #------check_pending_order
-                if len(logic_back.list_order_pending)>0 : 
-                    logic_back.check_pending_order()
+                if len(logic_back.list_order_pending)>0 : logic_back.check_pending_order()
                 #------check_profit_manager
-                if len(logic_back.list_order_open)>0 : 
-                    logic_back.check_profit_manager()
+                if len(logic_back.list_order_open)>0 : logic_back.check_profit_manager()
                 #------check_tp_sl
-                if len(logic_back.list_order_open)>0 : 
-                    logic_back.check_tp_sl()
+                if len(logic_back.list_order_open)>0 : logic_back.check_tp_sl()
                 #------check_limit
-                if len(logic_back.list_order_open)>0 : 
-                    logic_back.check_limit()
+                if len(logic_back.list_order_open)>0 : logic_back.check_limit()
                 #------balance_update
                 self.balance = logic_back.balance
                 self.equity = logic_back.equity
@@ -498,11 +493,9 @@ class Ali_PullBack:
                         ask=logic_back.ask,
                         bid=logic_back.bid
                     )
-                    if result.data : 
-                        logic_back.action(items=result.data)
+                    if result.data : logic_back.action(items=result.data)
                 #------order_open_accept
-                if not logic_back.order_open_accept : 
-                    break
+                if not logic_back.order_open_accept : break
             #--------------Stop
             result = self.stop(father_id=-1, step=step)
             if result.data : logic_back.action(items=result.data)
@@ -652,4 +645,53 @@ class Ali_PullBack:
             if t.minute % attention_value == 0 and t.second == 0:
                 output = True
         #--------------return
+        return output
+    
+    #---------------------------------------------test
+    def test(self):
+        #--------------Description
+        # IN     : symbol | time_frame | date_from | date_to
+        # OUT    : pandas data
+        # Action : 
+        #--------------Variable
+        output = None
+        #--------------Data
+        table = get_tbl_name("EUR/USD", "m1")
+
+        #--------------Data
+        start_time = time.time()
+        cmd = f"SELECT * FROM {table}"
+        data = self.data_sql.db.items(cmd=cmd).data
+        duration = sort(f"{(time.time() - start_time):.3f}", 7)
+        print(f"Select Data: {duration}")
+
+        #--------------Peymayesh
+        start_time = time.time()
+        for row in data:
+            pass
+        duration = sort(f"{(time.time() - start_time):.3f}", 7)
+        print(f"Peymayesh | Normal : {duration}")
+
+        #--------------Peymayesh | Normal
+        start_time = time.time()
+        for row in data:
+            #------price_data
+            date = row[1]
+            ask = row[2]
+            bid = row[3]
+        duration = sort(f"{(time.time() - start_time):.3f}", 7)
+        print(f"Peymayesh | Normal : {duration}")
+
+        #--------------Peymayesh | Float
+        start_time = time.time()
+        for row in data:
+            #------price_data
+            date = row[1]
+            ask = float(row[2])
+            bid = float(row[3])
+        duration = sort(f"{(time.time() - start_time):.3f}", 7)
+        print(f"Peymayesh | Float : {duration}")
+
+        time.sleep(100)
+        #--------------Return
         return output

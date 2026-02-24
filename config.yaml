@@ -270,13 +270,9 @@ debug:
     back_run: {log: false, verbose: true, model: "Dowjones"}
     back_next: {log: false, verbose: true, model: "Dowjones"}
     back: {log: false, verbose: true, model: "Dowjones"}
-  ST_04:
-    start: {log: false, verbose: true, model: "ST_04"}
-    stop: {log: false, verbose: true, model: "ST_04"}
-    order_close: {log: false, verbose: true, model: "ST_04"}
-    price_change: {log: false, verbose: true, model: "ST_04"}
-  ST_05:
-    start: {log: false, verbose: true, model: "ST_05"}
-    stop: {log: false, verbose: true, model: "ST_05"}
-    order_close: {log: false, verbose: true, model: "ST_05"}
-    price_change: {log: false, verbose: true, model: "ST_05"}
+  Ali_PullBack:
+    start: {log: false, verbose: true, model: "Ali_PullBack"}
+    stop: {log: false, verbose: true, model: "Ali_PullBack"}
+    order_action: {log: false, verbose: false, model: "Ali_PullBack"}
+    price_change: {log: false, verbose: false, model: "Ali_PullBack"}
+    back: {log: false, verbose: true, model: "Ali_PullBack"}
