@@ -286,6 +286,7 @@ class Logic_Live:
                         insert += 1
                         query += f"('{row['Date']}',{row['Bid']},{row['Ask']}),"
                     if iter > 0 : query = query[:-1]
+                    query = f"{query} ON CONFLICT (date) DO NOTHING"
                     result = self.data_sql.db.execute(query)
                     if not result.status : insert = 0
                 else:
@@ -300,6 +301,7 @@ class Logic_Live:
                         insert += 1
                         query += f"('{row['Date']}',{row['BidOpen']},{row['BidClose']},{row['BidHigh']},{row['BidLow']},{row['AskOpen']},{row['AskClose']},{row['AskHigh']},{row['AskLow']}),"
                     if iter > 0 : query = query[:-1]
+                    query = f"{query} ON CONFLICT (date) DO NOTHING"
                     result = self.data_sql.db.execute(query)
                     if not result.status : insert = 0
                 else:
