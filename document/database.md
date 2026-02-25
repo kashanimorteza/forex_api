@@ -126,6 +126,12 @@ GRANT pg_read_server_files TO forex;
 <br><br>
 
 ## Backup 
+<!-------------------------- flash -->
+```bash
+sudo mkdir -p /mnt/usb
+sudo umount /mnt/usb
+sudo mount -o uid=postgres,gid=postgres /dev/sde1 /mnt/usb
+```
 <!-------------------------- simple -->
 simple
 ```bash
@@ -160,7 +166,8 @@ pg_dump --dbname=forex --verbose --no-owner --table=public.xauusd_t1 | pigz > ba
 simple
 ```bash
 sudo mkdir -p /mnt/usb
-sudo mount /dev/sdb1 /mnt/usb
+sudo umount /mnt/usb
+sudo mount -o uid=postgres,gid=postgres /dev/sde1 /mnt/usb
 ```
 ```bash
 sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f /mnt/usb/backup_2025-12-31.sql
