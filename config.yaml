@@ -96,7 +96,7 @@ log:
 
 #--------------------------------------------------------------------------------- FXCM
 forex_connect:
-  default: acc-history1
+  default: acc-history4
   delay: 0.5
   acc-history1:
     broker    : 'fxcm'
@@ -157,18 +157,18 @@ forex_connect:
 
 #--------------------------------------------------------------------------------- Download
 download:
-  instrument: XAU/USD
+  instrument: EUR/USD
   timeframe: t1
   mode: complete
   count: 1000
   repeat: 1
   delay: 0
   save: True
-  bulk: False
+  bulk: True
   clear: False
   dedicate: False
-  datefrom: '1993-01-01 00:00:00'
-  dateto: '2030-01-01 21:00:00'
+  datefrom: '2025-12-31 00:00:00'
+  dateto: '2026-01-01 00:00:00'
   
 #--------------------------------------------------------------------------------- instrument
 instrument:
