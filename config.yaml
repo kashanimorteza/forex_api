@@ -112,6 +112,34 @@ forex_connect:
     password  : '1ezvcyi'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'
     key       : ''
+  acc-history3:
+    broker    : 'fxcm'
+    type      : 'Demo'
+    username  : '52067927'
+    password  : 'ea7aglo'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : ''
+  acc-history4:
+    broker    : 'fxcm'
+    type      : 'Demo'
+    username  : '52067930'
+    password  : 'uzob0he'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : ''
+  acc-history5:
+    broker    : 'fxcm'
+    type      : 'Demo'
+    username  : '52067933'
+    password  : 'lxq2kuv'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : ''
+  acc-history6:
+    broker    : 'fxcm'
+    type      : 'Demo'
+    username  : '52067934'
+    password  : '5qwivnd'
+    url       : 'http://www.fxcorporate.com/Hosts.jsp'
+    key       : ''
   acc-live:
     broker    : 'fxcm'
     type      : 'Demo'
@@ -119,7 +147,7 @@ forex_connect:
     password  : 'iaee0at'
     url       : 'http://www.fxcorporate.com/Hosts.jsp'
     key       : ''
-  acc-trade:
+  acc-history:
     broker    : 'fxcm'
     type      : 'Demo'
     username  : '52047997'
