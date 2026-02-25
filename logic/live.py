@@ -288,7 +288,7 @@ class Logic_Live:
                     if iter > 0 : query = query[:-1]
                     query = f"{query} ON CONFLICT (date) DO NOTHING"
                     result = self.data_sql.db.execute(query)
-                    if not result.status : insert = 0
+                    insert = result.data
                 else:
                     for index, row in data.iloc[::-1].iterrows():
                         iter += 1
@@ -303,7 +303,7 @@ class Logic_Live:
                     if iter > 0 : query = query[:-1]
                     query = f"{query} ON CONFLICT (date) DO NOTHING"
                     result = self.data_sql.db.execute(query)
-                    if not result.status : insert = 0
+                    insert = result.data
                 else:
                     for index, row in data.iloc[::-1].iterrows(): 
                         iter += 1

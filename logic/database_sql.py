@@ -130,7 +130,7 @@ class Database_SQL:
         try:
             #--------------Action
             result = self.cursor.execute(cmd)
-            result = self.cursor.fetchone()
+            result = self.cursor.statusmessage
             #--------------Output 
             output.time = sort(f"{(time.time() - start_time):.3f}", 7)
             output.data = result
