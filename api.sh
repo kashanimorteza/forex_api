@@ -518,7 +518,7 @@ service_create_webapi()
 
     [Service]
     User=root
-    WorkingDirectory=$path/.myenv/bin
+    WorkingDirectory=$path/
     ExecStart=uvicorn api:app --host $api_host --port $api_port --workers $api_workers --log-level warning
     SuccessExitStatus=143
     TimeoutStopSec=10
