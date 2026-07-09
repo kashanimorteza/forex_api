@@ -135,7 +135,7 @@ sudo mount -o uid=postgres,gid=postgres /dev/sde1 /mnt/usb
 <!-------------------------- simple -->
 simple
 ```bash
-sudo -u postgres pg_dump -v -O -d forex -f /mnt/usb/backup_2026-01-01.sql
+sudo -u postgres pg_dump -v -O -d forex -f /mnt/usb/backup_2026-02-26.sql
 ```
 ```bash
 sudo -u postgres pg_dump -v -O -d forex forex -t public.xauusd_t1 -f backup_xauusd_t1_2025-12-14.sql
@@ -167,10 +167,10 @@ simple
 ```bash
 sudo mkdir -p /mnt/usb
 sudo umount /mnt/usb
-sudo mount -o uid=postgres,gid=postgres /dev/sde1 /mnt/usb
+sudo mount -o uid=postgres,gid=postgres /dev/sdb1 /mnt/usb
 ```
 ```bash
-sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f /mnt/usb/backup_2025-12-31.sql
+sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f /mnt/usb/backup_2026-02-26.sql
 ```
 ```bash
 sudo -u postgres psql -d forex -v ON_ERROR_STOP=1 -f backup_xauusd_t1_2025-12-31.sql

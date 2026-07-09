@@ -82,3 +82,18 @@ except Exception as e:
 
 
 #if clear : if os.path.exists(f"{root_dir}/History"): shutil.rmtree(f"{root_dir}/History")
+
+
+# python3.7 download.py account=acc-history1 instrument=AUD/CAD timeframe=t1 mode=complete save=True bulk=True dedicate=False clear=False count=100000 datefrom='2026-01-01 00:00:00' dateto='2026-01-16 11:27:49'
+
+# python3.7 download.py account=acc-history2 instrument=AUD/JPY timeframe=t1 mode=complete save=True bulk=True dedicate=False clear=False count=100000 datefrom='2026-01-01 00:00:00' dateto='2026-02-25 08:25:28'
+
+# python3.7 download.py account=acc-history3 instrument=AUD/USD timeframe=t1 mode=complete save=True bulk=True dedicate=False clear=False count=100000 datefrom='2026-01-01 00:00:00' dateto='2026-01-13 14:55:03'
+
+# python3.7 download.py account=acc-history4 instrument=GBP/NZD timeframe=t1 mode=complete save=True bulk=True dedicate=False clear=False count=100000 datefrom='2026-01-01 00:00:00' dateto='2026-01-07 22:50:08'
+
+# python3.7 download.py account=acc-history5 instrument=GBP/AUD timeframe=t1 mode=complete save=True bulk=True dedicate=False clear=False count=100000 datefrom='2026-01-01 00:00:00' dateto='2026-01-23 10:22:45'
+
+# python3.7 download.py account=acc-history6 instrument=GBP/CAD timeframe=t1 mode=complete save=True bulk=True dedicate=False clear=False count=100000 datefrom='2026-01-01 00:00:00' dateto='2026-01-21 06:28:3'
+
+akharin asset k raft to list download : audjpy

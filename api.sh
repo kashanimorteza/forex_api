@@ -409,8 +409,12 @@ config_python()
     echo -e "${verbose_color}python3.7 -m pip install -r requirements.txt${ENDCOLOR}"
     echo -e "${verbose_color}python3.7 -m pip list${ENDCOLOR}"
     #----------Action
-    python3.7 -m pip install --upgrade pip
-    python3.7 -m pip install -r requirements.txt
+    python3.7 -m venv .myenv
+    .myenv/bin/python -m pip install --upgrade pip
+    source .myenv/bin/activate
+    pip install -r requirements.txt
+    #python3.7 -m pip install --upgrade pip
+    #python3.7 -m pip install -r requirements.txt
     python3.7 -m pip uninstall pytz -y
     python3.7 -m pip install pytz==2023.3
     python3.7 -m pip list
@@ -514,7 +518,7 @@ service_create_webapi()
 
     [Service]
     User=root
-    WorkingDirectory=$path/
+    WorkingDirectory=$path/.myenv/bin
     ExecStart=uvicorn api:app --host $api_host --port $api_port --workers $api_workers --log-level warning
     SuccessExitStatus=143
     TimeoutStopSec=10
